@@ -102,6 +102,20 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 		}
 
 		$newsletter = $this->record;
+		
+		// HACK JOCHEN. ADDING ATTACHMENTS
+		$attachment = $newsletter->Attachment();
+
+		if ( $attachment ) {
+			$file =  $attachment->getFullPath();
+			// We check the filesize in bytes in order to see if the file realy exists
+			if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+				$email->attachFile( $file, $file );
+			}
+		}
+		// END ATTACHMENTS
+		
+		
 		$email = new NewsletterEmail($newsletter, $recipient, true);
 		$email->send();
 
