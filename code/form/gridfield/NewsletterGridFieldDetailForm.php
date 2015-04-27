@@ -103,6 +103,8 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
 		$newsletter = $this->record;
 		
+		
+		$email = new NewsletterEmail($newsletter, $recipient, true);
 		// HACK JOCHEN. ADDING ATTACHMENTS
 		$attachment = $newsletter->Attachment();
 
@@ -116,7 +118,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 		// END ATTACHMENTS
 		
 		
-		$email = new NewsletterEmail($newsletter, $recipient, true);
+		
 		$email->send();
 
 		return Controller::curr()->redirectBack();
