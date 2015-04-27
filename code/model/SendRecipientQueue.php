@@ -55,7 +55,20 @@ class SendRecipientQueue extends DataObject {
 				$recipient
 			);
 			if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
+			
+			
+			// HACK JOCHEN. ADDING ATTACHMENTS
+			$attachment = $newsletter->Attachment();
 
+			if ( $attachment ) {
+				$file =  $attachment->getFullPath();
+				// We check the filesize in bytes in order to see if the file realy exists
+				if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+					$email->attachFile( $file, $file );
+				}
+			}
+			// END ATTACHMENTS
+			
 			$success = $email->send();
 
 			if ($success) {

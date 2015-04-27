@@ -207,6 +207,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
 				)
 			);
 		}
+		
+		
 
 		if($this->Status === 'Sending' || $this->Status === 'Sent') {
 			//make the whole field read-only

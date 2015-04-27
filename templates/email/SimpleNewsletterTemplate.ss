@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<% base_tag %>
 		<title>$Subject</title>
@@ -67,7 +68,7 @@
 			.bodyContent div{
 				color:#000000;
 				font-family:'Lucida Sans Unicode',sans-serif,Verdana,Arial;
-				font-size:13pt;
+				font-size:10pt;
 				line-height:140%;
 				text-align:left;
 			}
@@ -87,33 +88,150 @@
 			}
 		</style>
 	</head>
-	<body sytle="width:100% !important; -webkit-text-size-adjust:none;margin:0; padding:0;background-color:#FFFFFF;" leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
+	<body style="width:100% !important; -webkit-text-size-adjust:none;margin:0; padding:0;background-color:#FFFFFF;" leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
 		<center>
-			<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="backgroundTable" sytle="height:100% !important; margin:0; padding:0; width:100% !important; background-color:#FFFFFF;">
+
+		<table border="0" cellpadding="0" width="600" align="center">
+			<tbody>
+				
 				<tr>
-					<td align="center" valign="top" sytle="border-collapse:collapse;">
-						<table border="0" cellpadding="0" cellspacing="0" width="751" id="templateContainer" sytle="border: 1px solid #B29E80;background-color:#161616;">
-							<% include NewsletterHeader %>
-							<tr>
-								<td align="center" valign="top" sytle="border-collapse:collapse;">
-									<table border="0" cellpadding="20" cellspacing="0" width="751" id="templateBody" style="background-color:#FFFFFF;">
-										<tr>
-											<td valign="top" class="bodyContent" sytle="border-collapse:collapse;">
-												<div sytle="color:#000000;font-family:'Lucida Sans Unicode',sans-serif,Verdana,Arial;font-size:13pt;line-height:140%;text-align:left;">
-													$Body
-												</div>
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-							<% include NewsletterFooter %>
-						</table>
-						<br />
+					<td>
+						<img src="https://dl.dropboxusercontent.com/u/84613485/temp/SKODA-header.jpg" alt="Header" tabindex="0" />
+						<!-- <img src="{$Up.absoluteBaseURL}themes/bootstrap/img/SKODA-header.jpg" alt="Header" tabindex="0" /> -->
 					</td>
 				</tr>
-			</table>
-			<% include UnsubscribeFooter %>
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				
+				<tr>
+					<td style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+
+						<div style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+							$Body
+						</div>
+						
+						<span>Bei Fragen stehen wir Ihnen unter der unten angegebenen Telefonnummer gerne zur Verfügung.</span><br /><br />
+						
+						<span>Mit den besten Grüßen</span><br /><br />
+						<span>Ihr ŠKODA Fahrerlebnis Team</span>
+							
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				
+				
+				<!-- Footer -->
+				
+				<tr>
+					<td style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+						<span style="color:#4aa82d"><strong>ŠKODA Fahrerlebnisse</strong><br /></span>
+						<span>Operated by lmc.communication GmbH</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				<tr>
+					<td style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+						<span>Relenbergstraße 88<br /></span>
+						<span>70174 Stuttgart</span>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+
+				<tr>
+					<td style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+						<table border="0" cellpadding="0" width="100%" style="width:600px">
+							<tbody>
+								<tr>
+									<td style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;"width="10%">
+										<span>Tel.:</span>
+									</td>
+									<td style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+										<span><a href="tel:+49711389500347" value="+49711389500347" target="_blank">+49 711 389 500 347</a></span>
+									</td>
+								</tr>
+								<tr>
+									<td valign="top" style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+										<span>E-Mail:</span>
+									</td>
+									<td valign="top" style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+										<span><a href="mailto:fahrerlebnisse@skoda-events.de" target="_blank"><span style="text-decoration:none">fahrerlebnisse@skoda-events.de</span></a></span>
+									</td>
+								</tr>
+								<tr>
+									<td valign="top" style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+										<span>Web:</span>
+									</td>
+									<td valign="top" style="padding:0.75pt; color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+										<span><a href="http://skoda-fahrerlebnis.de" target="_blank"><span style="text-decoration:none"> skoda-fahrerlebnis.de</span></a></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+					
+				</tr>
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				
+				<tr>
+					<td style="padding:0.75pt">
+						<img border="0" src="https://dl.dropboxusercontent.com/u/84613485/temp/logo_fe_2013.jpg" alt="logo" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				<tr>
+					<td style="color:#000000;font-family:Verdana,Arial;font-size:10pt;line-height:140%;text-align:left;">
+						<span>Geschäftsführung: Oliver Langjahr<br /></span>
+						<span>Handelsregister: Amtsgericht Stuttgart HRB 23256</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img border="0" width="600" height="95" src="https://dl.dropboxusercontent.com/u/84613485/temp/skoda_2015_footer.jpg" alt="footer" />
+					</td>
+				</tr>
+				
+			</tbody>
+		</table>
 		</center>
 	</body>
 </html>
