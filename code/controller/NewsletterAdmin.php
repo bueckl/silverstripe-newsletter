@@ -11,6 +11,7 @@ class NewsletterAdmin extends ModelAdmin {
 	private static $url_segment = 'newsletter';
 	private static $menu_title = 'Newsletter';
 	private static $menu_icon = 'newsletter/images/newsletter-icon.png';
+	public $showImportForm = false;
 
 	private static $managed_models = array(
 		"Newsletter" => array('title' => 'Newsletters'),
