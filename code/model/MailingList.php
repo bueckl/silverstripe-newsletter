@@ -25,7 +25,9 @@ class MailingList extends DataObject {
 	private static $singular_name = 'Mailinglist';
 
 	private static $plural_name = 'Mailinglists';
-
+	
+	private static $default_sort = 'ID DESC';
+	
 	private static $summary_fields = array(
 		'Title',
 		'ActiveRecipients.Count'

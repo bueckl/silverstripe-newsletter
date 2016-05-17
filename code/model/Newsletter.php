@@ -196,6 +196,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
 				new HiddenField('RenderTemplate', false, key($templateSource))
 			);
 		}
+		
+		
+		// JOCHEN TODO: This is where we could hook in to apply further filters on the mailing list
+		// http://takeaway.bigfork.co.uk/a-beginners-introduction-to-using-entwine-in-silverstripe
 
 		if($this && $this->exists()){
 			$fields->removeByName("MailingLists");
