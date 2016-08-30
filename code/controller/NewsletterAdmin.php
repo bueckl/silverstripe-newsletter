@@ -25,7 +25,7 @@ class NewsletterAdmin extends ModelAdmin {
 	 */	
 	static $template_paths = null; //could be customised in _config.php
 
-	public function init() {
+	public function init() { 
 		parent::init();
 
 		Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
@@ -35,7 +35,6 @@ class NewsletterAdmin extends ModelAdmin {
 
 	public function getEditForm($id = null, $fields = null) {
 		$form = parent::getEditForm($id, $fields);
-
 		//custom handling of the newsletter modeladmin with a specialized action menu for the detail form
 		if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent") {
 			$config = $form->Fields()->first()->getConfig();
@@ -50,12 +49,21 @@ class NewsletterAdmin extends ModelAdmin {
 			));
 		}
 		if($this->modelClass == "Recipient") {
+			
 			$config = $form->Fields()->first()->getConfig();
 			$config->getComponentByType('GridFieldDataColumns')
 				->setFieldCasting(array(
 					"Blacklisted" => "Boolean->Nice",
 					"Verified" => "Boolean->Nice",
 			));
+			
+			// $config->removeComponentsByType('GridFieldDetailForm')
+// 				->addComponents(new GridFieldDetailFormRecipient());
+//
+// 			if($gridField = $config->getComponentByType('GridFieldDetailFormRecipient')) {
+// 				$gridField->setItemRequestClass('GridFieldDetailFormRecipient_ItemRequest');
+// 			}
+			
 		}
 		return $form;
 	}

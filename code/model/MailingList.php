@@ -32,7 +32,32 @@ class MailingList extends DataObject {
 		'Title',
 		'ActiveRecipients.Count'
 	);
+	
+	public function requireDefaultRecords() {
+		
+		//parent::requireDefaultRecords();
+		
+		$defaultLists =  MailingList::create();
+		$defaultLists->ID = 1;
+		$defaultLists->Title = 'Visitors Mailing List';
+		$defaultLists->write();
+		
+		$defaultLists->write();
 
+
+		$defaultLists =  MailingList::create();
+		$defaultLists->ID = 2;
+		$defaultLists->Title = 'Exhibitors Mailing List';
+		$defaultLists->write();
+
+		$defaultLists =  MailingList::create();
+		$defaultLists->ID = 3;
+		$defaultLists->Title = 'Subscriber Mailing List';
+		$defaultLists->write();
+
+	}
+	
+	
 	private static $searchable_fields = array(
 		'Title'
 	);
@@ -47,51 +72,56 @@ class MailingList extends DataObject {
 		return $labels;
 	}
 	
+
+			
 	function getCMSFields() {
 		$fields = new FieldList();
 		$fields->push(new TabSet("Root", $mainTab = new Tab("Main")));
 		$mainTab->setTitle(_t('SiteTree.TABMAIN', "Main"));
 
 		$fields->addFieldToTab('Root.Main',
-			new TextField('Title',_t('NewsletterAdmin.MailingListTitle','Mailing List Title')));
-
-		$gridFieldConfig = GridFieldConfig::create()->addComponents(
-			new GridFieldToolbarHeader(),
-			new GridFieldSortableHeader(),
-			$dataColumns = new GridFieldDataColumns(),
-			new GridFieldFilterHeader(),
-			new GridFieldDeleteAction(true),
-			new GridFieldPaginator(30),
-			new GridFieldAddNewButton(),
-			new GridFieldDetailForm(),
-			new GridFieldEditButton(),
-			$autocompelete = new GridFieldAutocompleterWithFilter('before',	array(
-					'FirstName',
-					'MiddleName',
-					'Surname',
-					'Email',
-				)
-			)
+			$TitleField = new TextField('Title',_t('NewsletterAdmin.MailingListTitle','Mailing List Title'))
 		);
+		
 
-		$dataColumns->setFieldCasting(array(
-			"Blacklisted" => "Boolean->Nice",
-			"Verified" => "Boolean->Nice",
-		));
-
-		$autocompelete->filters = array(
-			"Blacklisted" => false,
-		);
-
-		$recipientsGrid = GridField::create(
+		$grid = new GridField(
 			'Recipients',
 			_t('NewsletterAdmin.Recipients', 'Mailing list recipients'),
 			$this->Recipients(),
-			$gridFieldConfig
+			$config = GridFieldConfig::create()
+				->addComponent(new GridFieldButtonRow('before'))
+				->addComponent(new GridFieldToolbarHeader())
+				->addComponent(new GridFieldFilterHeader())
+				->addComponent(new GridFieldSortableHeader())
+				->addComponent(new GridFieldEditableColumns())
+				->addComponent(new GridFieldDeleteAction())
+				->addComponent(new GridFieldRecipientUnlinkAction())
+				->addComponent(new GridFieldEditButton())
+				->addComponent(new GridFieldDetailForm())
+				->addComponent(new GridFieldPaginator(100))
+				->addComponent( $autocomplete = new GridFieldAddExistingAutocompleterCustom('toolbar-header-right'))
+				->addComponent(new GridFieldAddNewButton('toolbar-header-left'))
+
 		);
+		
+		// $config->removeComponentsByType('GridFieldDetailForm')
+// 			->addComponents(new GridFieldDetailFormRecipient());
+//
+// 		if($gridField = $config->getComponentByType('GridFieldDetailFormRecipient')) {
+// 			$gridField->setItemRequestClass('GridFieldDetailFormRecipient_ItemRequest');
+// 		}
+		
+		
+		$autocomplete->setSearchList(Recipient::get());
+		$autocomplete->setSearchFields(array(
+			// 'Surname',
+// 			'Email',
+// 			'Tags.Title'
+		));
+		
+		
 
-
-		$fields->addFieldToTab('Root.Main',new FieldGroup($recipientsGrid));
+		$fields->addFieldToTab('Root.Main',new CompositeField($grid));
 		$this->extend("updateCMSFields", $fields);
 		
 		if(!$this->ID)
@@ -119,6 +149,8 @@ class MailingList extends DataObject {
 		if($this->Recipients()  instanceof UnsavedRelationList ) {
 			return new ArrayList();
 		}
-		return $this->Recipients()->exclude('Blacklisted', 1)->exclude('Verified', 0);
+		//return $this->Recipients()->exclude('Blacklisted', 1)->exclude('Verified', 0);
+		return $this->Recipients();
 	}
 }
+

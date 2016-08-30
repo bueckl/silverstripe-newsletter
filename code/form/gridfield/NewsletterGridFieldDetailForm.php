@@ -43,17 +43,21 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 		return $actions;
 	}
 
-	public function ItemEditForm(){
+	public function ItemEditForm() {
 		$form = parent::ItemEditForm();
 		// Do these action update only when the current record is_a newsletter
 		if($this->record && $this->record instanceof Newsletter) {
 			$form->setActions($this->updateCMSActions($form->Actions()));
 
-			$form->Fields()->push(new HiddenField("PreviewURL", "PreviewURL", $this->LinkPreview()));
+			$form->Fields()->push(
+				new HiddenField("PreviewURL", "PreviewURL", $this->LinkPreview())
+			);
 			// Added in-line to the form, but plucked into different view by LeftAndMain.Preview.js upon load
 			$navField = new LiteralField('SilverStripeNavigator', $this->getSilverStripeNavigator());
 			$navField->setAllowHTML(true);
-			$form->Fields()->push($navField);
+			$form->Fields()->push(
+					FormField::create('Foo',$navField)->addExtraClass('ui-tabs-panel')
+			);
 
 		}
 		return $form;
@@ -61,7 +65,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
 	/**
 	 * Used for preview controls
-	 * 
+	 *
 	 * @return ArrayData
 	 */
 	public function getSilverStripeNavigator() {
@@ -93,7 +97,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 	 */
 	public function emailpreview(SS_HTTPRequest $request = null) {
 		$emailVar = $request->getVar('email');
-		
+
 		$recipient = new Recipient(Recipient::$test_data);
 		if ($request && !empty($emailVar)) {
 			$recipient->Email = Convert::raw2js($emailVar);
@@ -102,23 +106,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 		}
 
 		$newsletter = $this->record;
-		
-		
 		$email = new NewsletterEmail($newsletter, $recipient, true);
-		// HACK JOCHEN. ADDING ATTACHMENTS
-		$attachment = $newsletter->Attachment();
-
-		if ( $attachment ) {
-			$file =  $attachment->getFullPath();
-			// We check the filesize in bytes in order to see if the file realy exists
-			if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-				$email->attachFile( $file, $file );
-			}
-		}
-		// END ATTACHMENTS
-		
-		
-		
 		$email->send();
 
 		return Controller::curr()->redirectBack();
@@ -135,7 +123,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 		}
 	}
 
-	public function doSaveAsNew($data, $form){
+	public function doSaveAsNew($data, $form) {
 		$originalID = $data['NEWSLETTER_ORIGINAL_ID'];
 		$origNewsletter = DataObject::get_by_id("Newsletter", $originalID);
 		$controller = Controller::curr();
@@ -155,7 +143,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 			//save once to get the new Newsletter created so as to add to mailing list
 			$newNewsletter->write($showDebug = false,$forceInsert = true);
 			$origMailinglists = $origNewsletter->MailingLists();
-			if($origMailinglists && $origMailinglists->count()){
+			if($origMailinglists && $origMailinglists->count()) {
 				$newNewsletter->MailingLists()->addMany($origMailinglists);
 			}
 			Newsletter::set_validation_enabled(true);
@@ -182,7 +170,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 					return $controller->redirectBack();
 				}
 			));
-			if($controller->getRequest()->isAjax()){
+			if($controller->getRequest()->isAjax()) {
 				$controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
 			}
 			return $responseNegotiator->respond($controller->getRequest());
@@ -197,7 +185,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 		return Controller::curr()->redirect($link);
 	}
 
-	public function doSend($data, $form){
+	public function doSend($data, $form) {
 		//copied from parent
 		$new_record = $this->record->ID == 0;
 		$controller = Controller::curr();
@@ -217,7 +205,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 					return $controller->redirectBack();
 				}
 			));
-			if($controller->getRequest()->isAjax()){
+			if($controller->getRequest()->isAjax()) {
 				$controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
 			}
 			return $responseNegotiator->respond($controller->getRequest());
@@ -252,7 +240,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 		}
 	}
 
-	public function preview($data){
+	public function preview($data) {
 		return $this->record->render();
 	}
 }

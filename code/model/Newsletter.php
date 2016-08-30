@@ -16,6 +16,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 		"SendFrom"				=> "Varchar(255)",
 		"ReplyTo"				=> "Varchar(255)",
 		"RenderTemplate"		=> "Varchar",
+		"ExcludeParams"			=> "Varchar(255)"
 	);
 
 	private static $has_many = array(
@@ -158,14 +159,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 				$templateSource)
 			);	
 
-			// $explanationTitle = _t("Newletter.TemplateExplanationTitle",
-			// 	"Select a styled template (.ss template) that this newsletter renders with"
-			// );
-
-			// $fields->insertBefore(
-			// 	LiteralField::create("TemplateExplanationTitle", "<h5>$explanationTitle</h5>"),
-			// 	"RenderTemplate"
-			// );
+			
 
 			if(!$this->ID) {
 				// $explanation1 = _t("Newletter.TemplateExplanation1",
@@ -201,17 +195,34 @@ class Newsletter extends DataObject implements CMSPreviewable{
 		// JOCHEN TODO: This is where we could hook in to apply further filters on the mailing list
 		// http://takeaway.bigfork.co.uk/a-beginners-introduction-to-using-entwine-in-silverstripe
 
+		
+		
 		if($this && $this->exists()){
-			$fields->removeByName("MailingLists");
+			
 			$mailinglists = MailingList::get();
 
-			$fields->addFieldToTab("Root.Main",
+			$fields->removeByName("MailingLists");
+			$fields->removeByName("ExcludeParams");
+			
+			$fields->addFieldsToTab("Root.Main", array(
 				new CheckboxSetField(
 					"MailingLists", 
 					_t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'), 
 					$mailinglists->map('ID', 'FullTitle')
+				),
+				new CheckboxSetField(
+					$name = "ExcludeParams",
+					"Auszuschließende Kriterien (Beispiel)",
+					$source = array(
+						"Confirmed" => "Bereits registrierte User Ausschließen",
+						"Whatever" => "Whatever"
+					)
 				)
-			);
+			));
+			
+			
+
+			
 		}
 		
 		

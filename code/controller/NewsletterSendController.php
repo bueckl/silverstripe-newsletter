@@ -64,7 +64,22 @@ class NewsletterSendController extends BuildTask {
 		$lists = $newsletter->MailingLists();
 		$queueCount = 0;
 		foreach($lists as $list) {
-			foreach($list->Recipients()->column('ID') as $recipientID) {
+			
+			// TODO: I introduced "ExcludedParams" here in order
+			// to give additional control over the recipients who receive
+			// a newsletter
+			// Those params get defined on the Newsletter DataObject and are managed
+			// through a CheckboxSetField
+			
+			$excludeParams = $newsletter->ExcludeParams;
+			// Convert ExcludeParams to Array
+			$excludeParams = explode(",",$excludeParams);
+			foreach ( $excludeParams as $excludeParam) {
+				$Recipients = $list->Recipients();
+				$Recipients = $Recipients->exclude($excludeParam, 0);
+			}
+			
+			foreach($Recipients->column('ID') as $recipientID) {
 				//duplicate filtering
 				$existingQueue = SendRecipientQueue::get()->filter(array(
 					'RecipientID' => $recipientID,
