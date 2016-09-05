@@ -11,6 +11,7 @@ class MailingList extends DataObject {
 	/* the database fields */
 	private static $db = array(
 		'Title'					=> "Varchar",
+		// 'EventIDForControl'		=> "Int",
 	);
 
 	/* a mailing list could contains many newsletter recipients */
@@ -22,9 +23,9 @@ class MailingList extends DataObject {
 		'Newsletters'			=> "Newsletter",
 	);
 
-	private static $singular_name = 'Mailinglist';
+	private static $singular_name = 'Mailing-Liste';
 
-	private static $plural_name = 'Mailinglists';
+	private static $plural_name = 'Mailing-Listen';
 	
 	private static $default_sort = 'ID DESC';
 	
@@ -36,7 +37,7 @@ class MailingList extends DataObject {
 	public function requireDefaultRecords() {
 		
 		//parent::requireDefaultRecords();
-		
+		return;
 		$defaultLists =  MailingList::create();
 		$defaultLists->ID = 1;
 		$defaultLists->Title = 'Visitors Mailing List';
@@ -76,6 +77,7 @@ class MailingList extends DataObject {
 			
 	function getCMSFields() {
 		$fields = new FieldList();
+
 		$fields->push(new TabSet("Root", $mainTab = new Tab("Main")));
 		$mainTab->setTitle(_t('SiteTree.TABMAIN', "Main"));
 
@@ -99,32 +101,31 @@ class MailingList extends DataObject {
 				->addComponent(new GridFieldEditButton())
 				->addComponent(new GridFieldDetailForm())
 				->addComponent(new GridFieldPaginator(100))
-				->addComponent( $autocomplete = new GridFieldAddExistingAutocompleterCustom('toolbar-header-right'))
-				->addComponent(new GridFieldAddNewButton('toolbar-header-left'))
-
+				->addComponent( $autocomplete = new GridFieldAddExistingAutocompleter('toolbar-header-right'))
+				->addComponent(new GridFieldAddNewButton('before'))
 		);
-		
-		// $config->removeComponentsByType('GridFieldDetailForm')
-// 			->addComponents(new GridFieldDetailFormRecipient());
-//
-// 		if($gridField = $config->getComponentByType('GridFieldDetailFormRecipient')) {
-// 			$gridField->setItemRequestClass('GridFieldDetailFormRecipient_ItemRequest');
-// 		}
-		
-		
+
 		$autocomplete->setSearchList(Recipient::get());
 		$autocomplete->setSearchFields(array(
-			// 'Surname',
-// 			'Email',
-// 			'Tags.Title'
+			'FirstName',
+			'Surname',
+			'Email',
+			'Company.CompanyName'
 		));
 		
-		
+		$config->removeComponentsByType('GridFieldAddNewButton');
+
+		// Nicht zwingend ein Eventteilnehmer. Kann irgendein Recipient sein
+		$config->addComponent($auto = new GridFieldAddExistingSearchButton());
+		$auto->setTitle('Bestehenden Teilnehmer dieser Mailing-Liste zuweisen.');
+
 
 		$fields->addFieldToTab('Root.Main',new CompositeField($grid));
+		$fields->findOrMakeTab('Root.Main')->setTitle('');
+		
 		$this->extend("updateCMSFields", $fields);
 		
-		if(!$this->ID)
+		if(!$this->ID) 
 			$fields->removeByName('Recipients');
 
 		return $fields;

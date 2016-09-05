@@ -27,6 +27,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	private static $many_many = array(
 		"MailingLists"			=> "MailingList"
 	);
+	
+	private static $singular_name   = 'Mailing';
+	private static $plural_name     = 'Mailings';
+	
 
 	private static $searchable_fields = array(
 		"Subject",

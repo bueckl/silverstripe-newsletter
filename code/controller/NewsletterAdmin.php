@@ -14,10 +14,10 @@ class NewsletterAdmin extends ModelAdmin {
 	public $showImportForm = false;
 
 	private static $managed_models = array(
-		"Newsletter" => array('title' => 'Newsletters'),
-		"Newsletter_Sent" => array('title' => 'Sent Newsletters'),
-		"MailingList" => array('title' => 'Mailing Lists'),
-		"Recipient" => array('title' => 'All Recipients')
+		"Newsletter" => array('title' => 'Mailing'),
+		"Newsletter_Sent" => array('title' => 'Sent Mailings'),
+		"MailingList",
+		"Recipient"
 	);
 
 	/** 

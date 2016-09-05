@@ -431,7 +431,7 @@ class Recipient extends DataObject {
 
 
 	// Data Generator http://www.generatedata.com/
-	public function requireDefaultRecords() {
+	public function requireDefaultRecords() { return;
 		
 $contacts = array(	
 

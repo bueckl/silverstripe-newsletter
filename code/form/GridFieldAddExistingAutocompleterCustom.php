@@ -217,7 +217,7 @@ class GridFieldAddExistingAutocompleterCustom
 			$params[$name] = $request->getVar('gridfield_relationsearch');
 		}
 		$results = $allList
-			//->subtract($gridField->getList())
+			->subtract($gridField->getList())
 			->filterAny($params)
 			->sort(strtok($searchFields[0], ':'), 'ASC')
 			->limit($this->getResultsLimit());
