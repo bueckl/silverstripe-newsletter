@@ -31,7 +31,8 @@ class MailingList extends DataObject {
 	
 	private static $summary_fields = array(
 		'Title',
-		'ActiveRecipients.Count'
+		'ActiveRecipients.Count',
+		'Event.Gebiet'
 	);
 	
 	public function requireDefaultRecords() {

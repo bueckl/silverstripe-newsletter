@@ -5,7 +5,7 @@
  *
  * @package newsletter
  */
-class NewsletterEmail extends SMTPEmail {
+class NewsletterEmail extends Email {
 
 	protected $mailinglists;
 	protected $newsletter;
@@ -55,7 +55,6 @@ class NewsletterEmail extends SMTPEmail {
 		$this->recipient = $recipient;
 		$this->fakeRecipient = $fakeRecipient;
 		
-		//$this->company = $recipient->Company();
 		parent::__construct($this->newsletter->SendFrom, $this->recipient->Email);
 
 		$this->populateTemplate(new ArrayData(array(
@@ -189,7 +188,6 @@ class NewsletterEmail extends SMTPEmail {
 			"IsEmail" => true,
 			"Recipient" => $this->recipient,
 			"Member" => $this->recipient // backwards compatibility,
-			// "Company" => $this->company
 		);
 
 		if($this->template_data) {
