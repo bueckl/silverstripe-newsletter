@@ -71,14 +71,14 @@ class NewsletterSendController extends BuildTask {
 			// Those params get defined on the Newsletter DataObject and are managed
 			// through a CheckboxSetField
 			
-			$excludeParams = $newsletter->ExcludeParams;
-			// Convert ExcludeParams to Array
-			$excludeParams = explode(",",$excludeParams);
-			foreach ( $excludeParams as $excludeParam) {
-				$Recipients = $list->Recipients();
-				$Recipients = $Recipients->exclude($excludeParam, 0);
-			}
-			
+			// $excludeParams = $newsletter->ExcludeParams;
+// 			// Convert ExcludeParams to Array
+// 			$excludeParams = explode(",",$excludeParams);
+// 			foreach ( $excludeParams as $excludeParam) {
+// 				$Recipients = $list->Recipients();
+// 				$Recipients = $Recipients->exclude($excludeParam, 0);
+// 			}
+			$Recipients = $list->Recipients();
 			foreach($Recipients->column('ID') as $recipientID) {
 				//duplicate filtering
 				$existingQueue = SendRecipientQueue::get()->filter(array(

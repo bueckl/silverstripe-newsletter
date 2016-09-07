@@ -5,12 +5,13 @@
  *
  * @package newsletter
  */
-class NewsletterEmail extends Email {
+class NewsletterEmail extends SMTPEmail {
 
 	protected $mailinglists;
 	protected $newsletter;
 	protected $recipient;
 	protected $fakeRecipient;
+	// protected $company;
 
 	/**
 	 * Should the link tracking be enabled.
@@ -54,6 +55,7 @@ class NewsletterEmail extends Email {
 		$this->recipient = $recipient;
 		$this->fakeRecipient = $fakeRecipient;
 		
+		//$this->company = $recipient->Company();
 		parent::__construct($this->newsletter->SendFrom, $this->recipient->Email);
 
 		$this->populateTemplate(new ArrayData(array(
@@ -186,7 +188,8 @@ class NewsletterEmail extends Email {
 			"BaseURL" => $this->BaseURL(),
 			"IsEmail" => true,
 			"Recipient" => $this->recipient,
-			"Member" => $this->recipient, // backwards compatibility
+			"Member" => $this->recipient // backwards compatibility,
+			// "Company" => $this->company
 		);
 
 		if($this->template_data) {

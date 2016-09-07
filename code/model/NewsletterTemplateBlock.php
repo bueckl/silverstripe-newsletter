@@ -20,12 +20,20 @@ class NewsletterTemplateBlock extends DataObject
     );
 
 
-    public function getEventCollection(){
-        $tags = $this->Events();
-        if($tags->count()){
-            $arrTags = $tags->column('Title');
-            return implode(',', $arrTags);
-        }
+	public function getEventCollection(){
+		$Events = $this->Events();
+
+		$arrTags = array();;
+		
+		if($Events->count()){
+			
+			foreach ($Events as $Event) {
+				$arrTags[] = $Event->getComposedTitle();
+			}
+		}
+		
+		return implode(',', $arrTags);
+		
     }
 
 
