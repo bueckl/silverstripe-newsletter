@@ -309,7 +309,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
 		$paths = NewsletterAdmin::template_paths();
 
 		$templates = array( 
-			"SimpleNewsletterTemplate" => _t('TemplateList.SimpleNewsletterTemplate', 'Simple Newsletter Template')
+			// We dont want the plugin default template.
+			// "SimpleNewsletterTemplate" => _t('TemplateList.SimpleNewsletterTemplate', 'Simple Newsletter Template')
 		);
 
 		if(isset($paths) && is_array($paths)){
