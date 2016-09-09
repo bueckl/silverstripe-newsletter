@@ -102,7 +102,8 @@ class NewsletterSendController extends BuildTask {
 							}
 							
 						} else {
-							//die('no booking for'. $R->Surname);
+							//no booking record. So include this one as well
+							$Recipients = $Recipients->exclude('ID', $R->ID);
 						}
 					}
 				}
