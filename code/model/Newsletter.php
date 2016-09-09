@@ -214,11 +214,13 @@ class Newsletter extends DataObject implements CMSPreviewable{
 					_t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'), 
 					$mailinglists->map('ID', 'FullTitle')
 				),
+				
+				// See enqueue() method on Newsletter Send Controller!
 				new CheckboxSetField(
 					$name = "ExcludeParams",
 					"Auszuschließende Kriterien (Beispiel)",
 					$source = array(
-						"Confirmed" => "Bereits registrierte User Ausschließen",
+						"HasBooking" => "User ausschließen, die bereits auf die Einladung reagiert haben. (Und einen Booking record besitzen.) :: Wir senden also an alle, die noch NICHT auf die Einladung reagiert haben!",
 						"Whatever" => "Whatever"
 					)
 				)
