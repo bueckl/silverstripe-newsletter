@@ -70,12 +70,12 @@ class NewsletterSendController extends BuildTask {
 			// a newsletter
 			// Those params get defined on the Newsletter DataObject and are managed
 			// through a CheckboxSetField
+			$Recipients = $list->Recipients();
 			
 			$excludeParams = $newsletter->ExcludeParams;
 			// Convert ExcludeParams to Array
 			$excludeParams = explode(",",$excludeParams);
 			foreach ( $excludeParams as $excludeParam) {
-				$Recipients = $list->Recipients();
 				
 				if ($excludeParam == 'HasBooking') {
 					foreach ($Recipients as $R) {
@@ -84,6 +84,23 @@ class NewsletterSendController extends BuildTask {
 							// We identify users who have a booking record. So we want 
 							// to excllude those from the list of Recipients
 							$Recipients = $Recipients->exclude('ID', $R->ID);
+						} else {
+							//die('no booking for'. $R->Surname);
+						}
+					}
+				}
+				
+				// Has Booking Record and will attend = Confirmed!
+				if ($excludeParam == 'Confirmed') {
+					foreach ($Recipients as $R) {
+
+						if ( $Booking = Booking::get()->filter('RecipientID', $R->ID)->First() ) {
+							// We identify users who have a booking record.
+							// but will not attend ERGO confirmed = 0!
+							if ( $Booking->Confirmed == 0) {
+								$Recipients = $Recipients->exclude('ID', $R->ID);
+							}
+							
 						} else {
 							//die('no booking for'. $R->Surname);
 						}
