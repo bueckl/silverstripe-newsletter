@@ -215,13 +215,15 @@ class Newsletter extends DataObject implements CMSPreviewable{
 					$mailinglists->map('ID', 'FullTitle')
 				),
 				
+				/**
 				// See enqueue() method on Newsletter Send Controller!
+				**/
 				new CheckboxSetField(
 					$name = "ExcludeParams",
-					"Auszuschließende Kriterien (Beispiel)",
+					"Auszuschließende Kriterien",
 					$source = array(
 						"HasBooking" => "User ausschließen, die bereits auf die Einladung reagiert haben. (Und einen Booking record besitzen.) :: Wir senden also an alle, die noch NICHT auf die Einladung reagiert haben!",
-						"Whatever" => "Whatever"
+						"Confirmed" => "User die nicht teilnehmen, aber einen Booking Record besitzen :: Wir senden also nur an teilnehmende User"
 					)
 				)
 			));
