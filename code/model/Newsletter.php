@@ -212,7 +212,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 				new CheckboxSetField(
 					"MailingLists", 
 					_t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'), 
-					$mailinglists->map('ID', 'FullTitle')
+					$mailinglists->map('ID', 'getFullTitleWithAreaCode')
 				),
 				
 				/**
