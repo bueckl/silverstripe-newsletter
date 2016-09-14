@@ -223,7 +223,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 					"Auszuschließende Kriterien",
 					$source = array(
 						"HasBooking" => "User ausschließen, die bereits auf die Einladung reagiert haben. (Und einen Booking record besitzen.) :: Wir senden also an alle, die noch NICHT auf die Einladung reagiert haben!",
-						"Confirmed" => "User die nicht teilnehmen, aber einen Booking Record besitzen :: Wir senden also nur an teilnehmende User"
+						"Confirmed" => "User die teilnehmen, also einen Booking Record besitzen :: Wir senden also NUR an teilnehmende User."
 					)
 				)
 			));
