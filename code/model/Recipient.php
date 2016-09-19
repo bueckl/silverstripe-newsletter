@@ -349,7 +349,9 @@ class Recipient extends DataObject {
 				} else {
 				// Wir versuchen erneut einen User mit der selben Email anzulegen
 				// STOP IT
-					throw new ValidationException('Already exists. please link an existing contact instead',0);
+				
+				// THIS BREAKS NEWSLETTER SENDING
+					//throw new ValidationException('Already exists. please link an existing contact instead',0);
 				}
 			
 			// Wir legen komplett neu an

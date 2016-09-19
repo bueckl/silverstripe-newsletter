@@ -206,6 +206,7 @@ class NewsletterSendController extends BuildTask {
 	}
 
 	function processQueue($newsletterID){
+		
 		set_time_limit(0);  //no time limit for running process
 
 		if (!empty($newsletterID)) {
