@@ -229,21 +229,6 @@ class Recipient extends DataObject {
 		return $fields;
 	}
 
-	public function fieldLabels($includerelations = true) {
-		$labels = parent::fieldLabels($includerelations);
-
-		$labels['Salutation'] = _t('Newsletter.FieldSalutation', 'Salutation');
-		$labels['FirstName'] = _t('Newsletter.FieldFirstName', 'FirstName');
-		$labels['Surname'] = _t('Newsletter.FieldSurname', 'Surname');
-		$labels['MiddleName'] = _t('Newsletter.FieldMiddleName', 'Middle Name');
-		$labels['Mailinglists'] = _t('Newsletter.FieldMailinglists', 'Mailinglists');
-		$labels['BouncedCount'] = _t('Newsletter.FieldBouncedCount', 'Bounced Count');
-		$labels['Verified'] = _t('Newsletter.FieldVerified', 'Verified?');
-		$labels['Blacklisted'] = _t('Newsletter.FieldBlacklisted', 'Blacklisted?');
-		$labels['ReceivedCount'] = _t('Newsletter.FieldReceivedCount', 'Received Count');
-
-		return $labels;
-	}
 
 	/** Returns the title of this Recipient for the MailingList auto-complete add field. The title includes the
 	 * email address, so that users with the same name can be distinguished. */

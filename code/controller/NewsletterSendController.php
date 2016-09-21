@@ -20,7 +20,7 @@ class NewsletterSendController extends BuildTask {
 	/**
 	 * @var integer number of emails to send out in "batches" to avoid spin up costs
 	 */
-	static $items_to_batch_process = 50;
+	static $items_to_batch_process = 1000;
 
 	/**
 	 * @var integer minutes after which we consider an "InProgress" item in the queue "stuck"
