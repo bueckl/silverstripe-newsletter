@@ -189,6 +189,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 // 					"RenderTemplate"
 // 				);
 			}
+			
 		} else {
 			$fields->replaceField("RenderTemplate", 
 				new HiddenField('RenderTemplate', false, key($templateSource))
@@ -265,7 +266,42 @@ class Newsletter extends DataObject implements CMSPreviewable{
 				$gridFieldConfig
 			);
 
-			$fields->addFieldToTab('Root.SentTo',$sendRecipientGrid);
+			$fields->addFieldToTab('Root.'._t('NewsletterAdmin.SentTo', 'Sent to'),$sendRecipientGrid);
+			
+			
+			// Lookup belonging Mailing Lists
+			$MailingLists = $this->MailingLists();
+			
+			
+			// Gather All Recipients for all Mailing Lists which belong to this Newsletter
+			$Recipients = new ArrayList();
+			foreach ( $MailingLists as $MailingList) {
+				foreach( $MailingList->Recipients() as $Recipient) {
+					$Recipients->push($Recipient);
+				}
+			}
+
+			// Now get those Recipients who already Recieved the Newsletter
+			$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
+			$RecipientsRecievedArrayList = new ArrayList();
+			
+			foreach($RecipientsRecieved as $Recipient) {
+				$RecipientsRecievedArrayList->push($Recipient);
+			}
+			
+			// Calculate the difference
+			$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
+			$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+			//die;
+			$notSentToYetRecipientGrid = GridField::create(
+				'Recipient',
+				_t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
+				$NewRecipients,
+				$gridFieldConfig
+			);
+
+			$fields->addFieldToTab('Root.Nachträglich hinzugefügte Teilnehmer', $notSentToYetRecipientGrid);
+			
 
 			//only show restart queue button if the newsletter is stuck in "sending"
 			//only show the restart queue button if the user can run the build task (i.e. has full admin permissions)
@@ -412,7 +448,6 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
 		// Create recipient with some test data
 		$recipient = new Recipient(Recipient::$test_data);
-
 		$newsletterEmail = new NewsletterEmail($this, $recipient, true);
 		return HTTP::absoluteURLs($newsletterEmail->getData()->renderWith($templateName));
 	}

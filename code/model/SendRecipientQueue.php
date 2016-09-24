@@ -45,20 +45,27 @@ class SendRecipientQueue extends DataObject {
 
 	/** Send the email out to the Recipient */
 	public function send($newsletter = null, $recipient = null) {
+		
+		
 		if (empty($newsletter)) $newsletter = $this->Newsletter();
 		if (empty($recipient)) $recipient = $this->Recipient();
 
 		//check recipient not blacklisted and verified
 		if ($recipient && empty($recipient->Blacklisted) && !empty($recipient->Verified)) {
-			$email = new NewsLetterEmail(
+			
+			$email = new NewsletterEmail(
 				$newsletter,
 				$recipient
 			);
+			
+			
 			if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
-			
-			
-			// HACK JOCHEN. ADDING ATTACHMENTS
-			$attachment = $newsletter->Attachment();
+
+
+			//HACK JOCHEN. ADDING ATTACHMENTS
+			if ( $newsletter->Attachment() ) {
+				$attachment = $newsletter->Attachment();
+			}
 
 			if ( $attachment ) {
 				$file =  $attachment->getFullPath();

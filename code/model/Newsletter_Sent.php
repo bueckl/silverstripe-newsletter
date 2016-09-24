@@ -9,8 +9,12 @@
  * Only necessary because ModelAdmin doesn't allow managing
  * multiple variations of the same class.
  */
-class Newsletter_Sent extends Newsletter {
 
-	private static $singular_name = "Sent Newsletters";
-	private static $plural_name = "Sent Newsletters";
-}
+
+/*** HEADS UP FROM JOCHEN ***/
+/* Now handled by Newsletter_SentExtension */
+// class Newsletter_Sent extends Newsletter {
+//
+// 	private static $singular_name = "Sent Newsletters";
+// 	private static $plural_name = "Sent Newsletters";
+// }

@@ -133,6 +133,74 @@ class NewsletterSendController extends BuildTask {
 		return $queueCount;
 	}
 
+
+	/**
+	 * Adds users to the queue for sending out a newsletter.
+	 * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
+	 * to the queue.
+	 * 
+	 * @param $id The ID of the Newsletter DataObject to send
+	 */
+	function enqueueRepeated(Newsletter $newsletter) {
+
+
+		$queueCount = 0;
+
+		// Lookup belonging Mailing Lists
+		$MailingLists = $newsletter->MailingLists();
+
+		// Gather All Recipients for all Mailing Lists which belong to this Newsletter
+		$Recipients = new ArrayList();
+		foreach ( $MailingLists as $MailingList) {
+			foreach( $MailingList->Recipients() as $Recipient) {
+				$Recipients->push($Recipient);
+			}
+		}
+		
+		
+		// Now get those Recipients who already Recieved the Newsletter
+		$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $newsletter->ID);
+		$RecipientsRecievedArrayList = new ArrayList();
+		
+		foreach($RecipientsRecieved as $Recipient) {
+			$RecipientsRecievedArrayList->push($Recipient);
+		}
+		
+		
+		// Calculate the difference
+		$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
+		$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+		
+		
+		$Recipients = $NewRecipients;
+		
+		foreach($Recipients as $Recipient) {
+				
+				//duplicate filtering
+				$existingQueue = SendRecipientQueue::get()->filter(array(
+					'RecipientID' => $Recipient->ID,
+					'NewsletterID' => $newsletter->ID,
+					'Status' => array('Scheduled', 'InProgress')
+				));
+
+				if($existingQueue->exists()) continue;
+				
+				$queueItem = SendRecipientQueue::create();
+				$queueItem->Status = "Scheduled";
+				$queueItem->NewsletterID = $newsletter->ID;
+				$queueItem->RecipientID = $Recipient->ID;
+				$queueItem->write();
+				$queueCount++;
+			}
+
+		return $queueCount;
+	}
+
+
+
+
+
+
 	function processQueueOnShutdown($newsletterID) {
 		if (class_exists('MessageQueue')) {
 			//start processing of email sending for this newsletter ID after shutdown
@@ -206,7 +274,6 @@ class NewsletterSendController extends BuildTask {
 	}
 
 	function processQueue($newsletterID){
-		
 		set_time_limit(0);  //no time limit for running process
 
 		if (!empty($newsletterID)) {
@@ -249,7 +316,8 @@ class NewsletterSendController extends BuildTask {
 				if (!empty($queueItemsList)) {
 					$queueItems2 = SendRecipientQueue::get()->filter(array('ID'=>$queueItemsList));
 				}
-
+				
+				
 				//do the actual mail out
 				if (!empty($queueItems2) && $queueItems2->count() > 0) {
 					//fetch all the recipients at once in one query
