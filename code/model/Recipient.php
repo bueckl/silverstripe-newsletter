@@ -87,9 +87,6 @@ class Recipient extends DataObject {
 	private static $summary_fields = array(
 		'FirstName'			=> 'First Name',
 		'Surname'			=> 'Last Name',
-		'Company.CompanyName' => 'Autohaus',
-		'Company.CompanyCity' => 'Ort',
-		'Company.CompanyAreaCode' => 'Gebiet',
 		'Email'				=> 'Email',
 		'Blacklisted'		=> 'Blacklisted',
 		'BouncedCount'		=> 'Bounced Count',
