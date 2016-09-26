@@ -70,6 +70,7 @@ class NewsletterAdmin extends ModelAdmin {
 	 * @return array
 	 */
 	public static function template_paths() {
+
 		if(!isset(self::$template_paths)) {
 			if(class_exists('SiteConfig') && ($config = SiteConfig::current_site_config()) && $config->Theme) {
 				$theme = $config->Theme;
