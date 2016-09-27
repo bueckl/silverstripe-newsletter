@@ -11,7 +11,6 @@ class MailingList extends DataObject {
 	/* the database fields */
 	private static $db = array(
 		'Title'					=> "Varchar",
-		// 'EventIDForControl'		=> "Int",
 	);
 
 	/* a mailing list could contains many newsletter recipients */
@@ -32,7 +31,6 @@ class MailingList extends DataObject {
 	private static $summary_fields = array(
 		'Title',
 		'ActiveRecipients.Count',
-		'Event.Gebiet'
 	);
 	
 	public function requireDefaultRecords() {
