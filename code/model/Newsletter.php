@@ -106,6 +106,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	 * @return FieldSet
 	 */
 	function getCMSFields() {
+
 		$fields = parent::getCMSFields();
 
 		$fields->removeByName('Status');
@@ -213,20 +214,9 @@ class Newsletter extends DataObject implements CMSPreviewable{
 				new CheckboxSetField(
 					"MailingLists", 
 					_t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'), 
-					$mailinglists->map('ID', 'getFullTitleWithAreaCode')
-				),
-				
-				/**
-				// See enqueue() method on Newsletter Send Controller!
-				**/
-				new CheckboxSetField(
-					$name = "ExcludeParams",
-					"Sonder Kriterien",
-					$source = array(
-						"HasBooking" => "User ausschließen, die bereits auf die Einladung reagiert haben. (Und einen Booking record besitzen.) :: Wir senden also an alle, die noch NICHT auf die Einladung reagiert haben!",
-						"Confirmed" => "Wir senden NUR an User die Ihre teilnahme bestätigt haben (Confirmed == 1)."
-					)
+					$mailinglists->map('ID', 'Title')
 				)
+				
 			));
 			
 			
@@ -334,8 +324,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
 			}
 		}
 
-
-
+		$this->extend('updateCMSFields', $fields);
+		
 		return $fields;
 	}
 
