@@ -264,47 +264,37 @@ class Newsletter extends DataObject implements CMSPreviewable{
 			
 			
 			// Gather All Recipients for all Mailing Lists which belong to this Newsletter
+			// Gather All Recipients for all Mailing Lists which belong to this Newsletter
 			$Recipients = new ArrayList();
 			foreach ( $MailingLists as $MailingList) {
 				foreach( $MailingList->Recipients() as $Recipient) {
-					
-					$NewsletterSentDate = $this->Created;
-					//debug::dump($NewsletterSentDate);
-					$RecipientCreatedDate = $Recipient->Created;
-					//debug::dump($RecipientCreatedDate);
-					
-					if ($NewsletterSentDate < $RecipientCreatedDate) {
-						//debug::dump('yay');
-						$Recipients->push($Recipient);
-						
-					}
+					$Recipients->push($Recipient);
 				}
 			}
-			//die;
-			// // Now get those Recipients who already Recieved the Newsletter
-// 			$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
-// 			$RecipientsRecievedArrayList = new ArrayList();
-//
-// 			foreach($RecipientsRecieved as $Recipient) {
-// 				$RecipientsRecievedArrayList->push($Recipient);
-// 			}
-//
-// 			// Calculate the difference
-// 			$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
-// 			$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
-			//die;
-			$NewRecipients = $Recipients;
 
-			if ( $NewRecipients->Count() > 0 ) {
-				$notSentToYetRecipientGrid = GridField::create(
-					'Recipient',
-					_t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
-					$NewRecipients,
-					$gridFieldConfig
-				);
+			// Now get those Recipients who already Recieved the Newsletter
+			$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
+			$RecipientsRecievedArrayList = new ArrayList();
 
-				$fields->addFieldToTab('Root.Nachträglich hinzugefügte Teilnehmer', $notSentToYetRecipientGrid);
+			foreach($RecipientsRecieved as $Recipient) {
+				$RecipientsRecievedArrayList->push($Recipient);
 			}
+
+			// Calculate the difference
+			$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
+			$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+			
+			$notSentToYetRecipientGrid = GridField::create(
+				'Recipient',
+				_t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
+				$NewRecipients,
+				$gridFieldConfig
+			);
+
+			$fields->addFieldsToTab('Root.Nachträglich hinzugefügte Teilnehmer', array(
+					LiteralField::create('hint', '<div class="message warning">Mit der Funktion <strong>Erneut versenden (an nachträglich hinzugefügte Teilnehmer)</strong> schicken wir Emails an solche Teilnehmer, die zum Versandzeitpunkt eines Newsletters noch nicht auf der Mailingliste waren. Dies ist z.B. beim erneuten Versand einer Einladungsmail oder Infomail hilfreich. *** Eine Ausnahme bilden Reminder Mails. Hier kann diese Funktion nicht eingesetzt werden. Für diesen Fall bitte einfach die bereits versandte Einladungs-/Infomail duplizieren und die Sonderkriterien zum Filtern von Teilnehmern nutzen.</div>', true),
+					$notSentToYetRecipientGrid
+				));
 			
 
 			//only show restart queue button if the newsletter is stuck in "sending"

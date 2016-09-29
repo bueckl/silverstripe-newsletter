@@ -151,25 +151,12 @@ class NewsletterSendController extends BuildTask {
 
 		// Gather All Recipients for all Mailing Lists which belong to this Newsletter
 		$Recipients = new ArrayList();
-
 		foreach ( $MailingLists as $MailingList) {
 			foreach( $MailingList->Recipients() as $Recipient) {
-				
-				$NewsletterSentDate = $this->SentDate;
-				//debug::dump($NewsletterSentDate);
-				$RecipientCreatedDate = $Recipient->LastEdited;
-				//debug::dump($RecipientCreatedDate);
-				
-				if ($NewsletterSentDate < $RecipientCreatedDate) {
-					//$Recipient->LastEdited = SS_Datetime::now()->Rfc2822();
-					$Recipient->write();
-					$Recipients->push($Recipient);
-				}
+				$Recipients->push($Recipient);
 			}
 		}
 		
-		
-		/*
 		
 		// Now get those Recipients who already Recieved the Newsletter
 		$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $newsletter->ID);
@@ -184,10 +171,9 @@ class NewsletterSendController extends BuildTask {
 		$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
 		$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
 		
-		*/
 		
+		$Recipients = $NewRecipients;
 		
-		die;
 		foreach($Recipients as $Recipient) {
 				
 				//duplicate filtering
