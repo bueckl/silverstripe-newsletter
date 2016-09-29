@@ -267,22 +267,34 @@ class Newsletter extends DataObject implements CMSPreviewable{
 			$Recipients = new ArrayList();
 			foreach ( $MailingLists as $MailingList) {
 				foreach( $MailingList->Recipients() as $Recipient) {
-					$Recipients->push($Recipient);
+					
+					$NewsletterSentDate = $this->Created;
+					//debug::dump($NewsletterSentDate);
+					$RecipientCreatedDate = $Recipient->Created;
+					//debug::dump($RecipientCreatedDate);
+					
+					if ($NewsletterSentDate < $RecipientCreatedDate) {
+						//debug::dump('yay');
+						$Recipients->push($Recipient);
+						
+					}
 				}
 			}
-
-			// Now get those Recipients who already Recieved the Newsletter
-			$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
-			$RecipientsRecievedArrayList = new ArrayList();
-			
-			foreach($RecipientsRecieved as $Recipient) {
-				$RecipientsRecievedArrayList->push($Recipient);
-			}
-			
-			// Calculate the difference
-			$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
-			$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
 			//die;
+			// // Now get those Recipients who already Recieved the Newsletter
+// 			$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
+// 			$RecipientsRecievedArrayList = new ArrayList();
+//
+// 			foreach($RecipientsRecieved as $Recipient) {
+// 				$RecipientsRecievedArrayList->push($Recipient);
+// 			}
+//
+// 			// Calculate the difference
+// 			$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
+// 			$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+			//die;
+			$NewRecipients = $Recipients;
+			
 			$notSentToYetRecipientGrid = GridField::create(
 				'Recipient',
 				_t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),

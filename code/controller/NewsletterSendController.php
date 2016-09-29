@@ -151,12 +151,23 @@ class NewsletterSendController extends BuildTask {
 
 		// Gather All Recipients for all Mailing Lists which belong to this Newsletter
 		$Recipients = new ArrayList();
+
 		foreach ( $MailingLists as $MailingList) {
 			foreach( $MailingList->Recipients() as $Recipient) {
-				$Recipients->push($Recipient);
+				
+				$NewsletterSentDate = $this->Created;
+				//debug::dump($NewsletterSentDate);
+				$RecipientCreatedDate = $Recipient->Created;
+				//debug::dump($RecipientCreatedDate);
+				
+				if ($NewsletterSentDate < $RecipientCreatedDate) {
+					$Recipients->push($Recipient);
+				}
 			}
 		}
 		
+		
+		/*
 		
 		// Now get those Recipients who already Recieved the Newsletter
 		$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $newsletter->ID);
@@ -170,6 +181,8 @@ class NewsletterSendController extends BuildTask {
 		// Calculate the difference
 		$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
 		$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+		
+		*/
 		
 		
 		$Recipients = $NewRecipients;
