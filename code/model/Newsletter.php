@@ -294,15 +294,17 @@ class Newsletter extends DataObject implements CMSPreviewable{
 // 			$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
 			//die;
 			$NewRecipients = $Recipients;
-			
-			$notSentToYetRecipientGrid = GridField::create(
-				'Recipient',
-				_t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
-				$NewRecipients,
-				$gridFieldConfig
-			);
 
-			$fields->addFieldToTab('Root.Nachträglich hinzugefügte Teilnehmer', $notSentToYetRecipientGrid);
+			if ( $NewRecipients->Count() > 0 ) {
+				$notSentToYetRecipientGrid = GridField::create(
+					'Recipient',
+					_t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
+					$NewRecipients,
+					$gridFieldConfig
+				);
+
+				$fields->addFieldToTab('Root.Nachträglich hinzugefügte Teilnehmer', $notSentToYetRecipientGrid);
+			}
 			
 
 			//only show restart queue button if the newsletter is stuck in "sending"

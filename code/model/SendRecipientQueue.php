@@ -23,22 +23,31 @@ class SendRecipientQueue extends DataObject {
 
 	private static $summary_fields = array(
 		"Status",
+		"Recipient.FirstName",
+		"Recipient.Surname",
 		"Recipient.Email",
 		"RetryCount",
+		"ReceivedCount",
 		"LastEdited",
 	);
 
 	private static $default_sort = array(
 		'LastEdited DESC'
 	);
-
+	
+	public function ReceivedCount() {
+		return $this->Recipient()->ReceivedCount;
+	}
 	public function fieldLabels($includelrelations = true) {
 		$labels = parent::fieldLabels($includelrelations);
 		
 		$labels["Status"] = _t('Newsletter.FieldStatus', "Status");
+		$labels["Recipient.FirstName"] = _t('Newsletter.FieldFirstName', "Vorname");
+		$labels["Recipient.Surname"] = _t('Newsletter.FieldSurname', "Nachname");
 		$labels["Recipient.Email"] = _t('Newsletter.FieldEmail', "Email");
 		$labels["RetryCount"] = _t('Newsletter.FieldRetryCount', "Retry Count");
-		$labels["LastEdited"] = _t('Newsletter.FieldLastEdited', "Last Edited");
+		$labels["RetryCount"] = _t('Newsletter.FieldRetryCount', "Retry Count");
+		$labels["ReceivedCount"] = _t('Newsletter.FieldReceivedCount', "Received Count");
 
 		return $labels;
 	}

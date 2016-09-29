@@ -155,12 +155,14 @@ class NewsletterSendController extends BuildTask {
 		foreach ( $MailingLists as $MailingList) {
 			foreach( $MailingList->Recipients() as $Recipient) {
 				
-				$NewsletterSentDate = $this->Created;
+				$NewsletterSentDate = $this->SentDate;
 				//debug::dump($NewsletterSentDate);
-				$RecipientCreatedDate = $Recipient->Created;
+				$RecipientCreatedDate = $Recipient->LastEdited;
 				//debug::dump($RecipientCreatedDate);
 				
 				if ($NewsletterSentDate < $RecipientCreatedDate) {
+					//$Recipient->LastEdited = SS_Datetime::now()->Rfc2822();
+					$Recipient->write();
 					$Recipients->push($Recipient);
 				}
 			}
@@ -185,8 +187,7 @@ class NewsletterSendController extends BuildTask {
 		*/
 		
 		
-		$Recipients = $NewRecipients;
-		
+		die;
 		foreach($Recipients as $Recipient) {
 				
 				//duplicate filtering
