@@ -3,11 +3,11 @@
 class RecipientValidator extends RequiredFields {
 
 	function php($data) {
-
+		
 		$bRet = parent::php($data);
 		
 		if (empty($data['Email'])) {
-			$this->validationError('Email','Are you serious?','required');
+			$this->validationError('Email','Your Email, please?','required');
 			return;
 		}
 
