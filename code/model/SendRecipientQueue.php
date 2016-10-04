@@ -83,7 +83,7 @@ class SendRecipientQueue extends DataObject {
 					$email->attachFile( $file, $file );
 				}
 			}
-			// END ATTACHMENTS
+			//END ATTACHMENTS
 			
 			$success = $email->send();
 

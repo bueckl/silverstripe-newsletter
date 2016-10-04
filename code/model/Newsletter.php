@@ -28,6 +28,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
 		"MailingLists"			=> "MailingList"
 	);
 	
+	private static $has_one = array(
+		"Attachment"	=> "File"
+	);
+	
 	private static $singular_name   = 'Mailing';
 	private static $plural_name     = 'Mailings';
 	
