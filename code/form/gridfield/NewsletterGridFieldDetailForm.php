@@ -253,7 +253,8 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
 		//create a link to the newly created object and open that instead of the old sent newsletter we had open before
 		$link = Controller::join_links($this->gridField->Link('item'),$newNewsletter->ID ? $newNewsletter->ID : 'new');
-		$link = str_replace('_Sent','',$link);
+		$link = str_replace('_SentExtension','',$link);
+		
 		return Controller::curr()->redirect($link);
 	}
 
