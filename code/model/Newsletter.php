@@ -29,7 +29,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	);
 	
 	private static $has_one = array(
-		"Attachment"	=> "File"
+		"Attachment"=> "File",
+		"PreviewImageWebsite"	=> "Image"
 	);
 	
 	private static $singular_name   = 'Mailing';
@@ -232,7 +233,13 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
 		if($this->Status === 'Sending' || $this->Status === 'Sent') {
 			//make the whole field read-only
+			$fields->removeByName('PreviewImageWebsite');
 			$fields = $fields->transform(new ReadonlyTransformation());
+			
+			$fields->push(
+				UploadField::create('PreviewImageWebsite')
+			);
+			
 			$fields->push(new HiddenField("NEWSLETTER_ORIGINAL_ID", "", $this->ID));
 
 			$gridFieldConfig = GridFieldConfig::create()->addComponents(

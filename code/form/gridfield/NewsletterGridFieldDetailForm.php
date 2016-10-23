@@ -33,11 +33,17 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 				->setUseButtonTag(true), 'action_doSaveAsNew');
 				
 			// Resend this Newsletter to newly added Recipients
-			$resendButton = FormAction::create('doResend', _t('Newsletter.SendAgain',"Erneut versenden (an nachträglich hinzugefügte Teilnehmer)"));
+			$resendButton = FormAction::create('doSave', _t('Newsletter.SAVE',"Save (after Image edit)"));
+			
+			// We want to be able to save the newsletter after sending in order to be able to set the PreviewImage
+			$sendButton = FormAction::create('doResend', _t('Newsletter.SendAgain',"Erneut versenden (an nachträglich hinzugefügte Teilnehmer)"));
+			
+
 			$resendButton->setUseButtonTag(false);
 			$resendButton->setDescription('Nur an Teilnehmer, welche nachträgich zur Mailingliste hinzugefügt wurden!');
 			$resendButton->addExtraClass('cms-description-tooltip');
 			$actions->push($resendButton);
+			$actions->push($sendButton);
 			
 		}
 
