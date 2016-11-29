@@ -116,8 +116,7 @@ class MailingList extends DataObject {
 
 		// Nicht zwingend ein Eventteilnehmer. Kann irgendein Recipient sein
 		$config->addComponent($auto = new GridFieldAddExistingSearchButton());
-		$auto->setTitle('Bestehenden Teilnehmer dieser Mailing-Liste zuweisen.');
-
+		$auto->setTitle(_t('Newsletter.AssignExistingRecipient', "Assign Recipient to Mailing List"));
 
 		$fields->addFieldToTab('Root.Main',new CompositeField($grid));
 		$fields->findOrMakeTab('Root.Main')->setTitle('');
