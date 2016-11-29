@@ -91,7 +91,7 @@ class Recipient extends DataObject {
 		'Blacklisted'		=> 'Blacklisted',
 		'BouncedCount'		=> 'Bounced Count',
 		'ReceivedCount'		=> 'Count Received',
-		'getTagCollection' =>'Tags',
+		// 'getTagCollection' =>'Tags',
 		'Tags.Title' =>'Tag Filter'
 	);
 
@@ -333,7 +333,7 @@ class Recipient extends DataObject {
 				// STOP IT
 				
 				// THIS BREAKS NEWSLETTER SENDING
-					//throw new ValidationException('Already exists. please link an existing contact instead',0);
+					throw new ValidationException('Already exists. please link an existing contact instead',0);
 				}
 			
 			// Wir legen komplett neu an

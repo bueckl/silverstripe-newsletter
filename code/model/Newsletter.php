@@ -236,7 +236,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 			$fields->removeByName('PreviewImageWebsite');
 			$fields = $fields->transform(new ReadonlyTransformation());
 			
-			$fields->push(
+			$fields->insertAfter('MailingLists',
 				UploadField::create('PreviewImageWebsite')
 			);
 			
@@ -302,10 +302,9 @@ class Newsletter extends DataObject implements CMSPreviewable{
 				$gridFieldConfig
 			);
 
-			$fields->addFieldsToTab('Root.Nachträglich hinzugefügte Teilnehmer', array(
-					LiteralField::create('hint', '<div class="message warning">Mit der Funktion <strong>Erneut versenden (an nachträglich hinzugefügte Teilnehmer)</strong> schicken wir Emails an solche Teilnehmer, die zum Versandzeitpunkt eines Newsletters noch nicht auf der Mailingliste waren. Dies ist z.B. beim erneuten Versand einer Einladungsmail oder Infomail hilfreich. *** Eine Ausnahme bilden Reminder Mails. Hier kann diese Funktion nicht eingesetzt werden. Für diesen Fall bitte einfach die bereits versandte Einladungs-/Infomail duplizieren und die Sonderkriterien zum Filtern von Teilnehmern nutzen.</div>', true),
-					$notSentToYetRecipientGrid
-				));
+			$fields->addFieldsToTab('Root.Recipients added after send-out', array(
+				$notSentToYetRecipientGrid
+			));
 			
 
 			//only show restart queue button if the newsletter is stuck in "sending"
