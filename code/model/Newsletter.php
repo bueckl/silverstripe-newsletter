@@ -110,7 +110,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	 * @param Controller
 	 * @return FieldSet
 	 */
-	function getCMSFields() {
+	public function getCMSFields() {
 
 		$fields = parent::getCMSFields();
 
