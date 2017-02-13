@@ -91,7 +91,6 @@ class Recipient extends DataObject {
 		'Blacklisted'		=> 'Blacklisted',
 		'BouncedCount'		=> 'Bounced Count',
 		'ReceivedCount'		=> 'Count Received',
-		'getTagCollection' =>'Tags',
 		'Tags.Title' =>'Tag Filter'
 	);
 
