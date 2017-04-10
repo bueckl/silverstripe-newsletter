@@ -11,41 +11,39 @@
  */
 class GridFieldAddNewRecipientButton implements GridField_HTMLProvider {
 
-	protected $targetFragment;
+    protected $targetFragment;
 
-	protected $buttonName;
+    protected $buttonName;
 
-	public function setButtonName($name) {
-		$this->buttonName = $name;
+    public function setButtonName($name) {
+        $this->buttonName = $name;
+        return $this;
+    }
 
-		return $this;
-	}
+    public function __construct($targetFragment = 'before') {
+        $this->targetFragment = $targetFragment;
+    }
 
-	public function __construct($targetFragment = 'before') {
-		$this->targetFragment = $targetFragment;
-	}
+    public function getHTMLFragments($gridField) {
+        $singleton = singleton($gridField->getModelClass());
 
-	public function getHTMLFragments($gridField) {
-		$singleton = singleton($gridField->getModelClass());
+        if(!$singleton->canCreate()) {
+            return array();
+        }
 
-		if(!$singleton->canCreate()) {
-			return array();
-		}
+        if(!$this->buttonName) {
+            // provide a default button name, can be changed by calling {@link setButtonName()} on this component
+            $objectName = $singleton->i18n_singular_name();
+            $this->buttonName = _t('GridField.Add', 'Add {name}', array('name' => $objectName));
+        }
 
-		if(!$this->buttonName) {
-			// provide a default button name, can be changed by calling {@link setButtonName()} on this component
-			$objectName = $singleton->i18n_singular_name();
-			$this->buttonName = _t('GridField.Add', 'Add {name}', array('name' => $objectName));
-		}
+        $data = new ArrayData(array(
+            'NewLink' => Controller::join_links($gridField->Link('item'), 'new'),
+            'ButtonName' => $this->buttonName,
+        ));
 
-		$data = new ArrayData(array(
-			'NewLink' => Controller::join_links($gridField->Link('item'), 'new'),
-			'ButtonName' => $this->buttonName,
-		));
-
-		return array(
-			$this->targetFragment => $data->renderWith('GridFieldAddNewbutton'),
-		);
-	}
-
+        return array(
+            $this->targetFragment => $data->renderWith('GridFieldAddNewbutton'),
+        );
+    }
 }

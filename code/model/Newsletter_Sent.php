@@ -4,7 +4,7 @@
  */
 
 /**
- * Single newsletter instance that shows only the 
+ * Single newsletter instance that shows only the
  * sent newsletters in the NewsletterAdmin ModelAdmin.
  * Only necessary because ModelAdmin doesn't allow managing
  * multiple variations of the same class.
@@ -15,6 +15,6 @@
 /* Now handled by Newsletter_SentExtension */
 // class Newsletter_Sent extends Newsletter {
 //
-// 	private static $singular_name = "Sent Newsletters";
-// 	private static $plural_name = "Sent Newsletters";
+//  private static $singular_name = "Sent Newsletters";
+//  private static $plural_name = "Sent Newsletters";
 // }

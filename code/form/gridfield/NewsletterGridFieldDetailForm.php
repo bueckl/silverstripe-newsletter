@@ -11,315 +11,308 @@ class NewsletterGridFieldDetailForm extends GridFieldDetailForm {
 }
 
 class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_ItemRequest {
-	private static $allowed_actions = array(
-		'ItemEditForm',
-		'emailpreview'
-	);
+    private static $allowed_actions = array(
+        'ItemEditForm',
+        'emailpreview'
+    );
 
-	public function updateCMSActions($actions) {
-		if (empty($this->record->Status) || $this->record->Status == "Draft") {
-			// save draft button
-			$actions->fieldByName("action_doSave")
-				->setTitle(_t('Newsletter.SAVE', "Save"))
-				->removeExtraClass('ss-ui-action-constructive')
-				->setAttribute('data-icon', 'addpage');
-		} else {    //sending or sent, "save as new" button
-			$saveAsNewButton = FormAction::create('doSaveAsNew', _t('Newsletter.SaveAsNew',"Save as new ..."));
+    public function updateCMSActions($actions) {
+        if (empty($this->record->Status) || $this->record->Status == "Draft") {
+            // save draft button
+            $actions->fieldByName("action_doSave")
+                ->setTitle(_t('Newsletter.SAVE', "Save"))
+                ->removeExtraClass('ss-ui-action-constructive')
+                ->setAttribute('data-icon', 'addpage');
+        } else {    //sending or sent, "save as new" button
+            $saveAsNewButton = FormAction::create('doSaveAsNew', _t('Newsletter.SaveAsNew',"Save as new ..."));
 
-			$actions->replaceField("action_doSave",
-				$saveAsNewButton
-				->addExtraClass('ss-ui-action-constructive')
-				->setAttribute('data-icon', 'addpage')
-				->setUseButtonTag(true), 'action_doSaveAsNew');
-				
-			// Resend this Newsletter to newly added Recipients
-			$resendButton = FormAction::create('doSave', _t('Newsletter.SAVE',"Save (after Image edit)"));
-			
-			// We want to be able to save the newsletter after sending in order to be able to set the PreviewImage
-			$sendButton = FormAction::create('doResend', _t('Newsletter.SendAgain',"Erneut versenden (an nachträglich hinzugefügte Teilnehmer)"));
-			
+            $actions->replaceField("action_doSave",
+                $saveAsNewButton
+                ->addExtraClass('ss-ui-action-constructive')
+                ->setAttribute('data-icon', 'addpage')
+                ->setUseButtonTag(true), 'action_doSaveAsNew');
 
-			$resendButton->setUseButtonTag(false);
-			$resendButton->setDescription('Nur an Teilnehmer, welche nachträgich zur Mailingliste hinzugefügt wurden!');
-			$resendButton->addExtraClass('cms-description-tooltip');
-			$actions->push($resendButton);
-			$actions->push($sendButton);
-			
-		}
+            // Resend this Newsletter to newly added Recipients
+            $resendButton = FormAction::create('doSave', _t('Newsletter.SAVE',"Save (after Image edit)"));
 
-		// send button
-		if ($this->record->Status == "Draft") { //only allow sending when the newsletter is "Draft"
-			$sendButton = FormAction::create('doSend', _t('Newsletter.Send','Send'));
-			$actions->insertBefore($sendButton
-							->addExtraClass('ss-ui-action-constructive')
-							->setAttribute('data-icon', 'accept')
-							->setUseButtonTag(true), 'action_doSave');
-		}
-		return $actions;
-	}
+            // We want to be able to save the newsletter after sending in order to be able to set the PreviewImage
+            $sendButton = FormAction::create('doResend', _t('Newsletter.SendAgain',"Erneut versenden (an nachträglich hinzugefügte Teilnehmer)"));
 
-	public function ItemEditForm() {
-		$form = parent::ItemEditForm();
-		// Do these action update only when the current record is_a newsletter
-		if($this->record && $this->record instanceof Newsletter) {
-			$form->setActions($this->updateCMSActions($form->Actions()));
+            $resendButton->setUseButtonTag(false);
+            $resendButton->setDescription('Nur an Teilnehmer, welche nachträgich zur Mailingliste hinzugefügt wurden!');
+            $resendButton->addExtraClass('cms-description-tooltip');
+            $actions->push($resendButton);
+            $actions->push($sendButton);
+        }
 
-			$form->Fields()->push(
-				new HiddenField("PreviewURL", "PreviewURL", $this->LinkPreview())
-			);
-			// Added in-line to the form, but plucked into different view by LeftAndMain.Preview.js upon load
-			$navField = new LiteralField('SilverStripeNavigator', $this->getSilverStripeNavigator());
-			$navField->setAllowHTML(true);
-			$form->Fields()->push(
-					FormField::create('Foo',$navField)->addExtraClass('ui-tabs-panel')
-			);
+        // send button
+        if ($this->record->Status == "Draft") { //only allow sending when the newsletter is "Draft"
+            $sendButton = FormAction::create('doSend', _t('Newsletter.Send','Send'));
+            $actions->insertBefore($sendButton
+                    ->addExtraClass('ss-ui-action-constructive')
+                    ->setAttribute('data-icon', 'accept')
+                    ->setUseButtonTag(true), 'action_doSave');
+        }
+        return $actions;
+    }
 
-		}
-		return $form;
-	}
+    public function ItemEditForm() {
+        $form = parent::ItemEditForm();
+        // Do these action update only when the current record is_a newsletter
+        if($this->record && $this->record instanceof Newsletter) {
+            $form->setActions($this->updateCMSActions($form->Actions()));
 
-	/**
-	 * Used for preview controls
-	 *
-	 * @return ArrayData
-	 */
-	public function getSilverStripeNavigator() {
-		$newsletter = $this->record;
-		if($newsletter) {
-			$navigator = new SilverStripeNavigator($newsletter);
+            $form->Fields()->push(
+                new HiddenField("PreviewURL", "PreviewURL", $this->LinkPreview())
+            );
+            // Added in-line to the form, but plucked into different view by LeftAndMain.Preview.js upon load
+            $navField = new LiteralField('SilverStripeNavigator', $this->getSilverStripeNavigator());
+            $navField->setAllowHTML(true);
+            $form->Fields()->push(
+                FormField::create('Foo',$navField)->addExtraClass('ui-tabs-panel')
+            );
+        }
+        return $form;
+    }
 
-			//create the link the send a preview email
-			$member = Member::currentUser();
-			$emailLink = '?email=';
-			if ($member) {
-				$emailLink .= $member->Email;
-			}
+    /**
+     * Used for preview controls
+     *
+     * @return ArrayData
+     */
+    public function getSilverStripeNavigator() {
+        $newsletter = $this->record;
+        if($newsletter) {
+            $navigator = new SilverStripeNavigator($newsletter);
 
-			$navigator->customise(
-				new ArrayData(array('EmailPreviewLink' => $newsletter->Link('emailpreview'.$emailLink)))
-			);
-			Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterAdminEmailPreview.js');
+            //create the link the send a preview email
+            $member = Member::currentUser();
+            $emailLink = '?email=';
+            if ($member) {
+                $emailLink .= $member->Email;
+            }
 
-			return $navigator->renderWith('NewsletterAdmin_SilverStripeNavigator');
-		} else {
-			return false;
-		}
-	}
+            $navigator->customise(
+                new ArrayData(array('EmailPreviewLink' => $newsletter->Link('emailpreview'.$emailLink)))
+            );
+            Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterAdminEmailPreview.js');
 
-	/**
-	 * Send the preview/test email
-	 * @param SS_HTTPRequest $request
-	 */
-	public function emailpreview(SS_HTTPRequest $request = null) {
-		$emailVar = $request->getVar('email');
+            return $navigator->renderWith('NewsletterAdmin_SilverStripeNavigator');
+        } else {
+            return false;
+        }
+    }
 
-		$recipient = new Recipient(Recipient::$test_data);
-		if ($request && !empty($emailVar)) {
-			$recipient->Email = Convert::raw2js($emailVar);
-		} else {
-			$recipient->Email = Member::currentUser()->Email;
-		}
+    /**
+     * Send the preview/test email
+     * @param SS_HTTPRequest $request
+     */
+    public function emailpreview(SS_HTTPRequest $request = null) {
+        $emailVar = $request->getVar('email');
 
-		$newsletter = $this->record;
-		$email = new NewsletterEmail($newsletter, $recipient, true);
-		$email->send();
+        $recipient = new Recipient(Recipient::$test_data);
+        if ($request && !empty($emailVar)) {
+            $recipient->Email = Convert::raw2js($emailVar);
+        } else {
+            $recipient->Email = Member::currentUser()->Email;
+        }
 
-		return Controller::curr()->redirectBack();
-	}
+        $newsletter = $this->record;
+        $email = new NewsletterEmail($newsletter, $recipient, true);
+        $email->send();
 
-	/**
-	 * @return string
-	 */
-	public function LinkPreview() {
-		if($this->record && $this->record instanceof Newsletter) {
-			return $this->Link('preview');
-		}else{
-			return false;
-		}
-	}
-	
-	// We send this newsletter again to newly added Recipients
-	public function doResend($data, $form) {
-		// Record is Newsletter
-		//debug::dump($this->record->Title); die;
-		//copied from parent
-		$controller = Controller::curr();
+        return Controller::curr()->redirectBack();
+    }
 
-		try {
-			//$form->saveInto($this->record);
-			$this->record->Status = 'Sending';  //custom: changing the status of to indicate we are sending
-			$this->record->write();
-			//$this->gridField->getList()->add($this->record);
-		} catch(ValidationException $e) {
-			$form->sessionMessage($e->getResult()->message(), 'bad');
-			$responseNegotiator = new PjaxResponseNegotiator(array(
-				'CurrentForm' => function() use(&$form) {
-					return $form->forTemplate();
-				},
-				'default' => function() use(&$controller) {
-					return $controller->redirectBack();
-				}
-			));
-			if($controller->getRequest()->isAjax()) {
-				$controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
-			}
-			return $responseNegotiator->respond($controller->getRequest());
-		}
+    /**
+     * @return string
+     */
+    public function LinkPreview() {
+        if($this->record && $this->record instanceof Newsletter) {
+        	return $this->Link('preview');
+        }else{
+        	return false;
+        }
+    }
 
-		//custom code
-		$nsc = NewsletterSendController::inst();
-		$nsc->enqueueRepeated($this->record);
-		$nsc->processQueueOnShutdown($this->record->ID);
+    // We send this newsletter again to newly added Recipients
+    public function doResend($data, $form) {
+        // Record is Newsletter
+        //debug::dump($this->record->Title); die;
+        //copied from parent
+        $controller = Controller::curr();
 
+        try {
+            //$form->saveInto($this->record);
+            $this->record->Status = 'Sending';  //custom: changing the status of to indicate we are sending
+            $this->record->write();
+            //$this->gridField->getList()->add($this->record);
+        } catch(ValidationException $e) {
+            $form->sessionMessage($e->getResult()->message(), 'bad');
+            $responseNegotiator = new PjaxResponseNegotiator(array(
+                'CurrentForm' => function() use(&$form) {
+                    return $form->forTemplate();
+                },
+                'default' => function() use(&$controller) {
+                    return $controller->redirectBack();
+                }
+            ));
+            if($controller->getRequest()->isAjax()) {
+                $controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
+            }
+            return $responseNegotiator->respond($controller->getRequest());
+        }
 
-		//javascript hides the success message appropriately
-		Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterSendConfirmation.js');
-		$message = _t('NewsletterAdmin.SendMessage',
-			'Send-out process started successfully. Check the progress in the "Sent To" tab');
-		//end custom code
+        //custom code
+        $nsc = NewsletterSendController::inst();
+        $nsc->enqueueRepeated($this->record);
+        $nsc->processQueueOnShutdown($this->record->ID);
 
-		$form->sessionMessage($message, 'good');
-		return Controller::curr()->redirect($this->Link());
-		
-		// if($new_record) {
-// 			return Controller::curr()->redirect($this->Link());
-// 		} elseif($this->gridField->getList()->byId($this->record->ID)) {
-// 			// Return new view, as we can't do a "virtual redirect" via the CMS Ajax
-// 			// to the same URL (it assumes that its content is already current, and doesn't reload)
-// 			return $this->edit(Controller::curr()->getRequest());
-// 		} else {
-// 			// Changes to the record properties might've excluded the record from
-// 			// a filtered list, so return back to the main view if it can't be found
-// 			$noActionURL = $controller->removeAction($data['url']);
-// 			$controller->getRequest()->addHeader('X-Pjax', 'Content');
-// 			return $controller->redirect($noActionURL, 302);
-// 		}
-		
-		
-	}
-	
-	public function doSaveAsNew($data, $form) {
-		$originalID = $data['NEWSLETTER_ORIGINAL_ID'];
-		$origNewsletter = DataObject::get_by_id("Newsletter", $originalID);
-		$controller = Controller::curr();
+        //javascript hides the success message appropriately
+        Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterSendConfirmation.js');
+        $message = _t('NewsletterAdmin.SendMessage',
+            'Send-out process started successfully. Check the progress in the "Sent To" tab');
+        //end custom code
 
-		try {
-			$newNewsletter = clone $origNewsletter;
+        $form->sessionMessage($message, 'good');
+        return Controller::curr()->redirect($this->Link());
 
-			//unset doesn't work, set system used fields to nulls.
-			$newNewsletter->ID = null;
-			$newNewsletter->Created = null;
-			$newNewsletter->Status = null;
-			$newNewsletter->LastEdited = null;
-			$newNewsletter->SentDate = null;
+        // if($new_record) {
+//          return Controller::curr()->redirect($this->Link());
+//      } elseif($this->gridField->getList()->byId($this->record->ID)) {
+//      // Return new view, as we can't do a "virtual redirect" via the CMS Ajax
+//      // to the same URL (it assumes that its content is already current, and doesn't reload)
+//          return $this->edit(Controller::curr()->getRequest());
+//      } else {
+//      // Changes to the record properties might've excluded the record from
+//      // a filtered list, so return back to the main view if it can't be found
+//      $noActionURL = $controller->removeAction($data['url']);
+//      $controller->getRequest()->addHeader('X-Pjax', 'Content');
+//      return $controller->redirect($noActionURL, 302);
+// }
+    }
 
-			//write once without validation
-			//Newsletter::set_validation_enabled(false);
-			// Hack Jochen
-			Config::inst()->update('Newsletter', 'validation_enabled', false);
-			//save once to get the new Newsletter created so as to add to mailing list
-			$newNewsletter->write($showDebug = false,$forceInsert = true);
-			$origMailinglists = $origNewsletter->MailingLists();
-			if($origMailinglists && $origMailinglists->count()) {
-				$newNewsletter->MailingLists()->addMany($origMailinglists);
-			}
-			Config::inst()->update('Newsletter', 'validation_enabled', true);
-			
-			$newNewsletter->Status = 'Draft';  //custom: changing the status of to indicate we are sending
+    public function doSaveAsNew($data, $form) {
+        $originalID = $data['NEWSLETTER_ORIGINAL_ID'];
+        $origNewsletter = DataObject::get_by_id("Newsletter", $originalID);
+        $controller = Controller::curr();
 
-			//add a (1) (2) count to new newsletter names if the subject name already exists elsewhere
-			$subjectCount = 0;
-			$newSubject = $newNewsletter->Subject;
-			do {
-				if ($subjectCount > 0) $newSubject = $newNewsletter->Subject . " ($subjectCount)";
-				$existingSubjectCount = Newsletter::get()->filter(array('Subject'=>$newSubject))->count();
-				$subjectCount++;
-			} while($existingSubjectCount != 0);
-			$newNewsletter->Subject = $newSubject;
+        try {
+            $newNewsletter = clone $origNewsletter;
 
-			$newNewsletter->write();
-		} catch(ValidationException $e) {
-			$form->sessionMessage($e->getResult()->message(), 'bad');
-			$responseNegotiator = new PjaxResponseNegotiator(array(
-				'CurrentForm' => function() use(&$form) {
-					return $form->forTemplate();
-				},
-				'default' => function() use(&$controller) {
-					return $controller->redirectBack();
-				}
-			));
-			if($controller->getRequest()->isAjax()) {
-				$controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
-			}
-			return $responseNegotiator->respond($controller->getRequest());
-		}
+            //unset doesn't work, set system used fields to nulls.
+            $newNewsletter->ID = null;
+            $newNewsletter->Created = null;
+            $newNewsletter->Status = null;
+            $newNewsletter->LastEdited = null;
+            $newNewsletter->SentDate = null;
 
-		$form->sessionMessage(_t('NewsletterAdmin.SaveAsNewMessage',
-			'New Newsletter created as copy of the sent newsletter'), 'good');
+            //write once without validation
+            //Newsletter::set_validation_enabled(false);
+            // Hack Jochen
+            Config::inst()->update('Newsletter', 'validation_enabled', false);
+            //save once to get the new Newsletter created so as to add to mailing list
+            $newNewsletter->write($showDebug = false,$forceInsert = true);
+            $origMailinglists = $origNewsletter->MailingLists();
+            if($origMailinglists && $origMailinglists->count()) {
+                $newNewsletter->MailingLists()->addMany($origMailinglists);
+            }
+            Config::inst()->update('Newsletter', 'validation_enabled', true);
 
-		//create a link to the newly created object and open that instead of the old sent newsletter we had open before
-		$link = Controller::join_links($this->gridField->Link('item'),$newNewsletter->ID ? $newNewsletter->ID : 'new');
-		$link = str_replace('_SentExtension','',$link);
-		
-		return Controller::curr()->redirect($link);
-	}
+            $newNewsletter->Status = 'Draft';  //custom: changing the status of to indicate we are sending
 
-	public function doSend($data, $form) {
-		//copied from parent
-		$new_record = $this->record->ID == 0;
-		$controller = Controller::curr();
+            //add a (1) (2) count to new newsletter names if the subject name already exists elsewhere
+            $subjectCount = 0;
+            $newSubject = $newNewsletter->Subject;
+            do {
+                if ($subjectCount > 0) $newSubject = $newNewsletter->Subject . " ($subjectCount)";
+                $existingSubjectCount = Newsletter::get()->filter(array('Subject'=>$newSubject))->count();
+                $subjectCount++;
+            } while($existingSubjectCount != 0);
+            $newNewsletter->Subject = $newSubject;
 
-		try {
-			$form->saveInto($this->record);
-			$this->record->Status = 'Sending';  //custom: changing the status of to indicate we are sending
-			$this->record->write();
-			$this->gridField->getList()->add($this->record);
-		} catch(ValidationException $e) {
-			$form->sessionMessage($e->getResult()->message(), 'bad');
-			$responseNegotiator = new PjaxResponseNegotiator(array(
-				'CurrentForm' => function() use(&$form) {
-					return $form->forTemplate();
-				},
-				'default' => function() use(&$controller) {
-					return $controller->redirectBack();
-				}
-			));
-			if($controller->getRequest()->isAjax()) {
-				$controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
-			}
-			return $responseNegotiator->respond($controller->getRequest());
-		}
+            $newNewsletter->write();
+        } catch(ValidationException $e) {
+            $form->sessionMessage($e->getResult()->message(), 'bad');
+            $responseNegotiator = new PjaxResponseNegotiator(array(
+                'CurrentForm' => function() use(&$form) {
+                    return $form->forTemplate();
+                },
+                'default' => function() use(&$controller) {
+                    return $controller->redirectBack();
+                }
+            ));
+            if($controller->getRequest()->isAjax()) {
+                $controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
+            }
+            return $responseNegotiator->respond($controller->getRequest());
+        }
 
-		//custom code
-		$nsc = NewsletterSendController::inst();
-		$nsc->enqueue($this->record);
-		$nsc->processQueueOnShutdown($this->record->ID);
+        $form->sessionMessage(_t('NewsletterAdmin.SaveAsNewMessage',
+            'New Newsletter created as copy of the sent newsletter'), 'good');
 
+        //create a link to the newly created object and open that instead of the old sent newsletter we had open before
+        $link = Controller::join_links($this->gridField->Link('item'),$newNewsletter->ID ? $newNewsletter->ID : 'new');
+        $link = str_replace('_SentExtension','',$link);
 
-		//javascript hides the success message appropriately
-		Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterSendConfirmation.js');
-		$message = _t('NewsletterAdmin.SendMessage',
-			'Send-out process started successfully. Check the progress in the "Sent To" tab');
-		//end custom code
+        return Controller::curr()->redirect($link);
+    }
 
-		$form->sessionMessage($message, 'good');
+    public function doSend($data, $form) {
+        //copied from parent
+        $new_record = $this->record->ID == 0;
+        $controller = Controller::curr();
 
-		if($new_record) {
-			return Controller::curr()->redirect($this->Link());
-		} elseif($this->gridField->getList()->byId($this->record->ID)) {
-			// Return new view, as we can't do a "virtual redirect" via the CMS Ajax
-			// to the same URL (it assumes that its content is already current, and doesn't reload)
-			return $this->edit(Controller::curr()->getRequest());
-		} else {
-			// Changes to the record properties might've excluded the record from
-			// a filtered list, so return back to the main view if it can't be found
-			$noActionURL = $controller->removeAction($data['url']);
-			$controller->getRequest()->addHeader('X-Pjax', 'Content');
-			return $controller->redirect($noActionURL, 302);
-		}
-	}
+        try {
+            $form->saveInto($this->record);
+            $this->record->Status = 'Sending';  //custom: changing the status of to indicate we are sending
+            $this->record->write();
+            $this->gridField->getList()->add($this->record);
+        } catch(ValidationException $e) {
+            $form->sessionMessage($e->getResult()->message(), 'bad');
+            $responseNegotiator = new PjaxResponseNegotiator(array(
+                'CurrentForm' => function() use(&$form) {
+                    return $form->forTemplate();
+                },
+                'default' => function() use(&$controller) {
+                    return $controller->redirectBack();
+                }
+            ));
+            if($controller->getRequest()->isAjax()) {
+                $controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
+            }
+            return $responseNegotiator->respond($controller->getRequest());
+        }
 
-	public function preview($data) {
-		return $this->record->render();
-	}
+        //custom code
+        $nsc = NewsletterSendController::inst();
+        $nsc->enqueue($this->record);
+        $nsc->processQueueOnShutdown($this->record->ID);
+
+        //javascript hides the success message appropriately
+        Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterSendConfirmation.js');
+        $message = _t('NewsletterAdmin.SendMessage',
+            'Send-out process started successfully. Check the progress in the "Sent To" tab');
+        //end custom code
+
+        $form->sessionMessage($message, 'good');
+
+        if($new_record) {
+            return Controller::curr()->redirect($this->Link());
+        } elseif($this->gridField->getList()->byId($this->record->ID)) {
+            // Return new view, as we can't do a "virtual redirect" via the CMS Ajax
+            // to the same URL (it assumes that its content is already current, and doesn't reload)
+            return $this->edit(Controller::curr()->getRequest());
+        } else {
+            // Changes to the record properties might've excluded the record from
+            // a filtered list, so return back to the main view if it can't be found
+            $noActionURL = $controller->removeAction($data['url']);
+            $controller->getRequest()->addHeader('X-Pjax', 'Content');
+            return $controller->redirect($noActionURL, 302);
+        }
+    }
+
+    public function preview($data) {
+        return $this->record->render();
+    }
 }

@@ -8,144 +8,139 @@
  */
 class NewsletterAdmin extends ModelAdmin {
 
-	private static $url_segment  = 'newsletter';
-	private static $menu_title   = 'Newsletter';
-	private static $menu_icon    = 'newsletter/images/newsletter-icon.png';
-	public $showImportForm       = false;
+    private static $url_segment  = 'newsletter';
+    private static $menu_title   = 'Newsletter';
+    private static $menu_icon    = 'newsletter/images/newsletter-icon.png';
+    public $showImportForm       = false;
 
-	private static $managed_models = array(
-		"Newsletter" => array('title' => 'Mailing'),
-		"Newsletter_SentExtension" => array('title' => 'Sent Mailings'),
-		"MailingList",
-		"Recipient"
-	);
+    private static $managed_models = array(
+        "Newsletter" => array('title' => 'Mailing'),
+        "Newsletter_SentExtension" => array('title' => 'Sent Mailings'),
+        "MailingList",
+        "Recipient"
+    );
 
-	/** 
-	 * @var array Array of template paths to check 
-	 */	
-	static $template_paths = null; //could be customised in _config.php
+    /**
+     * @var array Array of template paths to check
+     */
+    static $template_paths = null; //could be customised in _config.php
 
-	public function init() { 
-		parent::init();
+    public function init() {
+        parent::init();
 
-		Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
-		Requirements::javascript(NEWSLETTER_DIR . '/javascript/ActionOnConfirmation.js');
-		Requirements::css('newsletter/css/NewsletterAdmin.css');
-	}
+        Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
+        Requirements::javascript(NEWSLETTER_DIR . '/javascript/ActionOnConfirmation.js');
+        Requirements::css('newsletter/css/NewsletterAdmin.css');
+    }
 
-	public function getEditForm($id = null, $fields = null) {
-		$form = parent::getEditForm($id, $fields);
-		//custom handling of the newsletter modeladmin with a specialized action menu for the detail form
-		if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_SentExtension") {
-			$config = $form->Fields()->first()->getConfig();
-			$config->removeComponentsByType('GridFieldDetailForm')
-				->addComponents(new NewsletterGridFieldDetailForm());
-			if ($this->modelClass == "Newsletter_SentExtension") {
-				$config->removeComponentsByType('GridFieldAddNewButton');
-			}
-			$config->getComponentByType('GridFieldDataColumns')
-				->setFieldCasting(array(
-					"Content" => "HTMLText->LimitSentences",
-			));
-		}
-		if($this->modelClass == "Recipient") {
-			
-			$config = $form->Fields()->first()->getConfig();
-			$config->getComponentByType('GridFieldDataColumns')
-				->setFieldCasting(array(
-					"Blacklisted" => "Boolean->Nice",
-					"Verified" => "Boolean->Nice",
-			));
-			
-		}
-		return $form;
-	}
+    public function getEditForm($id = null, $fields = null) {
+        $form = parent::getEditForm($id, $fields);
+        //custom handling of the newsletter modeladmin with a specialized action menu for the detail form
+        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_SentExtension") {
+            $config = $form->Fields()->first()->getConfig();
+            $config->removeComponentsByType('GridFieldDetailForm')
+                ->addComponents(new NewsletterGridFieldDetailForm());
+            if ($this->modelClass == "Newsletter_SentExtension") {
+                $config->removeComponentsByType('GridFieldAddNewButton');
+            }
+            $config->getComponentByType('GridFieldDataColumns')
+                ->setFieldCasting(array(
+                    "Content" => "HTMLText->LimitSentences",
+            ));
+        }
+        if($this->modelClass == "Recipient") {
+            $config = $form->Fields()->first()->getConfig();
+            $config->getComponentByType('GridFieldDataColumns')
+                ->setFieldCasting(array(
+                    "Blacklisted" => "Boolean->Nice",
+                    "Verified" => "Boolean->Nice",
+            ));
+        }
+        return $form;
+    }
 
-	/**
-	 * looked-up the email template_paths. 
-	 * if not set, will look up both theme folder and project folder
-	 * in both cases, email folder exsits or Email folder exists
-	 * return an array containing all folders pointing to the bunch of email templates
-	 *
-	 * @return array
-	 */
-	public static function template_paths() {
+    /**
+    * looked-up the email template_paths.
+    * if not set, will look up both theme folder and project folder
+    * in both cases, email folder exsits or Email folder exists
+    * return an array containing all folders pointing to the bunch of email templates
+    *
+    * @return array
+    */
+    public static function template_paths() {
 
-		if(!isset(self::$template_paths)) {
-			if(class_exists('SiteConfig') && ($config = SiteConfig::current_site_config()) && $config->Theme) {
-				$theme = $config->Theme;
-			} elseif(SSViewer::current_custom_theme()) {
-				$theme = SSViewer::current_custom_theme();
-			} else if(SSViewer::current_theme()){
-				$theme = SSViewer::current_theme();
-			} else {
-				$theme = false;
-			}
+        if(!isset(self::$template_paths)) {
+            if(class_exists('SiteConfig') && ($config = SiteConfig::current_site_config()) && $config->Theme) {
+                $theme = $config->Theme;
+            } elseif(SSViewer::current_custom_theme()) {
+                $theme = SSViewer::current_custom_theme();
+            } else if(SSViewer::current_theme()){
+                $theme = SSViewer::current_theme();
+            } else {
+                $theme = false;
+            }
 
-			if($theme) {
-				if(file_exists("../".THEMES_DIR."/".$theme."/templates/email")){
-					self::$template_paths[] = THEMES_DIR."/".$theme."/templates/email";
-				}
-				
-				if(file_exists("../".THEMES_DIR."/".$theme."/templates/Email")){
-					self::$template_paths[] = THEMES_DIR."/".$theme."/templates/Email";
-				}
-			}
+            if($theme) {
+                if(file_exists("../".THEMES_DIR."/".$theme."/templates/email")){
+                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/email";
+                }
+                if(file_exists("../".THEMES_DIR."/".$theme."/templates/Email")){
+                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/Email";
+                }
+            }
 
-			$project = project();
-			
-			if(file_exists("../". $project . '/templates/email')){
-				self::$template_paths[] = $project . '/templates/email';
-			}
-			
-			if(file_exists("../". $project . '/templates/Email')){
-				self::$template_paths[] = $project . '/templates/Email';
-			}
-		}
-		else {
-			if(is_string(self::$template_paths)) {
-				self::$template_paths = array(self::$template_paths);
-			}
-		}
-		return self::$template_paths;
-	}
+            $project = project();
 
-	public function getList() {
-		$list = parent::getList();
-		if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_SentExtension" ){
-			if ($this->modelClass == "Newsletter") {
-				$statusFilter = array("Draft", "Sending");
+            if(file_exists("../". $project . '/templates/email')){
+            	self::$template_paths[] = $project . '/templates/email';
+            }
 
-				//using a editform detail request, that should allow Newsletter_Sent objects and regular Newsletters
-				if (!empty($_REQUEST['url'])) {
-					if (strpos($_REQUEST['url'],'/EditForm/field/Newsletter/item/') !== false) {
-						$statusFilter[] = "Sent";
-					}
-				}
-			} else {
-				$statusFilter = array("Sent");
-			}
+            if(file_exists("../". $project . '/templates/Email')){
+                self::$template_paths[] = $project . '/templates/Email';
+            }
+        }
+        else {
+            if(is_string(self::$template_paths)) {
+            self::$template_paths = array(self::$template_paths);
+            }
+        }
+        return self::$template_paths;
+    }
 
-			$list = $list->addFilter(array("Status" => $statusFilter));
-		}
+    public function getList() {
+        $list = parent::getList();
+        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_SentExtension" ){
+            if ($this->modelClass == "Newsletter") {
+                $statusFilter = array("Draft", "Sending");
 
+                //using a editform detail request, that should allow Newsletter_Sent objects and regular Newsletters
+                if (!empty($_REQUEST['url'])) {
+                    if (strpos($_REQUEST['url'],'/EditForm/field/Newsletter/item/') !== false) {
+                        $statusFilter[] = "Sent";
+                    }
+                }
+            } else {
+                $statusFilter = array("Sent");
+            }
 
+            $list = $list->addFilter(array("Status" => $statusFilter));
+        }
 
-		return $list;
-	}
+        return $list;
+    }
 
-	/**
-	 * @return SearchContext
-	 */
-	public function getSearchContext() {
-		$context = parent::getSearchContext();
+    /**
+    * @return SearchContext
+    */
+    public function getSearchContext() {
+        $context = parent::getSearchContext();
 
-		if($this->modelClass === "Newsletter_SentExtension") {
-			$context = singleton("Newsletter")->getDefaultSearchContext();
-			foreach($context->getFields() as $field) $field->setName(sprintf('q[%s]', $field->getName()));
-			foreach($context->getFilters() as $filter) $filter->setFullName(sprintf('q[%s]', $filter->getFullName()));
-		}
+        if($this->modelClass === "Newsletter_SentExtension") {
+            $context = singleton("Newsletter")->getDefaultSearchContext();
+            foreach($context->getFields() as $field) $field->setName(sprintf('q[%s]', $field->getName()));
+            foreach($context->getFilters() as $filter) $filter->setFullName(sprintf('q[%s]', $filter->getFullName()));
+        }
 
-		return $context;
-	}
+        return $context;
+    }
 }
