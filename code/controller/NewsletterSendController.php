@@ -17,205 +17,195 @@
  */
 class NewsletterSendController extends BuildTask {
 
-	/**
-	 * @var integer number of emails to send out in "batches" to avoid spin up costs
-	 */
-	static $items_to_batch_process = 1000;
+    /**
+    * @var integer number of emails to send out in "batches" to avoid spin up costs
+    */
+    static $items_to_batch_process = 1000;
 
-	/**
-	 * @var integer minutes after which we consider an "InProgress" item in the queue "stuck"
-	 */
-	static $stuck_timeout = 5;
-	
-	/**
-	 * @var integer number of times to retry sending email that get "stuck"
-	 */
-	static $retry_limit = 4;
+    /**
+    * @var integer minutes after which we consider an "InProgress" item in the queue "stuck"
+    */
+    static $stuck_timeout = 5;
 
-	/**
-	 * @var integer seconds to wait between sending out email batches.
-	 * Caution: Currently implemented through PHP's sleep() function.
-	 * While the execution time limit is unset in the process,
-	 * it still means that any higher value (minutes/hours) 
-	 * can lead to memory problems.
-	 */
-	static $throttle_batch_delay = 0;
+    /**
+    * @var integer number of times to retry sending email that get "stuck"
+    */
+    static $retry_limit = 4;
 
-	protected static $inst = null;
+    /**
+    * @var integer seconds to wait between sending out email batches.
+    * Caution: Currently implemented through PHP's sleep() function.
+    * While the execution time limit is unset in the process,
+    * it still means that any higher value (minutes/hours)
+    * can lead to memory problems.
+    */
+    static $throttle_batch_delay = 0;
 
-	protected $title = 'Newsletter Send Controller';
+    protected static $inst = null;
 
-	protected $description = 'Triggers processing of the send queue the specific newsletter ID.
-		Usage: dev/tasks/NewsletterSendController?newsletter=#';
+    protected $title = 'Newsletter Send Controller';
 
-	static function inst() {
-		if(!self::$inst) self::$inst = new NewsletterSendController();
-		return self::$inst;
-	}
+    protected $description = 'Triggers processing of the send queue the specific newsletter ID.
+        Usage: dev/tasks/NewsletterSendController?newsletter=#';
 
-	/**
-	 * Adds users to the queue for sending out a newsletter.
-	 * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
-	 * to the queue.
-	 * 
-	 * @param $id The ID of the Newsletter DataObject to send
-	 */
-	function enqueue(Newsletter $newsletter) {
-		$lists = $newsletter->MailingLists();
-		$queueCount = 0;
-		foreach($lists as $list) {
-			
-			// TODO: I introduced "ExcludedParams" here in order
-			// to give additional control over the recipients who receive
-			// a newsletter
-			// Those params get defined on the Newsletter DataObject and are managed
-			// through a CheckboxSetField
-			$Recipients = $list->Recipients();
-			
-			$excludeParams = $newsletter->ExcludeParams;
-			// Convert ExcludeParams to Array
-			$excludeParams = explode(",",$excludeParams);
-			foreach ( $excludeParams as $excludeParam) {
-				
-				if ($excludeParam == 'HasBooking') {
-					foreach ($Recipients as $R) {
+    static function inst() {
+        if(!self::$inst) self::$inst = new NewsletterSendController();
+        return self::$inst;
+    }
 
-						if ( Booking::get()->filter('RecipientID', $R->ID)->First() ) {
-							// We identify users who have a booking record. So we want 
-							// to excllude those from the list of Recipients
-							$Recipients = $Recipients->exclude('ID', $R->ID);
-						} else {
-							//die('no booking for'. $R->Surname);
-						}
-					}
-				}
-				
-				// Has Booking Record and will attend = Confirmed!
-				if ($excludeParam == 'Confirmed') {
-					foreach ($Recipients as $R) {
+    /**
+    * Adds users to the queue for sending out a newsletter.
+    * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
+    * to the queue.
+    *
+    * @param $id The ID of the Newsletter DataObject to send
+    */
+    function enqueue(Newsletter $newsletter) {
+        $lists = $newsletter->MailingLists();
+        $queueCount = 0;
+        foreach($lists as $list) {
 
-						if ( $Booking = Booking::get()->filter('RecipientID', $R->ID)->First() ) {
-							// We identify users who have a booking record.
-							// but will not attend ERGO confirmed = 0!
-							if ( $Booking->Confirmed == 0) {
-								$Recipients = $Recipients->exclude('ID', $R->ID);
-							}
-							
-						} else {
-							//no booking record. So include this one as well
-							$Recipients = $Recipients->exclude('ID', $R->ID);
-						}
-					}
-				}
-				
-			}
+            // TODO: I introduced "ExcludedParams" here in order
+            // to give additional control over the recipients who receive
+            // a newsletter
+            // Those params get defined on the Newsletter DataObject and are managed
+            // through a CheckboxSetField
+            $Recipients = $list->Recipients();
 
-			
-			
-			
-			foreach($Recipients->column('ID') as $recipientID) {
-				//duplicate filtering
-				$existingQueue = SendRecipientQueue::get()->filter(array(
-					'RecipientID' => $recipientID,
-					'NewsletterID' => $newsletter->ID,
-					'Status' => array('Scheduled', 'InProgress')
-				));
-				if($existingQueue->exists()) continue;
-				
-				$queueItem = SendRecipientQueue::create();
-				$queueItem->NewsletterID = $newsletter->ID;
-				$queueItem->RecipientID = $recipientID;
-				$queueItem->write();
-				$queueCount++;
-			}
-		}
+            $excludeParams = $newsletter->ExcludeParams;
+            // Convert ExcludeParams to Array
+            $excludeParams = explode(",",$excludeParams);
+            foreach ( $excludeParams as $excludeParam) {
 
-		return $queueCount;
-	}
+                if ($excludeParam == 'HasBooking') {
+                    foreach ($Recipients as $R) {
+
+                        if ( Booking::get()->filter('RecipientID', $R->ID)->First() ) {
+                            // We identify users who have a booking record. So we want
+                            // to excllude those from the list of Recipients
+                            $Recipients = $Recipients->exclude('ID', $R->ID);
+                        } else {
+                            //die('no booking for'. $R->Surname);
+                        }
+                    }
+                }
+
+                // Has Booking Record and will attend = Confirmed!
+                if ($excludeParam == 'Confirmed') {
+                    foreach ($Recipients as $R) {
+
+                        if ( $Booking = Booking::get()->filter('RecipientID', $R->ID)->First() ) {
+                            // We identify users who have a booking record.
+                            // but will not attend ERGO confirmed = 0!
+                            if ( $Booking->Confirmed == 0) {
+                                $Recipients = $Recipients->exclude('ID', $R->ID);
+                            }
+
+                        } else {
+                            //no booking record. So include this one as well
+                            $Recipients = $Recipients->exclude('ID', $R->ID);
+                        }
+                    }
+                }
+
+            }
 
 
-	/**
-	 * Adds users to the queue for sending out a newsletter.
-	 * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
-	 * to the queue.
-	 * 
-	 * @param $id The ID of the Newsletter DataObject to send
-	 */
-	function enqueueRepeated(Newsletter $newsletter) {
+            foreach($Recipients->column('ID') as $recipientID) {
+                //duplicate filtering
+                $existingQueue = SendRecipientQueue::get()->filter(array(
+                    'RecipientID' => $recipientID,
+                    'NewsletterID' => $newsletter->ID,
+                    'Status' => array('Scheduled', 'InProgress')
+                ));
+
+                if($existingQueue->exists()) continue;
+
+                $queueItem = SendRecipientQueue::create();
+                $queueItem->NewsletterID = $newsletter->ID;
+                $queueItem->RecipientID = $recipientID;
+                $queueItem->write();
+                $queueCount++;
+            }
+        }
+
+        return $queueCount;
+    }
+
+    /**
+    * Adds users to the queue for sending out a newsletter.
+     * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
+    * to the queue.
+    *
+    * @param $id The ID of the Newsletter DataObject to send
+    */
+    function enqueueRepeated(Newsletter $newsletter) {
+
+        $queueCount = 0;
+
+        // Lookup belonging Mailing Lists
+        $MailingLists = $newsletter->MailingLists();
+
+        // Gather All Recipients for all Mailing Lists which belong to this Newsletter
+        $Recipients = new ArrayList();
+        foreach ( $MailingLists as $MailingList) {
+            foreach( $MailingList->Recipients() as $Recipient) {
+                $Recipients->push($Recipient);
+            }
+        }
 
 
-		$queueCount = 0;
+        // Now get those Recipients who already Recieved the Newsletter
+        $RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $newsletter->ID);
+        $RecipientsRecievedArrayList = new ArrayList();
 
-		// Lookup belonging Mailing Lists
-		$MailingLists = $newsletter->MailingLists();
+        foreach($RecipientsRecieved as $Recipient) {
+            $RecipientsRecievedArrayList->push($Recipient);
+        }
 
-		// Gather All Recipients for all Mailing Lists which belong to this Newsletter
-		$Recipients = new ArrayList();
-		foreach ( $MailingLists as $MailingList) {
-			foreach( $MailingList->Recipients() as $Recipient) {
-				$Recipients->push($Recipient);
-			}
-		}
-		
-		
-		// Now get those Recipients who already Recieved the Newsletter
-		$RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $newsletter->ID);
-		$RecipientsRecievedArrayList = new ArrayList();
-		
-		foreach($RecipientsRecieved as $Recipient) {
-			$RecipientsRecievedArrayList->push($Recipient);
-		}
-		
-		
-		// Calculate the difference
-		$diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
-		$NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
-		
-		
-		$Recipients = $NewRecipients;
-		
-		foreach($Recipients as $Recipient) {
-				
-				//duplicate filtering
-				$existingQueue = SendRecipientQueue::get()->filter(array(
-					'RecipientID' => $Recipient->ID,
-					'NewsletterID' => $newsletter->ID,
-					'Status' => array('Scheduled', 'InProgress')
-				));
+        // Calculate the difference
+        $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
+        $NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
 
-				if($existingQueue->exists()) continue;
-				
-				$queueItem = SendRecipientQueue::create();
-				$queueItem->Status = "Scheduled";
-				$queueItem->NewsletterID = $newsletter->ID;
-				$queueItem->RecipientID = $Recipient->ID;
-				$queueItem->write();
-				$queueCount++;
-			}
+        $Recipients = $NewRecipients;
 
-		return $queueCount;
-	}
+        foreach($Recipients as $Recipient) {
 
+            //duplicate filtering
+            $existingQueue = SendRecipientQueue::get()->filter(array(
+                'RecipientID' => $Recipient->ID,
+                'NewsletterID' => $newsletter->ID,
+                'Status' => array('Scheduled', 'InProgress')
+            ));
 
+            if($existingQueue->exists()) continue;
+                $queueItem = SendRecipientQueue::create();
+                $queueItem->Status = "Scheduled";
+                $queueItem->NewsletterID = $newsletter->ID;
+                $queueItem->RecipientID = $Recipient->ID;
+                $queueItem->write();
+                $queueCount++;
+            }
 
+            return $queueCount;
+        }
 
+        function processQueueOnShutdown($newsletterID) {
+            if (class_exists('MessageQueue')) {
+                //start processing of email sending for this newsletter ID after shutdown
+                MessageQueue::send(
+                    "newsletter",
+                    new MethodInvocationMessage('NewsletterSendController', "process_queue_invoke", $newsletterID)
+                );
 
-
-	function processQueueOnShutdown($newsletterID) {
-		if (class_exists('MessageQueue')) {
-			//start processing of email sending for this newsletter ID after shutdown
-			MessageQueue::send(
-				"newsletter",
-				new MethodInvocationMessage('NewsletterSendController', "process_queue_invoke", $newsletterID)
-			);
-			
-			MessageQueue::consume_on_shutdown();
-		} else {
-			// Do the sending in real-time, if there is not MessageQueue to do it out-of-process.
-			// Caution: Will only send the first batch (see $items_to_batch_process), 
-			// needs to be continued manually afterwards, e.g. through the "restart queue processing"
-			// in the admin UI.
-			$this->processQueue($newsletterID);
+                MessageQueue::consume_on_shutdown();
+            } else {
+            // I removed Messageque in this fork!!!
+            // Do the sending in real-time, if there is not MessageQueue to do it out-of-process.
+            // Caution: Will only send the first batch (see $items_to_batch_process),
+            // needs to be continued manually afterwards, e.g. through the "restart queue processing"
+            // in the admin UI.
+            $this->processQueue($newsletterID);
 		}
 	}
 
@@ -303,7 +293,7 @@ class NewsletterSendController extends BuildTask {
 					// Commit transaction
 					if($conn->supportsTransactions()) $conn->transactionEnd();
 				} catch (Exception $e) {
-					
+
 					// Rollback
 					if($conn->supportsTransactions()) $conn->transactionRollback();
 
@@ -316,8 +306,8 @@ class NewsletterSendController extends BuildTask {
 				if (!empty($queueItemsList)) {
 					$queueItems2 = SendRecipientQueue::get()->filter(array('ID'=>$queueItemsList));
 				}
-				
-				
+
+
 				//do the actual mail out
 				if (!empty($queueItems2) && $queueItems2->count() > 0) {
 					//fetch all the recipients at once in one query
