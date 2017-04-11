@@ -70,6 +70,8 @@ class NewsletterSendController extends BuildTask {
             // a newsletter
             // Those params get defined on the Newsletter DataObject and are managed
             // through a CheckboxSetField
+
+
             $Recipients = $list->Recipients();
 
             $excludeParams = $newsletter->ExcludeParams;

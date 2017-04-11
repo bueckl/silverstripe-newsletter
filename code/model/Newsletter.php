@@ -15,8 +15,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
         "SentDate" => "Datetime",
         "SendFrom" => "Varchar(255)",
         "ReplyTo" => "Varchar(255)",
-        "RenderTemplate" => "Varchar",
-        "ExcludeParams" => "Varchar(255)"
+        "RenderTemplate" => "Varchar"
     );
 
     private static $has_many = array(
@@ -26,11 +25,6 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
     private static $many_many = array(
         "MailingLists" => "MailingList"
-    );
-
-    private static $has_one = array(
-        "Attachment" => "File",
-        "PreviewImageWebsite" => "Image"
     );
 
     private static $singular_name = 'Mailing';
@@ -169,31 +163,31 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
             if(!$this->ID) {
                 // $explanation1 = _t("Newletter.TemplateExplanation1",
-//  'You should make your own styled SilverStripe templates	make sure your templates have a'
-//  . '$Body coded so the newletter\'s content could be clearly located in your templates'
-//  );
-//  $explanation2 = _t("Newletter.TemplateExplanation2",
-//  "Make sure your newsletter templates could be looked up in the dropdown list below by
-//  either placing them under your theme directory,	e.g. themes/mytheme/templates/email/
-//  ");
-//  $explanation3 = _t("Newletter.TemplateExplanation3",
-// "or under your project directory e.g. mysite/templates/email/
-// ");
-//  $fields->insertBefore(
-// LiteralField::create("TemplateExplanation1", "<p class='help'>$explanation1</p>"),
-//  "RenderTemplate"
-//  );
-//  $fields->insertBefore(
-//  LiteralField::create(
-//  "TemplateExplanation2",
-//  "<p class='help'>$explanation2<br />$explanation3</p>"
-//  ),
-//  "RenderTemplate"
-//  );
+                //  'You should make your own styled SilverStripe templates	make sure your templates have a'
+                //  . '$Body coded so the newletter\'s content could be clearly located in your templates'
+                //  );
+                //  $explanation2 = _t("Newletter.TemplateExplanation2",
+                //  "Make sure your newsletter templates could be looked up in the dropdown list below by
+                //  either placing them under your theme directory,	e.g. themes/mytheme/templates/email/
+                //  ");
+                //  $explanation3 = _t("Newletter.TemplateExplanation3",
+                // "or under your project directory e.g. mysite/templates/email/
+                // ");
+                //  $fields->insertBefore(
+                // LiteralField::create("TemplateExplanation1", "<p class='help'>$explanation1</p>"),
+                //  "RenderTemplate"
+                //  );
+                //  $fields->insertBefore(
+                //  LiteralField::create(
+                //  "TemplateExplanation2",
+                //  "<p class='help'>$explanation2<br />$explanation3</p>"
+                //  ),
+                //  "RenderTemplate"
+                //  );
             }
         } else {
             $fields->replaceField("RenderTemplate",
-            	new HiddenField('RenderTemplate', false, key($templateSource))
+                new HiddenField('RenderTemplate', false, key($templateSource))
             );
         }
 
@@ -204,7 +198,6 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
             $mailinglists = MailingList::get();
             $fields->removeByName("MailingLists");
-            $fields->removeByName("ExcludeParams");
 
             $fields->addFieldsToTab("Root.Main", array(
                 new CheckboxSetField(
