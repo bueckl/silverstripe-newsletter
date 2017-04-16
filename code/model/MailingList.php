@@ -92,7 +92,7 @@ class MailingList extends DataObject {
 
         }
 
-        $fields->addFieldsToTab('Root.Manage Mailing list filters', $FilterableFields);
+        $fields->addFieldsToTab('Root.Main', $FilterableFields);
 
 
         // Prepopulate Fields from given data. This won't work on relations. Maybe we need to prefix FilterableFields with the DataObject's name of the relation
@@ -107,7 +107,7 @@ class MailingList extends DataObject {
         // Populate Data
         $grid = new GridField(
             'Members',
-            _t('NewsletterAdmin.Recipients', 'Recipients for this mailing list'),
+            _t('NewsletterAdmin.Recipients', 'Additional recipients for this mailing list'),
             $this->Members(),
             $config = GridFieldConfig::create()
                 ->addComponent(new GridFieldButtonRow('before'))
@@ -137,7 +137,7 @@ class MailingList extends DataObject {
         $config->addComponent($auto = new GridFieldAddExistingSearchButton());
         $auto->setTitle(_t('Newsletter.AssignExistingRecipient', "Assign Recipient to Mailing List"));
 
-        $fields->addFieldToTab('Root.Main',new CompositeField($grid));
+        $fields->addFieldToTab('Root.Additional recipients',new CompositeField($grid));
 
         $this->extend("updateCMSFields", $fields);
 
