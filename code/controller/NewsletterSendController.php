@@ -53,6 +53,7 @@ class NewsletterSendController extends BuildTask {
         return self::$inst;
     }
 
+
     /**
     * Adds users to the queue for sending out a newsletter.
     * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
@@ -60,31 +61,32 @@ class NewsletterSendController extends BuildTask {
     *
     * @param $id The ID of the Newsletter DataObject to send
     */
+
     function enqueue(Newsletter $newsletter) {
+
         $lists = $newsletter->MailingLists();
         $queueCount = 0;
+
         foreach($lists as $list) {
 
             // TODO: I introduced "ExcludedParams" here in order
-            // to give additional control over the recipients who receive
-            // a newsletter
+            // to give additional control over the recipients who receive a newsletter
             // Those params get defined on the Newsletter DataObject and are managed
             // through a CheckboxSetField
-
 
             $Recipients = $list->Recipients();
 
             $excludeParams = $newsletter->ExcludeParams;
-            // Convert ExcludeParams to Array
             $excludeParams = explode(",",$excludeParams);
+
+
             foreach ( $excludeParams as $excludeParam) {
 
                 if ($excludeParam == 'HasBooking') {
                     foreach ($Recipients as $R) {
 
                         if ( Booking::get()->filter('RecipientID', $R->ID)->First() ) {
-                            // We identify users who have a booking record. So we want
-                            // to excllude those from the list of Recipients
+                            // Exclude users who have a booking
                             $Recipients = $Recipients->exclude('ID', $R->ID);
                         } else {
                             //die('no booking for'. $R->Surname);

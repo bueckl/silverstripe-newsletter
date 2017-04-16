@@ -11,6 +11,7 @@ class MailingList extends DataObject {
     /* the database fields */
     private static $db = array(
         'Title' => "Varchar",
+        'FiltersApplied' => 'Text'
     );
 
     /* a mailing list could contains many newsletter recipients */
@@ -33,38 +34,15 @@ class MailingList extends DataObject {
         'ActiveRecipients.Count',
     );
 
-    public function requireDefaultRecords() {
-        //parent::requireDefaultRecords();
-        return;
-        $defaultLists =  MailingList::create();
-        $defaultLists->ID = 1;
-        $defaultLists->Title = 'Visitors Mailing List';
-        $defaultLists->write();
-
-        $defaultLists->write();
-
-        $defaultLists =  MailingList::create();
-        $defaultLists->ID = 2;
-        $defaultLists->Title = 'Exhibitors Mailing List';
-        $defaultLists->write();
-
-        $defaultLists =  MailingList::create();
-        $defaultLists->ID = 3;
-        $defaultLists->Title = 'Subscriber Mailing List';
-        $defaultLists->write();
-    }
-
     private static $searchable_fields = array(
         'Title'
     );
 
     public function fieldLabels($includelrelations = true) {
         $labels = parent::fieldLabels($includelrelations);
-
         $labels["Title"] = _t('Newsletter.FieldTitle', "Title");
         $labels["FullTitle"] = _t('Newsletter.FieldTitle', "Title");
         $labels["ActiveRecipients.Count"] = _t('Newsletter.Recipients', "Recipients");
-
         return $labels;
     }
 
@@ -79,6 +57,54 @@ class MailingList extends DataObject {
             $TitleField = new TextField('Title',_t('NewsletterAdmin.MailingListTitle','Mailing List Title'))
         );
 
+        /*
+         We construct a UI to be able to select the filters we want to apply when creating a MailingList
+         FilterableFields are set using the mailinglistFilterableFields() method, to be set on the DataObject
+         FilterableFields of relations should be set on the Main DataObject, which is "Member" / respectivley its extension
+         This is not very clean, but this is rather custom stuff anyway …
+        */
+
+        $FilterableFields = new FieldList();
+
+        if ( singleton('Member')->mailinglistFilterableFields() && count(singleton('Member')->mailinglistFilterableFields()>0) ) {
+
+            $FilterableFieldsArray = singleton('Member')->mailinglistFilterableFields();
+
+            foreach ( $FilterableFieldsArray as $Filterable ) {
+                $FilterableField = singleton('Member')->getCMSFields()->dataFieldByName($Filterable);
+                $FilterableField->setName( 'Filter_' . $FilterableField->getName());
+                $FilterableFields->add( $FilterableField );
+            }
+
+        }
+
+        if ( singleton('Hotel')->mailinglistFilterableFields() && count(singleton('Hotel')->mailinglistFilterableFields() > 0) ) {
+
+            $FilterableFieldsArrayHotel = singleton('Hotel')->mailinglistFilterableFields();
+
+            foreach ( $FilterableFieldsArrayHotel as $Filterable ) {
+                $FilterableField = singleton('Member')->getCMSFields()->dataFieldByName($Filterable);
+                $FilterableField->setName( 'Filter_' . $FilterableField->getName());
+                $FilterableFields->add( $FilterableField );
+            }
+
+            $FilterableFields = array_merge($FilterableFieldsArray, $FilterableFieldsArrayHotel);
+
+        }
+
+        $fields->addFieldsToTab('Root.MailingListConfig', $FilterableFields);
+
+
+        // Prepopulate Fields from given data. This won't work on relations. Maybe we need to prefix FilterableFields with the DataObject's name of the relation
+
+        $FiltersApplied = unserialize($this->FiltersApplied);
+
+        foreach ( $FiltersApplied as $key => $filter ) {
+            $FilterableFields->dataFieldByName($key)->setValue($filter);
+        }
+
+
+        // Populate Data
         $grid = new GridField(
             'Recipients',
             _t('NewsletterAdmin.Recipients', 'Mailing list recipients'),
@@ -144,5 +170,31 @@ class MailingList extends DataObject {
         }
         //return $this->Recipients()->exclude('Blacklisted', 1)->exclude('Verified', 0);
         return $this->Recipients();
+    }
+
+
+    public function onBeforeWrite() {
+
+        parent::onBeforeWrite();
+
+        // Saving selected filters
+
+        $data = $this->record;
+        $keys = array_keys($data);
+
+        // Find all Fields having a "Filter_" prefix
+        $filterArray = preg_grep('/Filter_/', $keys);
+
+        $filterKeyValue = array();
+
+        foreach($filterArray as $key => $val) {
+            // ignore empty values
+            if ( $this->$val && !empty($this->$val) ) {
+                $filterKeyValue[$val] = $this->$val;
+            }
+        }
+
+        $this->FiltersApplied = serialize($filterKeyValue);
+
     }
 }
