@@ -124,7 +124,7 @@ class RecipientExtension extends DataExtension
 
     public static function RecipientExists($email) {
 
-        $Recipient = Recipient::get()->Filter('Email', $email);
+        $Recipient = Member::get()->Filter('Email', $email);
 
         // THE RECIPIENT EXISTS. NOW LET'S CHECK IF THE USER JUST WANTS TO SIGNUP FOR AN ADDITIONAL MAILING LIST
         if ( $Recipient->Count() > 0 ) {
@@ -184,7 +184,7 @@ class RecipientExtension extends DataExtension
         do {
             $generator = new RandomGenerator();
             $hash = $generator->randomToken();
-        } while(DataObject::get_one('Recipient', "\"ValidateHash\" = '$hash'"));
+        } while(DataObject::get_one('Member', "\"ValidateHash\" = '$hash'"));
 
         $this->owner->ValidateHash = $hash;
         $this->owner->ValidateHashExpired = date('Y-m-d H:i:s', time() + (86400 * $lifetime));
@@ -269,7 +269,7 @@ class RecipientExtension extends DataExtension
     public function onAfterWrite() {
         parent::onAfterWrite();
 
-        $Recipient = Recipient::get()->Filter('Email', $this->owner->Email);
+        $Recipient = Member::get()->Filter('Email', $this->owner->Email);
 
         // Lets add user to the default mailing list
         switch ( $this->owner->ClassName ) {
@@ -295,12 +295,12 @@ class RecipientExtension extends DataExtension
 
         if ($MailingListID) {
             //Is already subscribed. maybe just add the user to another list?
-            if (self::inMailingList( $Recipient->First(), $MailingListID )) {
+            if (self::inMailingList( $Member->First(), $MailingListID )) {
                 throw new ValidationException($this->owner->Email.' already exists on this mailing list. In case you have made changes to this record; All good. Those have been stored.',0);
             } else {
                 // Add the existing user to this new mailing list
                 $MailingList = DataObject::get_by_id('MailingList', $MailingListID);
-                $MailingList->Recipients()->add($Recipient->First());
+                $MailingList->Members()->add($Recipient->First());
                 $MailingList->write();
             }
         }
