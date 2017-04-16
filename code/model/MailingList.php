@@ -39,34 +39,6 @@ class MailingList extends DataObject {
     );
 
 
-
-    /**
-     * Classes that contain a mailinglistFilters method
-     * Such a method could look like this:
-     *
-     * public function mailinglistFilters()
-     * {
-     *     return [
-     *          'Country' => [
-     *              'Callback' => function($members, $restraint) {
-     *                  return $members->filter('Country', $restraint);
-     *              }
-     *          ],
-     *          'Name' => [
-     *              'Field' => DropdownField::create('Name')
-     *                  ->setSource(Hotel::get()->map())
-     *                  ->setEmptyString('Please select hotel'),
-     *              'Callback' => function($members, $restraint) {
-     *                  $hotelID = $restraint;
-     *                  return $members->filter('HotelID', $hotelID);
-     *              }
-     *          ]
-     *     ];
-     * }
-     *
-     *
-     * @var array
-     */
     private static $filter_classes = [];
 
     public function fieldLabels($includelrelations = true) {
@@ -89,28 +61,7 @@ class MailingList extends DataObject {
             $TitleField = new TextField('Title',_t('NewsletterAdmin.MailingListTitle','Mailing List Title'))
         );
 
-        $FilterableFields = new FieldList();
-
-        foreach ($this->config()->filter_classes as $fc) {
-            $filters = singleton($fc)->mailinglistFilters();
-            if ( $filters && count($filters > 0) ) {
-                $FilterableFields->add(HeaderField::create('Filters' . $fc .'Header', $fc, 3));
-                foreach ( $filters as $key => $filterable ) {
-                    $field = null;
-                    if (isset($filterable['Field'])) {
-                        $field = $filterable['Field'];
-                    } else {
-                        if (is_array($filterable)) {
-                            $filterable = $key;
-                        }
-                        $field = singleton($fc)->getCMSFields()->dataFieldByName($filterable);
-                    }
-                    //TODO this should be stored globally as we need it when applying the filters
-                    $field->setName( 'Filter_' . $fc . '_' . $field->getName());
-                    $FilterableFields->add($field);
-                }
-            }
-        }
+        $FilterableFields = self::get_filterable_fields_or_callbacks();
 
         $fields->addFieldsToTab('Root.Main', [
             HeaderField::create('FiltersHeader', 'Filters'),
@@ -129,19 +80,11 @@ class MailingList extends DataObject {
 
         $fields->addFieldsToTab('Root.Main', $FilterableFields);
 
-
-        //Debug::dump($this->FilteredRecipients()->count());
-        //die;
-
         $fields->addFieldsToTab('Root.Main', LiteralField::create(
             'MemberCount',
             'Applicable members: ' . $this->FilteredRecipients()->count()
         ));
 
-
-
-
-        // Prepopulate Fields from given data. This won't work on relations. Maybe we need to prefix FilterableFields with the DataObject's name of the relation
 
         $FiltersApplied = unserialize($this->FiltersApplied);
 
@@ -194,6 +137,7 @@ class MailingList extends DataObject {
         return $fields;
     }
 
+
     public function getFullTitle() {
         return sprintf(
             '%s (%s)',
@@ -206,24 +150,50 @@ class MailingList extends DataObject {
         );
     }
 
-    public function FilteredRecipients() {
-        //TODO this should be a getter as it's also used on getCMSFields
-        $filtersApplied = unserialize($this->FiltersApplied);
-        //Debug::dump($filtersApplied);
-        //die;
+    /**
+     * All filterable fields
+     * Fields are configured as the method "mailinglistFilters" in any class that interacts with Member
+     * Additionally these have to be added as a configuration, e.g. like this:
+     *
+     * MailingList:
+     * filter_classes:
+     *   - Member
+     *   - Hotel
+     *
+     * Example of the mailinglistFilters method
+     *
+     * public function mailinglistFilters()
+     * {
+     *     return [
+     *          'Country' => [
+     *              'Callback' => function($members, $restraint) {
+     *                  return $members->filter('Country', $restraint);
+     *              }
+     *          ],
+     *          'Name' => [
+     *              'Field' => DropdownField::create('Name')
+     *                  ->setSource(Hotel::get()->map())
+     *                  ->setEmptyString('Please select hotel'),
+     *              'Callback' => function($members, $restraint) {
+     *                  $hotelID = $restraint;
+     *                  return $members->filter('HotelID', $hotelID);
+     *              }
+     *          ]
+     *     ];
+     * }
+     *
+     * @param bool $callBacks whether to return
+     * @return array|FieldList
+     */
+    public static function get_filterable_fields_or_callbacks($callBacks = false) {
+        $FilterableFields = new FieldList();
+        $callBacksArr = [];
 
-        if ($filtersApplied) foreach ( $filtersApplied as $key => $filter ) {
-            //$field = $FilterableFields->dataFieldByName($key);
-            //if ($field) $field->setValue($filter);
-        }
-        $members = Member::get();
-        foreach ($this->config()->filter_classes as $fc) {
+        foreach (Config::inst()->get('MailingList', 'filter_classes') as $fc) {
             $filters = singleton($fc)->mailinglistFilters();
-            //Debug::dump($filters);
             if ( $filters && count($filters > 0) ) {
+                $FilterableFields->add(HeaderField::create('Filters' . $fc .'Header', $fc, 3));
                 foreach ( $filters as $key => $filterable ) {
-                    //Debug::dump($filterable);
-                    //TODO this should be stored globally as it's used twice
                     $field = null;
                     if (isset($filterable['Field'])) {
                         $field = $filterable['Field'];
@@ -232,18 +202,38 @@ class MailingList extends DataObject {
                     }
                     $fieldName = 'Filter_' . $fc . '_' . $field->getName();
 
-                    if (isset($filterable['Callback'])) {
-                        $callBack = $filterable['Callback'];
-                        $restraint = isset($filtersApplied[$fieldName]) ? $filtersApplied[$fieldName] : false;
-                        if ($restraint) {
-                            $members = $callBack($members, $restraint);
+                    if ($callBacks) {
+                        if (isset($filterable['Callback'])) {
+                            $callBacksArr[$fieldName] = $filterable['Callback'];
                         }
+                    } else {
+                        $field->setName($fieldName);
+                        $FilterableFields->add($field);
                     }
                 }
-                //die;
             }
         }
-        //die;
+        if ($callBacks) {
+            return $callBacksArr;
+        } else {
+            return $FilterableFields;
+        }
+    }
+
+    /**
+     * All recipients defined by the set filter
+     * @return DataList
+     */
+    public function FilteredRecipients() {
+        $filtersApplied = unserialize($this->FiltersApplied);
+        $members = Member::get();
+
+        foreach (self::get_filterable_fields_or_callbacks(true) as $fieldName => $callBack) {
+            $restraint = isset($filtersApplied[$fieldName]) ? $filtersApplied[$fieldName] : false;
+            if ($restraint) {
+                $members = $callBack($members, $restraint);
+            }
+        }
         return $members;
     }
 
