@@ -7,7 +7,7 @@
 class MailingList extends DataObject {
 
     private static $db = array(
-        'Title' => "Varchar",
+        'Title' => "Varchar(255)",
         'FiltersApplied' => 'Text'
     );
 
@@ -70,7 +70,7 @@ class MailingList extends DataObject {
                 'FiltersDesc',
                 '
                 <em>
-                    The mailing list will include all members that fit filters defined here. <br> 
+                    The mailing list will include all members that fit filters defined here. <br>
                     Additional members can be added manually.
                 </em>
                 <br>
@@ -87,12 +87,20 @@ class MailingList extends DataObject {
 
         // Filtered recipients
         $filteredRecipients = $this->FilteredRecipients();
+
         $grid = new GridField(
             'FilteredRecipients',
             'Filtered Recipients',
             $filteredRecipients
         );
+        // Important to set ModelClass
+        $grid->setModelClass('Member');
+
         $grid->getConfig()->removeComponentsByType('GridFieldAjaxRefresh');
+
+        // Heads up !!!! $filteredRecipients ist not calculated from the actual database, here !!!
+        // This is potentially dangerous. Reinvestigate …
+
         $fields->addFieldsToTab(
             'Root.Filtered recipients (' . $filteredRecipients->count() . ')', [
             LiteralField::create('FilteredRecipientsDesc','
