@@ -1,14 +1,11 @@
 <?php
-/**
- * @package  newsletter
- */
 
 /**
- * Represents a specific containner of newsletter recipients
+ * MailingList.
+ * Represents a specific container of newsletter recipients
  */
 class MailingList extends DataObject {
 
-    /* the database fields */
     private static $db = array(
         'Title' => "Varchar",
         'FiltersApplied' => 'Text'
@@ -38,7 +35,9 @@ class MailingList extends DataObject {
         'Title'
     );
 
-
+    /**
+     * @var array
+     */
     private static $filter_classes = [];
 
     public function fieldLabels($includelrelations = true) {
@@ -47,10 +46,12 @@ class MailingList extends DataObject {
         $labels["FullTitle"] = _t('Newsletter.FieldTitle', "Title");
         $labels["ActiveRecipients.Count"] = _t('Newsletter.Recipients', "Recipients");
         return $labels;
-
     }
 
 
+    /**
+     * @return FieldList
+     */
     function getCMSFields() {
         $fields = new FieldList();
 
@@ -61,8 +62,8 @@ class MailingList extends DataObject {
             $TitleField = new TextField('Title',_t('NewsletterAdmin.MailingListTitle','Mailing List Title'))
         );
 
+        // Filterable fields
         $FilterableFields = self::get_filterable_fields_or_callbacks();
-
         $fields->addFieldsToTab('Root.Main', [
             HeaderField::create('FiltersHeader', 'Filters'),
             LiteralField::create(
@@ -77,28 +78,40 @@ class MailingList extends DataObject {
                 '
             )
         ]);
-
         $fields->addFieldsToTab('Root.Main', $FilterableFields);
-
-        $fields->addFieldsToTab('Root.Main', LiteralField::create(
-            'MemberCount',
-            'Applicable members: ' . $this->FilteredRecipients()->count()
-        ));
-
-
         $FiltersApplied = unserialize($this->FiltersApplied);
-
         if ($FiltersApplied) foreach ( $FiltersApplied as $key => $filter ) {
             $field = $FilterableFields->dataFieldByName($key);
             if ($field) $field->setValue($filter);
         }
 
+        // Filtered recipients
+        $filteredRecipients = $this->FilteredRecipients();
+        $grid = new GridField(
+            'FilteredRecipients',
+            'Filtered Recipients',
+            $filteredRecipients
+        );
+        $grid->getConfig()->removeComponentsByType('GridFieldAjaxRefresh');
+        $fields->addFieldsToTab(
+            'Root.Filtered recipients (' . $filteredRecipients->count() . ')', [
+            LiteralField::create('FilteredRecipientsDesc','
+                <em>
+                    These recipients are filtered based on the filtering options. <br>
+                    Make sure to save for these to refresh.
+                </em>
+            '),
+            new CompositeField($grid)
+        ]);
 
-        // Populate Data
+
+
+        // Additional recipients
+        $additionalRecipients = $this->Members();
         $grid = new GridField(
             'Members',
             _t('NewsletterAdmin.Recipients', 'Additional recipients for this mailing list'),
-            $this->Members(),
+            $additionalRecipients,
             $config = GridFieldConfig::create()
                 ->addComponent(new GridFieldButtonRow('before'))
                 ->addComponent(new GridFieldToolbarHeader())
@@ -127,7 +140,7 @@ class MailingList extends DataObject {
         $config->addComponent($auto = new GridFieldAddExistingSearchButton());
         $auto->setTitle(_t('Newsletter.AssignExistingRecipient', "Assign Recipient to Mailing List"));
 
-        $fields->addFieldToTab('Root.Additional recipients',new CompositeField($grid));
+        $fields->addFieldToTab('Root.Additional recipients (' . $additionalRecipients->count() . ')',new CompositeField($grid));
 
         $this->extend("updateCMSFields", $fields);
 
@@ -137,7 +150,9 @@ class MailingList extends DataObject {
         return $fields;
     }
 
-
+    /**
+     * @return string
+     */
     public function getFullTitle() {
         return sprintf(
             '%s (%s)',
@@ -250,11 +265,9 @@ class MailingList extends DataObject {
 
 
     public function onBeforeWrite() {
-
         parent::onBeforeWrite();
 
         // Saving selected filters
-
         $data = $this->record;
         $keys = array_keys($data);
 
@@ -262,15 +275,12 @@ class MailingList extends DataObject {
         $filterArray = preg_grep('/Filter_/', $keys);
 
         $filterKeyValue = array();
-
         foreach($filterArray as $key => $val) {
             // ignore empty values
             if ( $this->$val && !empty($this->$val) ) {
                 $filterKeyValue[$val] = $this->$val;
             }
         }
-
         $this->FiltersApplied = serialize($filterKeyValue);
-
     }
 }
