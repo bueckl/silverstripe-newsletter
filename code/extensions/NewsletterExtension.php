@@ -21,7 +21,7 @@ class NewsletterExtension extends DataExtension {
 
 
 	public function updateCMSFields(FieldList $fields) {
-
+        return $fields;
         /* Reorder all fields */
         $SubjectField = $fields->dataFieldByName('Subject');
         $SubjectField->setDescription('Mandatory!');
@@ -40,6 +40,12 @@ class NewsletterExtension extends DataExtension {
 
         $HeadlineField = $fields->dataFieldByName('Headline');
         $HeadlineField->setDescription('Not shown if left empty');
+
+        $HeroImageField = $fields->dataFieldByName('HeroImage');
+        $HeroImageField->setDescription('Not shown if left empty');
+
+        $HeroImageField = $fields->dataFieldByName('HeroImage');
+        $HeroImageField->setDescription('Not shown if left empty');
 
         $AttachmentField = $fields->dataFieldByName('Attachment');
         $AttachmentField->setDescription('Leave empty for no Attachments');
