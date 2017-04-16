@@ -1,4 +1,5 @@
 <?php
+//TODO is not used right now - do we need it???
 /**
  * @package  newsletter
  */

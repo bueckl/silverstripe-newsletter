@@ -1,3 +1,6 @@
+Member:
+  extensions:
+    - RecipientExtension
 SiteConfig:
   extensions:
     - NewsletterSiteConfig

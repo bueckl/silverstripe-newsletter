@@ -16,7 +16,7 @@ class MailingList extends DataObject {
 
     /* a mailing list could contains many newsletter recipients */
     private static $many_many = array(
-        'Recipients' => "Recipient",
+        'Recipients' => "Member",
     );
 
     private static $belongs_many_many = array(
@@ -99,7 +99,7 @@ class MailingList extends DataObject {
 
         $FiltersApplied = unserialize($this->FiltersApplied);
 
-        foreach ( $FiltersApplied as $key => $filter ) {
+        if ($FiltersApplied) foreach ( $FiltersApplied as $key => $filter ) {
             $FilterableFields->dataFieldByName($key)->setValue($filter);
         }
 
