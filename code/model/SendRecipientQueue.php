@@ -18,14 +18,14 @@ class SendRecipientQueue extends DataObject {
 
     private static $has_one = array(
         "Newsletter" => "Newsletter",
-        "Recipient" => "Recipient"
+        "Member" => "Member"
     );
 
     private static $summary_fields = array(
         "Status",
-        "Recipient.FirstName",
-        "Recipient.Surname",
-        "Recipient.Email",
+        "Member.FirstName",
+        "Member.Surname",
+        "Member.Email",
         "RetryCount",
         "ReceivedCount",
         "LastEdited",

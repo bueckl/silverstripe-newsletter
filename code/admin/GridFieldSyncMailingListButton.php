@@ -32,15 +32,15 @@ class GridFieldSyncMailingListButton implements GridField_HTMLProvider, GridFiel
     public function getHTMLFragments($gridField) {
         $button = new GridField_FormAction(
             $gridField,
-            'tags_to_mailinglists',
-            'Update Mailing Lists',
-            'tags_to_mailinglists',
+            'sync_mailinglists',
+            'Update/Sync ALL Mailing Lists',
+            'sync_mailinglists',
             null
         );
 
 
         $button->setAttribute('data-icon', 'download-csv');
-        $button->addExtraClass('action_tags_to_mailinglists');
+        $button->addExtraClass('action_sync_mailinglists');
         $button->setForm($gridField->getForm());
         return array(
             $this->targetFragment => '<p class="grid-csv-button">' . $button->Field() . '</p>',
@@ -51,12 +51,12 @@ class GridFieldSyncMailingListButton implements GridField_HTMLProvider, GridFiel
      * tagss_to_mailinglists is an action button
      */
     public function getActions($gridField) {
-        return array('tags_to_mailinglists');
+        return array('sync_mailinglists');
     }
 
     public function handleAction(GridField $gridField, $actionName, $arguments, $data) {
-        if($actionName == 'tags_to_mailinglists') {
-            return $this->handleTagsToMailinglists($gridField);
+        if($actionName == 'sync_mailinglists') {
+            return $this->handleSyncMailinglists($gridField);
         }
     }
 
@@ -65,7 +65,7 @@ class GridFieldSyncMailingListButton implements GridField_HTMLProvider, GridFiel
      */
     public function getURLHandlers($gridField) {
         return array(
-            'export' => 'handleTagsToMailinglists',
+            'export' => 'handleSyncMailinglists',
         );
     }
 
@@ -103,7 +103,16 @@ class GridFieldSyncMailingListButton implements GridField_HTMLProvider, GridFiel
     /**
      * Handle the logic, for both the action button and the URL
      */
-    public function handleTagsToMailinglists($gridField, $request = null) {
+
+    public function handleSyncMailinglists($gridField, $request = null) {
+
+        Controller::curr()->getResponse()->setStatusCode(
+            200,
+            'Implement Logic to sync/update Mailing lists based on filters ...'
+        );
+
+        return;
+
 
         $Tags = CustomerTag::get();
 

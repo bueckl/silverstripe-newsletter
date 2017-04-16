@@ -16,7 +16,7 @@ class MailingList extends DataObject {
 
     /* a mailing list could contains many newsletter recipients */
     private static $many_many = array(
-        'Recipients' => "Member",
+        'Members' => "Member"
     );
 
     private static $belongs_many_many = array(
@@ -92,7 +92,7 @@ class MailingList extends DataObject {
 
         }
 
-        $fields->addFieldsToTab('Root.MailingListConfig', $FilterableFields);
+        $fields->addFieldsToTab('Root.Manage Mailing list filters', $FilterableFields);
 
 
         // Prepopulate Fields from given data. This won't work on relations. Maybe we need to prefix FilterableFields with the DataObject's name of the relation
@@ -106,9 +106,9 @@ class MailingList extends DataObject {
 
         // Populate Data
         $grid = new GridField(
-            'Recipients',
-            _t('NewsletterAdmin.Recipients', 'Mailing list recipients'),
-            $this->Recipients(),
+            'Members',
+            _t('NewsletterAdmin.Recipients', 'Recipients for this mailing list'),
+            $this->Members(),
             $config = GridFieldConfig::create()
                 ->addComponent(new GridFieldButtonRow('before'))
                 ->addComponent(new GridFieldToolbarHeader())
@@ -124,12 +124,11 @@ class MailingList extends DataObject {
                 ->addComponent(new GridFieldAddNewButton('before'))
         );
 
-        $autocomplete->setSearchList(Recipient::get());
+        $autocomplete->setSearchList(Member::get());
         $autocomplete->setSearchFields(array(
             'FirstName',
             'Surname',
-            'Email',
-            'Company.CompanyName'
+            'Email'
         ));
 
         $config->removeComponentsByType('GridFieldAddNewButton');
@@ -164,11 +163,11 @@ class MailingList extends DataObject {
      * Returns all recipients who aren't blacklisted, and are verified.
      */
     public function ActiveRecipients() {
-        if($this->Recipients()  instanceof UnsavedRelationList ) {
+        if($this->Members()  instanceof UnsavedRelationList ) {
             return new ArrayList();
         }
-        //return $this->Recipients()->exclude('Blacklisted', 1)->exclude('Verified', 0);
-        return $this->Recipients();
+        //return $this->Members()->exclude('Blacklisted', 1)->exclude('Verified', 0);
+        return $this->Members();
     }
 
 

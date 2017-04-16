@@ -108,14 +108,15 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
      * @param SS_HTTPRequest $request
      */
     public function emailpreview(SS_HTTPRequest $request = null) {
-        $emailVar = $request->getVar('email');
 
-        $recipient = new Recipient(Recipient::$test_data);
-        if ($request && !empty($emailVar)) {
-            $recipient->Email = Convert::raw2js($emailVar);
-        } else {
-            $recipient->Email = Member::currentUser()->Email;
-        }
+        $emailVar = $request->getVar('email');
+        $recipient->Email = Convert::raw2js($emailVar);
+
+        // if ($request && !empty($emailVar)) {
+        //     $recipient->Email = Convert::raw2js($emailVar);
+        // } else {
+        //     $recipient->Email = Member::currentUser()->Email;
+        // }
 
         $newsletter = $this->record;
         $email = new NewsletterEmail($newsletter, $recipient, true);
