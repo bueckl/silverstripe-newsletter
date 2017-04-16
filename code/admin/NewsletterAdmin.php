@@ -16,8 +16,8 @@ class NewsletterAdmin extends ModelAdmin {
     private static $managed_models = array(
         "Newsletter" => array('title' => 'Mailing'),
         "Newsletter_SentExtension" => array('title' => 'Sent Mailings'),
-        "MailingList",
-        "Member"
+        // "MailingList"
+        // "Member"
     );
 
     /**
@@ -33,8 +33,12 @@ class NewsletterAdmin extends ModelAdmin {
         Requirements::css('newsletter/css/NewsletterAdmin.css');
     }
 
+
     public function getEditForm($id = null, $fields = null) {
+
         $form = parent::getEditForm($id, $fields);
+
+
         //custom handling of the newsletter modeladmin with a specialized action menu for the detail form
         if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_SentExtension") {
             $config = $form->Fields()->first()->getConfig();
@@ -48,6 +52,7 @@ class NewsletterAdmin extends ModelAdmin {
                     "Content" => "HTMLText->LimitSentences",
             ));
         }
+
         if($this->modelClass == "Member") {
             $config = $form->Fields()->first()->getConfig();
             $config->getComponentByType('GridFieldDataColumns')
@@ -56,6 +61,9 @@ class NewsletterAdmin extends ModelAdmin {
                     "Verified" => "Boolean->Nice",
             ));
         }
+
+        // debug::dump($form->Fields()->fieldByName('Member')); die;
+
         return $form;
     }
 

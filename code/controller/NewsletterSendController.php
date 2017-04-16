@@ -74,7 +74,7 @@ class NewsletterSendController extends BuildTask {
             // Those params get defined on the Newsletter DataObject and are managed
             // through a CheckboxSetField
 
-            $Recipients = $list->Recipients();
+            $Recipients = $list->Members();
 
             $excludeParams = $newsletter->ExcludeParams;
             $excludeParams = explode(",",$excludeParams);
@@ -167,7 +167,7 @@ class NewsletterSendController extends BuildTask {
 
         // Calculate the difference
         $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
-        $NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+        $NewRecipients = Member::get()->filterAny('ID', array_keys($diff));
 
         $Recipients = $NewRecipients;
 
@@ -312,7 +312,7 @@ class NewsletterSendController extends BuildTask {
                 //do the actual mail out
                 if (!empty($queueItems2) && $queueItems2->count() > 0) {
                     //fetch all the recipients at once in one query
-                    $recipients = Recipient::get()->filter(array('ID' => $queueItems2->column('RecipientID')));
+                    $recipients = Member::get()->filter(array('ID' => $queueItems2->column('RecipientID')));
                     if ($recipients->count() > 0) {
                         $recipientsMap = array();
                         foreach($recipients as $r) {

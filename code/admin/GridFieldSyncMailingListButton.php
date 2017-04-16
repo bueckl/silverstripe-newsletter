@@ -75,7 +75,7 @@ class GridFieldSyncMailingListButton implements GridField_HTMLProvider, GridFiel
     public function AddRecipientsToMailingList($TagID, $MailingListID) {
 
 
-        $Recipients = Recipient::get();
+        $Recipients = Member::get();
 
         foreach ($Recipients as $Recipient) {
 

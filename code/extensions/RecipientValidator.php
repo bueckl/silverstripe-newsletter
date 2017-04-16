@@ -18,7 +18,7 @@ class RecipientValidator extends RequiredFields {
 
         // Check if an Email exists but belongs to a different User
         // If so we dont want to add this user and so avoid duplicates
-        $ExistingRecipient = Recipient::get()->filter('Email', $data['Email'])->First();
+        $ExistingRecipient = Member::get()->filter('Email', $data['Email'])->First();
 
         if (isset($ExistingRecipient)) {
 
@@ -28,7 +28,7 @@ class RecipientValidator extends RequiredFields {
                 $MailingListID = $data['MailingListID'];
 
                 // Is already subscribed. maybe just add the user to another list?
-                if (Recipient::inMailingList( $ExistingRecipient, $MailingListID )) {
+                if (Member::inMailingList( $ExistingRecipient, $MailingListID )) {
                     // TODO write correct error message and show message in form
                     $this->validationError('Email','You have already subscribed to this mailing list','required');
                 }

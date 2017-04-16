@@ -27,8 +27,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
         "MailingLists" => "MailingList"
     );
 
-    private static $singular_name = 'Mailing';
-    private static $plural_name = 'Mailings';
+    private static $singular_name = 'Newsletter';
+    private static $plural_name = 'Newsletters';
 
     private static $searchable_fields = array(
         "Subject",
@@ -59,7 +59,6 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
     public function fieldLabels($includelrelations = true) {
         $labels = parent::fieldLabels($includelrelations);
-
         $labels["Subject"] = _t('Newsletter.FieldSubject', "Subject");
         $labels["Status"] = _t('Newsletter.FieldStatus', "Status");
         $labels["SendFrom"] = _t('Newsletter.FieldSendFrom', "From Address");
@@ -69,6 +68,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
     }
 
     public function validate() {
+
         $result = parent::validate();
 
         foreach(self::$required_fields as $field) {
@@ -105,6 +105,11 @@ class Newsletter extends DataObject implements CMSPreviewable{
     public function getCMSFields() {
 
         $fields = parent::getCMSFields();
+
+        // We don't want to show a MailingList Grid here.
+        $fields->removeFieldFromTab('Root', 'MailingLists');
+        // nor a member gridfield
+        $fields->removeFieldFromTab('Root', 'Member');
 
         $fields->removeByName('Status');
         $fields->addFieldToTab(
@@ -161,43 +166,16 @@ class Newsletter extends DataObject implements CMSPreviewable{
                 $templateSource)
             );
 
-            if(!$this->ID) {
-                // $explanation1 = _t("Newletter.TemplateExplanation1",
-                //  'You should make your own styled SilverStripe templates	make sure your templates have a'
-                //  . '$Body coded so the newletter\'s content could be clearly located in your templates'
-                //  );
-                //  $explanation2 = _t("Newletter.TemplateExplanation2",
-                //  "Make sure your newsletter templates could be looked up in the dropdown list below by
-                //  either placing them under your theme directory,	e.g. themes/mytheme/templates/email/
-                //  ");
-                //  $explanation3 = _t("Newletter.TemplateExplanation3",
-                // "or under your project directory e.g. mysite/templates/email/
-                // ");
-                //  $fields->insertBefore(
-                // LiteralField::create("TemplateExplanation1", "<p class='help'>$explanation1</p>"),
-                //  "RenderTemplate"
-                //  );
-                //  $fields->insertBefore(
-                //  LiteralField::create(
-                //  "TemplateExplanation2",
-                //  "<p class='help'>$explanation2<br />$explanation3</p>"
-                //  ),
-                //  "RenderTemplate"
-                //  );
-            }
         } else {
             $fields->replaceField("RenderTemplate",
                 new HiddenField('RenderTemplate', false, key($templateSource))
             );
         }
 
-        // JOCHEN TODO: This is where we could hook in to apply further filters on the mailing list
-        // http://takeaway.bigfork.co.uk/a-beginners-introduction-to-using-entwine-in-silverstripe
 
         if($this && $this->exists()){
 
             $mailinglists = MailingList::get();
-            $fields->removeByName("MailingLists");
 
             $fields->addFieldsToTab("Root.Main", array(
                 new CheckboxSetField(
@@ -208,14 +186,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
             ));
         }
 
-        if($this->Status === 'Sending' || $this->Status === 'Sent') {
-            //make the whole field read-only
-            $fields->removeByName('PreviewImageWebsite');
-            $fields = $fields->transform(new ReadonlyTransformation());
 
-            $fields->insertAfter('MailingLists',
-                UploadField::create('PreviewImageWebsite')
-            );
+        if($this->Status === 'Sending' || $this->Status === 'Sent') {
 
             $fields->push(new HiddenField("NEWSLETTER_ORIGINAL_ID", "", $this->ID));
 
@@ -244,76 +216,81 @@ class Newsletter extends DataObject implements CMSPreviewable{
             $gridFieldConfig
         );
 
-        $fields->addFieldToTab('Root.'._t('NewsletterAdmin.SentTo', 'Sent to'),$sendRecipientGrid);
 
-            // Lookup belonging Mailing Lists
-            $MailingLists = $this->MailingLists();
+        $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent tooo'), $sendRecipientGrid );
 
-            // Gather All Recipients for all Mailing Lists which belong to this Newsletter
-            $Recipients = new ArrayList();
-            foreach ( $MailingLists as $MailingList) {
-                foreach( $MailingList->Members() as $Recipient) {
-                    $Recipients->push($Recipient);
-                }
-            }
+        // Lookup belonging Mailing Lists
+        $MailingLists = $this->MailingLists();
 
-            // Now get those Recipients who already Recieved the Newsletter
-            $RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
-            $RecipientsRecievedArrayList = new ArrayList();
+        // Gather All Recipients for all Mailing Lists which belong to this Newsletter
+        $Recipients = new ArrayList();
 
-            foreach($RecipientsRecieved as $Recipient) {
-                $RecipientsRecievedArrayList->push($Recipient);
-            }
-
-            // Calculate the difference
-            $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
-            $NewRecipients = Member::get()->filterAny('ID', array_keys($diff));
-
-            $notSentToYetRecipientGrid = GridField::create(
-                'Member',
-                _t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
-                $NewRecipients,
-                $gridFieldConfig
-            );
-
-            $fields->addFieldsToTab('Root.Recipients added after send-out', array(
-                $notSentToYetRecipientGrid
-            ));
-
-            //only show restart queue button if the newsletter is stuck in "sending"
-            //only show the restart queue button if the user can run the build task (i.e. has full admin permissions)
-            if ($this->Status == "Sending" && Permission::check('ADMIN')) {
-                $restartLink = Controller::join_links(
-                    Director::absoluteBaseURL(),
-                    'dev/tasks/NewsletterSendController?newsletter='.$this->ID
-                );
-                $fields->addFieldToTab('Root.SentTo',
-                    new LiteralField(
-                        'RestartQueue',
-                        sprintf(
-                        '<a href="%s" class="ss-ui-button" data-icon="arrow-circle-double">%s</a>',
-                        $restartLink,
-                        _t('Newsletter.RestartQueue', 'Restart queue processing')
-                        )
-                    )
-                );
-            }
-
-            //only show the TrackedLinks tab, if there are tracked links in the newsletter and the status is "Sent"
-            if($this->TrackedLinks()->count() > 0) {
-                $fields->addFieldToTab('Root.TrackedLinks',GridField::create(
-                    'TrackedLinks',
-                    _t('NewsletterAdmin.TrackedLinks', 'Tracked Links'),
-                    $this->TrackedLinks(),
-                    $gridFieldConfig
-                    )
-                );
+        foreach ( $MailingLists as $MailingList) {
+            foreach( $MailingList->Members() as $Recipient) {
+                $Recipients->push($Recipient);
             }
         }
 
-        $this->extend('updateCMSFields', $fields);
+        // Now get those Recipients who already Recieved the Newsletter
+        $RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
+        $RecipientsRecievedArrayList = new ArrayList();
 
-        return $fields;
+        foreach($RecipientsRecieved as $Recipient) {
+            $RecipientsRecievedArrayList->push($Recipient);
+        }
+
+        // Calculate the difference
+        $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
+        $NewRecipients = Member::get()->filterAny('ID', array_keys($diff));
+
+        $notSentToYetRecipientGrid = GridField::create(
+            'Member',
+            _t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
+            $NewRecipients,
+            $gridFieldConfig
+        );
+
+        $fields->addFieldsToTab('Root.Recipients added after send-out', array(
+            $notSentToYetRecipientGrid
+        ));
+
+        //only show restart queue button if the newsletter is stuck in "sending"
+        //only show the restart queue button if the user can run the build task (i.e. has full admin permissions)
+        if ($this->Status == "Sending" && Permission::check('ADMIN')) {
+
+            $restartLink = Controller::join_links(
+                Director::absoluteBaseURL(),
+                'dev/tasks/NewsletterSendController?newsletter='.$this->ID
+            );
+
+            $fields->addFieldToTab('Root.Restart if stucked …',
+                new LiteralField(
+                    'RestartQueue',
+                    sprintf(
+                    '<a href="%s" class="ss-ui-button" data-icon="arrow-circle-double">%s</a>',
+                    $restartLink,
+                    _t('Newsletter.RestartQueue', 'Restart queue processing')
+                    )
+                )
+            );
+        }
+
+        //only show the TrackedLinks tab, if there are tracked links in the newsletter and the status is "Sent"
+        if($this->TrackedLinks()->count() > 0) {
+            $fields->addFieldToTab('Root.TrackedLinks',GridField::create(
+                'TrackedLinks',
+                _t('NewsletterAdmin.TrackedLinks', 'Tracked Links'),
+                $this->TrackedLinks(),
+                $gridFieldConfig
+                )
+            );
+        }
+    }
+
+    $this->extend('updateCMSFields', $fields);
+
+    return $fields;
+
     }
 
     /**

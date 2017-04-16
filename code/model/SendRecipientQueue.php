@@ -36,7 +36,7 @@ class SendRecipientQueue extends DataObject {
     );
 
     public function ReceivedCount() {
-        return $this->Recipient()->ReceivedCount;
+        return $this->Member()->ReceivedCount;
     }
     public function fieldLabels($includelrelations = true) {
         $labels = parent::fieldLabels($includelrelations);
@@ -56,7 +56,7 @@ class SendRecipientQueue extends DataObject {
     public function send($newsletter = null, $recipient = null) {
 
         if (empty($newsletter)) $newsletter = $this->Newsletter();
-        if (empty($recipient)) $recipient = $this->Recipient();
+        if (empty($recipient)) $recipient = $this->Member();
 
         //check recipient not blacklisted and verified
         if ($recipient && empty($recipient->Blacklisted) && !empty($recipient->Verified)) {

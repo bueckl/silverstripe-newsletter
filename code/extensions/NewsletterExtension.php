@@ -13,9 +13,7 @@ class NewsletterExtension extends DataExtension {
     );
 
 	private static $has_one = array(
-        "Attachment" => "File",
-        "PreviewImageWebsite" => "Image",
-        "HeroImage" => "Image"
+        "Attachment" => "File"
     );
 
 	public static $many_many = array(
@@ -33,11 +31,9 @@ class NewsletterExtension extends DataExtension {
         // $HintField =  LiteralField::create('Hint', 'Mit Erneut versenden (an nachtr&auml;glich hinzugef&uuml;gte Teilnehmer) schicken wir Emails an solche Teilnehmer, die zum Versandzeitpunkt eines Newsletters noch nicht auf der Mailingliste waren. Dies ist z.B. beim erneuten Versand einer Einladungsmail oder Infomail hilfreich. *** Eine Ausnahme bilden Reminder Mails. Hier kann diese Funktion nicht eingesetzt werden. F&uuml;r diesen Fall bitte einfach die bereits versandte Einladungs-/Infomail duplizieren und die Sonderkriterien zum Filtern von Teilnehmern nutzen.');
 //         $fields->insertAfter('Headline', $HintField);
 
-        $PreviewImageWebsiteField = $fields->dataFieldByName('PreviewImageWebsite');
-        $PreviewImageWebsiteField->setDescription('This is the preview image on the website. Not always used.');
-
-        $MailingListsField = $fields->dataFieldByName('MailingLists');
-        $MailingListsField->setTitle( _t('Newsletter.SendTo', "Send To") );
+        // $MailingListsField = $fields->dataFieldByName('MailingLists');
+        // $MailingListsField->setTitle( _t('Newsletter.SendTo', "Send To") );
+        // $MailingListsField->setDescription('Who will receive the Newsletter? Choose at least one list');
 
         $RenderTemplateField = $fields->dataFieldByName('RenderTemplate');
         $RenderTemplateField->setTitle('Template');
@@ -45,26 +41,11 @@ class NewsletterExtension extends DataExtension {
         $HeadlineField = $fields->dataFieldByName('Headline');
         $HeadlineField->setDescription('Not shown if left empty');
 
-        $HeroImageField = $fields->dataFieldByName('HeroImage');
-        $HeroImageField->setDescription('Not shown if left empty');
-
-        $HeroImageField = $fields->dataFieldByName('HeroImage');
-        $HeroImageField->setDescription('Not shown if left empty');
-
         $AttachmentField = $fields->dataFieldByName('Attachment');
         $AttachmentField->setDescription('Leave empty for no Attachments');
 
         $SublineField = $fields->dataFieldByName('Subline');
         $SublineField->setDescription('Not shown if left empty');
-
-        $MailingListsField = $fields->dataFieldByName('MailingLists');
-        $MailingListsField->setDescription('Who will receive the Newsletter? Choose at least one list');
-
-
-        $SelectAllField = new CheckboxField('SelectAll', 'Select all');
-        $SelectAllField->setDescription('Heads up! All mailing Lists get seleceted. You know what you are doing, right?');
-
-        $fields->insertAfter('MailingLists', $SelectAllField );
 
         // See enqueue() method on NewsletterSendController!
 

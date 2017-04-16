@@ -39,7 +39,7 @@ class GridFieldDetailFormRecipient_ItemRequest extends GridFieldDetailForm_ItemR
 //      }
 
         // Save the existing recipient
-        if (Recipient::RecipientExists($data['Email'])) {
+        if (Member::RecipientExists($data['Email'])) {
             //throw new ValidationException('You can\'t add a recipient twice to the same mailing list!',0);
         } else {
             // just update the many relation for the current mailing list
