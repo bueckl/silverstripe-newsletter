@@ -139,7 +139,6 @@ class MailingList extends DataObject {
         $auto->setTitle(_t('Newsletter.AssignExistingRecipient', "Assign Recipient to Mailing List"));
 
         $fields->addFieldToTab('Root.Main',new CompositeField($grid));
-        $fields->findOrMakeTab('Root.Main')->setTitle('');
 
         $this->extend("updateCMSFields", $fields);
 
