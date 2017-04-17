@@ -17,7 +17,7 @@ class MailingList extends DataObject {
     );
 
     private static $belongs_many_many = array(
-        'Newsletters' => "Newsletter",
+        'MailingLists' => "Newsletter",
     );
 
     private static $singular_name = 'Mailing-Liste';
@@ -93,7 +93,8 @@ class MailingList extends DataObject {
             'Filtered Recipients',
             $filteredRecipients
         );
-        // Important to set ModelClass
+
+        // Important to set ModelClass otherwise Grid moans
         $grid->setModelClass('Member');
 
         $grid->getConfig()->removeComponentsByType('GridFieldAjaxRefresh');
@@ -115,6 +116,12 @@ class MailingList extends DataObject {
 
 
         // Additional recipients
+
+        /* TODO
+        Discuss with Anselm. This doesn't work because manually added users get overwritten when Mailing list members are re-calculated. Maybe we should simply drop that for now.
+
+
+
         $additionalRecipients = $this->Members();
         $grid = new GridField(
             'Members',
@@ -148,7 +155,12 @@ class MailingList extends DataObject {
         $config->addComponent($auto = new GridFieldAddExistingSearchButton());
         $auto->setTitle(_t('Newsletter.AssignExistingRecipient', "Assign Recipient to Mailing List"));
 
+
         $fields->addFieldToTab('Root.Additional recipients (' . $additionalRecipients->count() . ')',new CompositeField($grid));
+
+        END ADDITIONAL RECIPIENTS */
+
+
 
         $this->extend("updateCMSFields", $fields);
 
@@ -271,6 +283,21 @@ class MailingList extends DataObject {
         return $this->Members();
     }
 
+    public function updateRecipientsforMailingList() {
+
+        $Recipients = $this->FilteredRecipients();
+
+        // First delete all Member for this Mailing List
+        $this->Members()->removeAll();
+
+        // Now add the Members which fit the filter settings
+        foreach ($Recipients as $Recipient) {
+            if ($Recipient) {
+                $this->Members()->add($Recipient);
+            }
+        }
+
+    }
 
     public function onBeforeWrite() {
         parent::onBeforeWrite();
@@ -290,5 +317,9 @@ class MailingList extends DataObject {
             }
         }
         $this->FiltersApplied = serialize($filterKeyValue);
+
+        $this->updateRecipientsforMailingList();
+
     }
+
 }

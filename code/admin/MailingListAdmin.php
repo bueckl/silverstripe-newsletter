@@ -18,11 +18,12 @@ class MailingListAdmin extends ModelAdmin {
         $gridField = $form->Fields()->fieldByName($this->sanitiseClassName($this->modelClass));
         $config = $gridField->getConfig();
         $config->addComponents(new GridFieldSyncMailingListButton('before'));
+        $config->addComponent(new GridFieldCopyButton(), 'GridFieldEditButton');
 
         $config->getComponentByType('GridFieldDataColumns')->setDisplayFields(array(
             'ID' => '#',
             'Title' => 'Name',
-            'ActiveRecipients.Count' => 'Contacts on list',
+            'filteredRecipients.Count' => 'Contacts on list',
         ));
 
 
