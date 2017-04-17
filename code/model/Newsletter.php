@@ -110,15 +110,18 @@ class Newsletter extends DataObject implements CMSPreviewable{
         $fields->removeFieldFromTab('Root', 'MailingLists');
         // nor a member gridfield
         $fields->removeFieldFromTab('Root', 'Member');
+        // Clean up interface a bit
+       // $fields->removeByName('Status');
+        $fields->removeFieldFromTab('Root.SendRecipientQueue',"SendRecipientQueue");
+        $fields->removeByName('SendRecipientQueue');
+        $fields->removeByName('TrackedLinks');
 
-        $fields->removeByName('Status');
         $fields->addFieldToTab(
             'Root.Main',
             new ReadonlyField('Status', $this->fieldLabel('Status')),
             'Subject'
         );
 
-        $fields->removeByName("SentDate");
         if ($this->Status == "Sent") {
             $fields->addFieldToTab(
                 'Root.Main',
@@ -139,9 +142,6 @@ class Newsletter extends DataObject implements CMSPreviewable{
                 'Any undeliverable emails will be collected in this mailbox'
         ));
 
-        $fields->removeFieldFromTab('Root.SendRecipientQueue',"SendRecipientQueue");
-        $fields->removeByName('SendRecipientQueue');
-        $fields->removeByName('TrackedLinks');
 
         if($this->Status != 'Sent') {
             $contentHelp = '<strong>'
@@ -217,44 +217,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
         );
 
 
-        $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Recipients on this list'), $sendRecipientGrid );
+        $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
 
-        // Lookup belonging Mailing Lists
-        $MailingLists = $this->MailingLists();
-
-        // Gather All Recipients for all Mailing Lists which belong to this Newsletter
-        $Recipients = new ArrayList();
-
-        foreach ( $MailingLists as $MailingList) {
-            foreach( $MailingList->Members() as $Recipient) {
-                $Recipients->push($Recipient);
-            }
-        }
-
-        //debug::dump( $Recipients ); die;
-
-        // Now get those Recipients who already Recieved the Newsletter
-        $RecipientsRecieved = SendRecipientQueue::get()->filter('NewsletterID', $this->ID);
-        $RecipientsRecievedArrayList = new ArrayList();
-
-        foreach($RecipientsRecieved as $Recipient) {
-            $RecipientsRecievedArrayList->push($Recipient);
-        }
-
-        // Calculate the difference
-        $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('MemberID'));
-        $NewRecipients = Member::get()->filterAny('ID', array_keys($diff));
-
-        $notSentToYetRecipientGrid = GridField::create(
-            'Member',
-            _t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
-            $NewRecipients,
-            $gridFieldConfig
-        );
-
-        $fields->addFieldsToTab('Root.Recipients added after send-out', array(
-            $notSentToYetRecipientGrid
-        ));
 
         //only show restart queue button if the newsletter is stuck in "sending"
         //only show the restart queue button if the user can run the build task (i.e. has full admin permissions)

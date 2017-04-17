@@ -31,11 +31,6 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                 ->addExtraClass('ss-ui-action-constructive')
                 ->setAttribute('data-icon', 'addpage')
                 ->setUseButtonTag(true), 'action_doSaveAsNew');
-
-            // We want to be able to save the newsletter after sending in order to be able to set the PreviewImage
-            $sendButton = FormAction::create('doResend', _t('Newsletter.SendAgain',"Erneut versenden (an nachträglich hinzugefügte Teilnehmer)"));
-
-            $actions->push($sendButton);
         }
 
         // send button
@@ -127,63 +122,6 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         }else{
         	return false;
         }
-    }
-
-    // We send this newsletter again to newly added Recipients
-    public function doResend($data, $form) {
-        // Record is Newsletter
-        //debug::dump($this->record->Title); die;
-        //copied from parent
-        $controller = Controller::curr();
-
-        try {
-            //$form->saveInto($this->record);
-            $this->record->Status = 'Sending';  //custom: changing the status of to indicate we are sending
-            $this->record->write();
-            //$this->gridField->getList()->add($this->record);
-        } catch(ValidationException $e) {
-            $form->sessionMessage($e->getResult()->message(), 'bad');
-            $responseNegotiator = new PjaxResponseNegotiator(array(
-                'CurrentForm' => function() use(&$form) {
-                    return $form->forTemplate();
-                },
-                'default' => function() use(&$controller) {
-                    return $controller->redirectBack();
-                }
-            ));
-            if($controller->getRequest()->isAjax()) {
-                $controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
-            }
-            return $responseNegotiator->respond($controller->getRequest());
-        }
-
-        //custom code
-        $nsc = NewsletterSendController::inst();
-        $nsc->enqueueRepeated($this->record);
-        $nsc->processQueueOnShutdown($this->record->ID);
-
-        //javascript hides the success message appropriately
-        Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterSendConfirmation.js');
-        $message = _t('NewsletterAdmin.SendMessage',
-            'Send-out process started successfully. Check the progress in the "Sent To" tab');
-        //end custom code
-
-        $form->sessionMessage($message, 'good');
-        return Controller::curr()->redirect($this->Link());
-
-        // if($new_record) {
-//          return Controller::curr()->redirect($this->Link());
-//      } elseif($this->gridField->getList()->byId($this->record->ID)) {
-//      // Return new view, as we can't do a "virtual redirect" via the CMS Ajax
-//      // to the same URL (it assumes that its content is already current, and doesn't reload)
-//          return $this->edit(Controller::curr()->getRequest());
-//      } else {
-//      // Changes to the record properties might've excluded the record from
-//      // a filtered list, so return back to the main view if it can't be found
-//      $noActionURL = $controller->removeAction($data['url']);
-//      $controller->getRequest()->addHeader('X-Pjax', 'Content');
-//      return $controller->redirect($noActionURL, 302);
-// }
     }
 
     public function doSaveAsNew($data, $form) {
