@@ -15,7 +15,7 @@ class NewsletterAdmin extends ModelAdmin {
 
     private static $managed_models = array(
         "Newsletter" => array('title' => 'Mailing'),
-        "Newsletter_SentExtension" => array('title' => 'Sent Mailings'),
+        "Newsletter_Sent" => array('title' => 'Sent Mailings'),
         // "MailingList"
         // "Member"
     );
@@ -34,17 +34,16 @@ class NewsletterAdmin extends ModelAdmin {
     }
 
 
-    public function getEditForm($id = null, $fields = null) {
-
+    public function getEditForm($id = null, $fields = null)
+    {
         $form = parent::getEditForm($id, $fields);
 
-
         //custom handling of the newsletter modeladmin with a specialized action menu for the detail form
-        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_SentExtension") {
+        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent") {
             $config = $form->Fields()->first()->getConfig();
             $config->removeComponentsByType('GridFieldDetailForm')
                 ->addComponents(new NewsletterGridFieldDetailForm());
-            if ($this->modelClass == "Newsletter_SentExtension") {
+            if ($this->modelClass == "Newsletter_Sent") {
                 $config->removeComponentsByType('GridFieldAddNewButton');
             }
             $config->getComponentByType('GridFieldDataColumns')
@@ -52,8 +51,7 @@ class NewsletterAdmin extends ModelAdmin {
                     "Content" => "HTMLText->LimitSentences",
             ));
         }
-
-        if($this->modelClass == "Member") {
+        if ($this->modelClass == "Recipient") {
             $config = $form->Fields()->first()->getConfig();
             $config->getComponentByType('GridFieldDataColumns')
                 ->setFieldCasting(array(
@@ -61,9 +59,6 @@ class NewsletterAdmin extends ModelAdmin {
                     "Verified" => "Boolean->Nice",
             ));
         }
-
-        // debug::dump($form->Fields()->fieldByName('Member')); die;
-
         return $form;
     }
 
@@ -117,7 +112,7 @@ class NewsletterAdmin extends ModelAdmin {
 
     public function getList() {
         $list = parent::getList();
-        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_SentExtension" ){
+        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent" ){
             if ($this->modelClass == "Newsletter") {
                 $statusFilter = array("Draft", "Sending");
 
@@ -143,7 +138,7 @@ class NewsletterAdmin extends ModelAdmin {
     public function getSearchContext() {
         $context = parent::getSearchContext();
 
-        if($this->modelClass === "Newsletter_SentExtension") {
+        if($this->modelClass === "Newsletter_Sent") {
             $context = singleton("Newsletter")->getDefaultSearchContext();
             foreach($context->getFields() as $field) $field->setName(sprintf('q[%s]', $field->getName()));
             foreach($context->getFilters() as $filter) $filter->setFullName(sprintf('q[%s]', $filter->getFullName()));

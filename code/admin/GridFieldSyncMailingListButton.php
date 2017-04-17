@@ -88,7 +88,7 @@ class GridFieldSyncMailingListButton implements GridField_HTMLProvider, GridFiel
                     // Now add to Recipient to MailingList
                     // TODO Check if already on List
                     $MailingList = MailingList::get()->filter('ID', $MailingListID );
-                    $MailingList->First()->Recipients()->add($Recipient);
+                    $MailingList->First()->Members()->add($Recipient);
 
                 }
 

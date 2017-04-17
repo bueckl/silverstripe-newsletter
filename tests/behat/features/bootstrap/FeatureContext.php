@@ -43,8 +43,8 @@ class FeatureContext extends SilverStripeContext
      */
     public function thenEmailShouldBeSubscribedToMailinglist($email, $mailinglistTitle)
     {
-        $recipient = \Recipient::get()->filter('Email', $email)->First();
-        assertNotNull($recipient, 'Could not find Recipient with ' . $email);
+        $recipient = \Member::get()->filter('Email', $email)->First();
+        assertNotNull($recipient, 'Could not find Member with ' . $email);
 
         $mailinglist = \MailingList::get()->filter('Title', $mailinglistTitle)->First();
         assertNotNull($mailinglist, 'Could not find MailingList with ' . $mailinglistTitle);
@@ -57,8 +57,8 @@ class FeatureContext extends SilverStripeContext
      */
     public function theNewsletterSubscriptionForIsVerified($email, $shouldOrNot = '')
     {
-        $recipient = \Recipient::get()->filter('Email', $email)->First();
-        assertNotNull($recipient, 'Could not find Recipient with ' . $email);
+        $recipient = \Member::get()->filter('Email', $email)->First();
+        assertNotNull($recipient, 'Could not find Member with ' . $email);
 
         $assertion = ($shouldOrNot == 'should') ? 'assertTrue' : 'assertFalse';
         $assertion((bool)$recipient->Verified);

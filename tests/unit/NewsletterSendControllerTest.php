@@ -23,7 +23,7 @@ class NewsletterSendControllerTest extends SapphireTest {
             $nsc->processQueue($newsletter->ID);
 
             foreach($newsletter->MailingLists() as $mailingList) {
-                foreach($mailingList->Recipients() as $r) {
+                foreach($mailingList->Members() as $r) {
                     $this->assertEmailSent($r->Email, $newsletter->SendFrom, $newsletter->Subject);
                 }
             }
