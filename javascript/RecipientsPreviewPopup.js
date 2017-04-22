@@ -33,7 +33,6 @@
 
                 var url = this.data('url');
                 var EditFormURL = this.data('edit-form-url');
-                alert(url);
                 $.ajax({
                     url         : url,
                     'success'   : function(data){
