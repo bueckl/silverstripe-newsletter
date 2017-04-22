@@ -57,39 +57,119 @@ class NewsletterSendController extends BuildTask
         return self::$inst;
     }
 
-    /**
-     * Adds users to the queue for sending out a newsletter.
-     * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
-     * to the queue.
-     *
-     * @param $id The ID of the Newsletter DataObject to send
-     */
-    public function enqueue(Newsletter $newsletter)
-    {
-        $lists = $newsletter->MailingLists();
-        $queueCount = 0;
-        foreach ($lists as $list) {
-            foreach ($list->Members()->column('ID') as $recipientID) {
+	/**
+	 * Adds users to the queue for sending out a newsletter.
+	 * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
+	 * to the queue.
+	 *
+	 * @param $id The ID of the Newsletter DataObject to send
+	 */
+
+    function enqueue(Newsletter $newsletter) {
+
+        // Array not DataList!
+        $Recipients = $this->previewRecipients($newsletter);
+
+
+        foreach ($Recipients as $R) {
                 //duplicate filtering
                 $existingQueue = SendRecipientQueue::get()->filter(array(
-                    'MemberID' => $recipientID,
+                    'MemberID' => $R['ID'],
                     'NewsletterID' => $newsletter->ID,
                     'Status' => array('Scheduled', 'InProgress')
                 ));
-                if ($existingQueue->exists()) {
-                    continue;
-                }
+
+                if($existingQueue->exists()) continue;
 
                 $queueItem = SendRecipientQueue::create();
-                $queueItem->NewsletterID = $newsletter->ID;
-                $queueItem->MemberID = $recipientID;
+
+                // In case we send a newsletter which is a duplicate from an existing
+                // newsletter -> we rather save the newsletter Parent ID
+                // So we can easily track who has received a certain newsletter including
+                // Copies, Resends etc …
+                if ($newsletter->ParentID && $newsletter->ParentID > 0) {
+                    $queueItem->NewsletterID = $newsletter->ParentID;
+                    $queueItem->isDuplicate = true;
+
+                } else {
+                    $queueItem->NewsletterID = $newsletter->ID;
+                }
+                $queueItem->MemberID = $R['ID'];
                 $queueItem->write();
                 $queueCount++;
             }
-        }
 
         return $queueCount;
     }
+
+
+
+    function previewRecipients(Newsletter $newsletter) {
+
+        $lists = $newsletter->MailingLists();
+
+        $RecipientsArray = array();
+
+        foreach($lists as $list) {
+            // All recipients which are actually on the list.
+            $Recipients = $list->Members();
+
+            if ( $Recipients->Count()) {
+                foreach ($Recipients as $R ) {
+                    $RecipientsArray[] = $R->toMap();
+                }
+            }
+        }
+
+
+        // Special case: Only send to newly added recipients which never received a newsletter.
+        $NewAddedOnly = $newsletter->NewAddedOnly;
+
+
+        if ($NewAddedOnly == 1) {
+
+            // Get those recipients who DID receive this Newsletter (identified by "ParentID") in the past.
+            $AlreadyReceived = SendRecipientQueue:: get()->filter(array(
+                'NewsletterID' => $newsletter->ParentID,
+                'Status' => 'Sent'
+            ));
+
+            $AlreadyReceivedArray = array();
+
+            // Building the Already Recieved array
+            foreach ( $AlreadyReceived as $ar) {
+                $AlreadyReceivedArray[] = $ar->toMap();
+            }
+
+
+            // Building the final Arrau which shows only the difference.
+            $FinalList = array();
+
+            foreach ($RecipientsArray as $Key => $R) {
+
+                foreach ( $AlreadyReceivedArray as $A) {
+                    if ( $A['MemberID'] == $R['ID'] ) {
+                        unset($RecipientsArray[$Key]);
+                    }
+                }
+            }
+
+            return $RecipientsArray;
+
+        } else {
+
+            //Simply return all the Recipients from all the lists
+            return $RecipientsArray;
+
+        }
+
+
+
+
+	}
+
+
+
 
     public function processQueueOnShutdown($newsletterID)
     {

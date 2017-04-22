@@ -13,7 +13,8 @@ class SendRecipientQueue extends DataObject {
      */
     private static $db = array(
         "Status" => "Enum('Scheduled, InProgress, Sent, Failed, Bounced, BlackListed', 'Scheduled')",
-        "RetryCount" => "Int"    //number of times this email got "stuck" in the queue
+        "RetryCount" => "Int",    //number of times this email got "stuck" in the queue
+        "isDuplicate" => 'Boolean' // Is a duplicate of another Mailing
     );
 
     private static $has_one = array(
@@ -28,30 +29,38 @@ class SendRecipientQueue extends DataObject {
         "Member.Email",
         "RetryCount",
         "ReceivedCount",
+        "niceIsDuplicate" => "niceIsDuplicate",
         "LastEdited"
     );
+
 
     private static $default_sort = array(
         // 'LastEdited DESC'
         'ID'
     );
 
+    public function niceIsDuplicate() {
+        return ( $this->isDuplicate ) ? 'JA' : '-';
+    }
     public function ReceivedCount() {
         return $this->Member()->ReceivedCount;
     }
 
 
-    // public function fieldLabels($includelrelations = true) {
-    //     $labels = parent::fieldLabels($includelrelations);
-    //     $labels["Status"] = _t('Newsletter.FieldStatus', "Status");
-    //     $labels["Recipient.FirstName"] = _t('Newsletter.FieldFirstName', "Vorname");
-    //     $labels["Recipient.Surname"] = _t('Newsletter.FieldSurname', "Nachname");
-    //     $labels["Recipient.Email"] = _t('Newsletter.FieldEmail', "Email");
-    //     $labels["RetryCount"] = _t('Newsletter.FieldRetryCount', "Retry Count");
-    //     $labels["RetryCount"] = _t('Newsletter.FieldRetryCount', "Retry Count");
-    //     $labels["ReceivedCount"] = _t('Newsletter.FieldReceivedCount', "Received Count");
-    //     return $labels;
-    // }
+    public function fieldLabels($includelrelations = true) {
+
+        $labels = parent::fieldLabels($includelrelations);
+        $labels["Status"] = _t('Newsletter.FieldStatus', "Status");
+        $labels["Member.FirstName"] = _t('Newsletter.FieldFirstName', "Vorname");
+        $labels["Member.Surname"] = _t('Newsletter.FieldSurname', "Nachname");
+        $labels["Member.Email"] = _t('Newsletter.FieldEmail', "Email");
+        $labels["RetryCount"] = _t('Newsletter.FieldRetryCount', "Retry Count");
+        $labels["RetryCount"] = _t('Newsletter.FieldRetryCount', "Retry Count");
+        $labels["ReceivedCount"] = _t('Newsletter.FieldReceivedCount', "Received Count");
+        $labels["LastEdited"] = _t('Newsletter.Timestamp', "Zeitstempel");
+        $labels["niceIsDuplicate"] = _t('Newsletter.Duplicate', "Duplikat");
+        return $labels;
+    }
 
     /** Send the email out to the Recipient */
     public function send($newsletter = null, $recipient = null) {

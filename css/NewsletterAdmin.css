@@ -14,3 +14,5 @@
 .cms .cms-content-fields .field .fieldholder-small fieldset { margin-left: 184px; }
 .cms table.ss-gridfield-table tbody td.col-buttons { width: 60px; }
 .cms table.ss-gridfield-table tbody td.col-buttons button .ui-button-text { padding: 0.4em 1.2em; }
+
+#Root_Main #MailingLists li { display:block; width: 100%; }

@@ -15,7 +15,9 @@ class Newsletter extends DataObject implements CMSPreviewable{
         "SentDate" => "Datetime",
         "SendFrom" => "Varchar(255)",
         "ReplyTo" => "Varchar(255)",
-        "RenderTemplate" => "Varchar"
+        "RenderTemplate" => "Varchar",
+        "ParentID" => "Int",
+        "NewAddedOnly" => "Boolean"
     );
 
     private static $has_many = array(
@@ -106,15 +108,20 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
         $fields = parent::getCMSFields();
 
-        // We don't want to show a MailingList Grid here.
         $fields->removeFieldFromTab('Root', 'MailingLists');
-        // nor a member gridfield
         $fields->removeFieldFromTab('Root', 'Member');
-        // Clean up interface a bit
-       // $fields->removeByName('Status');
         $fields->removeFieldFromTab('Root.SendRecipientQueue',"SendRecipientQueue");
         $fields->removeByName('SendRecipientQueue');
         $fields->removeByName('TrackedLinks');
+
+        if ( $this->ParentID ) {
+
+            $OriginalNewsletter = DataObject::get_by_id('Newsletter', $this->ParentID);
+
+            $Dup = new LiteralField('Hint', '<div class="message notice">Dieser Newsletter ist ein Duplikat von <strong>'.$OriginalNewsletter->Subject.'</strong></div>');
+
+            $fields->insertBefore('Status', $Dup );
+        }
 
         $fields->addFieldToTab(
             'Root.Main',
@@ -161,10 +168,12 @@ class Newsletter extends DataObject implements CMSPreviewable{
         if(count($templateSource) > 1) {
             $fields->replaceField(
                 "RenderTemplate",
-                new DropdownField("RenderTemplate", _t('NewsletterAdmin.RENDERTEMPLATE',
+                $Drop =new DropdownField("RenderTemplate", _t('NewsletterAdmin.RENDERTEMPLATE',
                     'Template the newsletter render to'),
                 $templateSource)
             );
+
+            $Drop->setDisabledItems(array('VW_Simple_Template'));
 
         } else {
             $fields->replaceField("RenderTemplate",
@@ -177,14 +186,30 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
             $mailinglists = MailingList::get();
 
+            $map = $mailinglists->map('ID', 'Title');
+
+            foreach ($map as $key => $m) {
+                $Filters = DataObject::get_by_id('MailingList', $key)->FiltersApplied;
+                //$map->push($key, $m . serialize($Filters));
+                $map->push($key, $m);
+            }
+
             $fields->addFieldsToTab("Root.Main", array(
                 new CheckboxSetField(
                     "MailingLists",
                     _t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'),
-                    $mailinglists->map('ID', 'Title')
+                    $map
                 )
             ));
         }
+
+        $fields->removeByName('NewAddedOnly');
+        $fields->insertAfter('MailingLists', FieldGroup::create('Foo',
+            $ParentIDTitleField,
+            $cb = new CheckboxField('NewAddedOnly', 'NUR an Teilnehmer, welche diesen Newsletter noch nicht erhalten haben.')
+        ));
+
+        $cb->setDescription('Diese Checkbox setzen wir nur, wenn es sich bei dem Newsletter um ein Duplikat handelt. Man also z.B Die Einladung erneut verschicken möchte – und seit dem letzten Versand neue Teilnehmer hinzugekommen sind!');
 
 
         if($this->Status === 'Sending' || $this->Status === 'Sent') {
@@ -200,24 +225,43 @@ class Newsletter extends DataObject implements CMSPreviewable{
                 new GridFieldPaginator(30)
             );
 
-            //Create the Sent To Queue grid
-            if (class_exists("GridFieldAjaxRefresh") && $this->SendRecipientQueue()->exists()) {
-                //only use auto-refresh if there is a send out currently in-progress, otherwise no-point
-            if ($this->SendRecipientQueue()->filter(
-                array('Status'=>array('Scheduled','InProgress')))->count() > 0) {
-                $gridFieldConfig->addComponent(new GridFieldAjaxRefresh(5000,true));
+             if ( !$this->ParentID || !$this->ParentID == 0 ) {
+
+                //Create the Sent To Queue grid
+                if (class_exists("GridFieldAjaxRefresh") && $this->SendRecipientQueue()->exists()) {
+                    //only use auto-refresh if there is a send out currently in-progress, otherwise no-point
+                if ($this->SendRecipientQueue()->filter(
+                    array('Status'=>array('Scheduled','InProgress')))->count() > 0) {
+                    $gridFieldConfig->addComponent(new GridFieldAjaxRefresh(5000,true));
+                }
+
             }
         }
 
-        $sendRecipientGrid = GridField::create(
-            'SendRecipientQueue',
-            _t('NewsletterAdmin.SentTo', 'Sent to'),
-            $this->SendRecipientQueue(),
-            $gridFieldConfig
-        );
 
+        // We dont show "Sent To" if sending Duplicated Newsletters aka Resends.
+        // All recipients are show below the Original Newsletter
 
-        $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
+        if ( $this->ParentID > 0 ) {
+
+            $OriginalNewsletter = DataObject::get_by_id('Newsletter', $this->ParentID);
+
+            $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'),
+                $Dup = new LiteralField('Hint', '<div class="message notice">Dieser Newsletter ist ein Duplikat von <strong>'.$OriginalNewsletter->Subject.'</strong>. Um den Versand zu kontrollieren gehen Sie bitte zum Original.</div>')
+
+            );
+        } else {
+
+            $sendRecipientGrid = GridField::create(
+                'SendRecipientQueue',
+                _t('NewsletterAdmin.SentTo', 'Sent to'),
+                $this->SendRecipientQueue(),
+                $gridFieldConfig
+            );
+
+            $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
+        }
+
 
 
         //only show restart queue button if the newsletter is stuck in "sending"
@@ -251,6 +295,9 @@ class Newsletter extends DataObject implements CMSPreviewable{
                 )
             );
         }
+
+
+
     }
 
     $this->extend('updateCMSFields', $fields);
@@ -363,7 +410,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
         Requirements::clear();
 
         // Create recipient with some test data
-        $recipient = new Member(Member::$test_data);
+        //$recipient = new Member(Member::$test_data);
+        $recipient = Member::currentUser()->toMap();
         $newsletterEmail = new NewsletterEmail($this, $recipient, true);
         return HTTP::absoluteURLs($newsletterEmail->getData()->renderWith($templateName));
     }
@@ -411,6 +459,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
         //remove this from its belonged mailing lists
         $this->MailingLists()->removeAll();
     }
+
 }
 
 /**

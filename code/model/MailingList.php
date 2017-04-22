@@ -45,6 +45,7 @@ class MailingList extends DataObject {
         $labels["Title"] = _t('Newsletter.FieldTitle', "Title");
         $labels["FullTitle"] = _t('Newsletter.FieldTitle', "Title");
         $labels["ActiveRecipients.Count"] = _t('Newsletter.Recipients', "Recipients");
+        $labels["ActiveRecipients.Count"] = _t('Newsletter.Recipients', "Recipients");
         return $labels;
     }
 
@@ -64,20 +65,29 @@ class MailingList extends DataObject {
 
         // Filterable fields
         $FilterableFields = self::get_filterable_fields_or_callbacks();
+
+
+        $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setTitle('Ich bin … / Art des Teilnehmers');
+        $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setDescription('Keine Auswahl für Alle');
+        $FilterableFields->dataFieldByName('Filter_Member_WillAssist')->setTitle('Teilnahme bestätigt')->setDescription('Keine Auswahl für Alle');
+        $FilterableFields->dataFieldByName('Filter_Member_NDAAccepted')->setTitle('Geheimhaltungserklärung akzeptiert');
+        $FilterableFields->dataFieldByName('Filter_Member_Locale')->setEmptyString('Bitte wählen')->setDescription('Keine Auswahl für Alle');
+
+
         $fields->addFieldsToTab('Root.Main', [
-            HeaderField::create('FiltersHeader', 'Filters'),
+            HeaderField::create('FiltersHeader', 'Kriterien / Filter'),
             LiteralField::create(
                 'FiltersDesc',
                 '
-                <em>
-                    The mailing list will include all members that fit filters defined here. <br>
-                    Additional members can be added manually.
-                </em>
+                <div class="message notice">
+                    Die Mailing-Liste erstellt eine Empfängerliste nach den hier gewählten Kriterien.<br>
+                </div>
                 <br>
                 <br>
                 '
             )
         ]);
+
         $fields->addFieldsToTab('Root.Main', $FilterableFields);
         $FiltersApplied = unserialize($this->FiltersApplied);
         if ($FiltersApplied) foreach ( $FiltersApplied as $key => $filter ) {
@@ -104,12 +114,12 @@ class MailingList extends DataObject {
 
         $fields->addFieldsToTab(
             'Root.Filtered recipients (' . $filteredRecipients->count() . ')', [
-            LiteralField::create('FilteredRecipientsDesc','
-                <em>
-                    These recipients are filtered based on the filtering options. <br>
-                    Make sure to save for these to refresh.
-                </em>
-            '),
+            // LiteralField::create('FilteredRecipientsDesc','
+//                 <em>
+//                     These recipients are filtered based on the filtering options. <br>
+//                     Make sure to save for these to refresh.
+//                 </em>
+//             '),
             new CompositeField($grid)
         ]);
 
@@ -119,7 +129,6 @@ class MailingList extends DataObject {
 
         /* TODO
         Discuss with Anselm. This doesn't work because manually added users get overwritten when Mailing list members are re-calculated. Maybe we should simply drop that for now.
-
 
 
         $additionalRecipients = $this->Members();
@@ -160,7 +169,7 @@ class MailingList extends DataObject {
 
         END ADDITIONAL RECIPIENTS */
 
-
+        $fields->dataFieldByName('Title')->setTitle('Name der Mailing-Liste');
 
         $this->extend("updateCMSFields", $fields);
 
@@ -169,6 +178,7 @@ class MailingList extends DataObject {
 
         return $fields;
     }
+
 
     /**
      * @return string
@@ -221,13 +231,16 @@ class MailingList extends DataObject {
      * @return array|FieldList
      */
     public static function get_filterable_fields_or_callbacks($callBacks = false) {
+
         $FilterableFields = new FieldList();
         $callBacksArr = [];
 
         foreach (Config::inst()->get('MailingList', 'filter_classes') as $fc) {
             $filters = singleton($fc)->mailinglistFilters();
             if ( $filters && count($filters > 0) ) {
+
                 $FilterableFields->add(HeaderField::create('Filters' . $fc .'Header', $fc, 3));
+
                 foreach ( $filters as $key => $filterable ) {
                     $field = null;
                     if (isset($filterable['Field'])) {
@@ -235,6 +248,7 @@ class MailingList extends DataObject {
                     } else {
                         $field = singleton($fc)->getCMSFields()->dataFieldByName($key);
                     }
+
                     $fieldName = 'Filter_' . $fc . '_' . $field->getName();
 
                     if ($callBacks) {

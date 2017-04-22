@@ -30,6 +30,7 @@ class NewsletterAdmin extends ModelAdmin {
 
         Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/ActionOnConfirmation.js');
+        Requirements::javascript(NEWSLETTER_DIR . '/javascript/RecipientsPreviewPopup.js');
         Requirements::css('newsletter/css/NewsletterAdmin.css');
     }
 
@@ -37,6 +38,9 @@ class NewsletterAdmin extends ModelAdmin {
     public function getEditForm($id = null, $fields = null)
     {
         $form = parent::getEditForm($id, $fields);
+
+        $Important = new LiteralField('Hint1', '<div class="message bad">Wichtig! Vor dem Versand eines Newsletters müssen immer alle bestehenden Mailing-Listen aktualisiert werden.</div>');
+        $form->Fields()->push( $Important );
 
         //custom handling of the newsletter modeladmin with a specialized action menu for the detail form
         if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent") {
@@ -51,7 +55,7 @@ class NewsletterAdmin extends ModelAdmin {
                     "Content" => "HTMLText->LimitSentences",
             ));
         }
-        if ($this->modelClass == "Recipient") {
+        if ($this->modelClass == "Member") {
             $config = $form->Fields()->first()->getConfig();
             $config->getComponentByType('GridFieldDataColumns')
                 ->setFieldCasting(array(

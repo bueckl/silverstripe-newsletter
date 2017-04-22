@@ -71,3 +71,5 @@ de:
     SENDFAIL: "Das versenden an die folgenden Empfänger schlug fehl"
     SENTOK: "Der Versand an folgende Empfänger war erfolgreich"
     SN: "Nachname"
+  MailingList:
+    SAVEANDSYNC: "Speichern und Empfänger dieser Mailing-Liste aktualisieren"

@@ -16,6 +16,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
     private static $allowed_actions = array(
         'ItemEditForm',
         'emailpreview',
+        'doPreviewRecipientsForAjax',
     );
 
     public function updateCMSActions($actions)
@@ -37,11 +38,28 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
         // send button
         if ($this->record->Status == "Draft") { //only allow sending when the newsletter is "Draft"
-            $sendButton = FormAction::create('doSend', _t('Newsletter.Send', 'Send'));
-            $actions->insertBefore($sendButton
+
+            $link = Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'doPreviewRecipientsForAjax');
+
+            $sendButton = FormAction::create('doSend', _t('Newsletter.Send', 'Send'))
                             ->addExtraClass('ss-ui-action-constructive')
                             ->setAttribute('data-icon', 'accept')
-                            ->setUseButtonTag(true), 'action_doSave');
+                            ->setUseButtonTag(true);
+            $previewRecipientsButton = FormAction::create('doPreviewRecipients', _t('Newsletter.PreviewRecipients', 'Preview Recipients'))
+                            ->addExtraClass('ss-ui-action-constructive')
+                            ->setAttribute('data-icon', 'accept')
+                            ->setAttribute('data-url', $link)
+                            ->setUseButtonTag(true);
+
+            $previewEmail = FormAction::create('doPreviewEmail', _t('Newsletter.PreviewEmail', 'Preview Email'))
+                            ->addExtraClass('ss-ui-action-constructive')
+                            ->setAttribute('data-icon', 'accept')
+                            ->setUseButtonTag(true);
+
+            $actions->push($sendButton);
+            $actions->push($previewRecipientsButton);
+            $actions->push($previewEmail);
+
         }
         return $actions;
     }
@@ -99,7 +117,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
     {
         $emailVar = $request->getVar('email');
 
-        $recipient = new Member(Member::$test_data);
+        //$recipient = new Member(Member::$test_data);
 
         if ($request && !empty($emailVar)) {
             $recipient->Email = Convert::raw2js($emailVar);
@@ -142,15 +160,22 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $newNewsletter->LastEdited = null;
             $newNewsletter->SentDate = null;
 
+            // If allready cloned. Take the very Original ID
+            if ( $origNewsletter->ParentID > 0) {
+                $newNewsletter->ParentID = $origNewsletter->ParentID;
+            } else {
+                $newNewsletter->ParentID = $origNewsletter->ID;
+            }
+
             //write once without validation
-            Newsletter::set_validation_enabled(false);
+            //Newsletter::set_validation_enabled(false);
             //save once to get the new Newsletter created so as to add to mailing list
             $newNewsletter->write($showDebug = false, $forceInsert = true);
             $origMailinglists = $origNewsletter->MailingLists();
             if ($origMailinglists && $origMailinglists->count()) {
                 $newNewsletter->MailingLists()->addMany($origMailinglists);
             }
-            Newsletter::set_validation_enabled(true);
+            //Newsletter::set_validation_enabled(true);
             $newNewsletter->Status = 'Draft';  //custom: changing the status of to indicate we are sending
 
             //add a (1) (2) count to new newsletter names if the subject name already exists elsewhere
@@ -245,6 +270,37 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $controller->getRequest()->addHeader('X-Pjax', 'Content');
             return $controller->redirect($noActionURL, 302);
         }
+    }
+
+    public function doPreviewRecipientsForAjax() {
+
+        // Write the current Form not working here during ajax call
+        // But we should be able to write the current state of the form in case mailing list selection has changed.
+
+        $nsc = NewsletterSendController::inst();
+        $array = $nsc->previewRecipients($this->record);
+
+        $arrayList = new ArrayList();
+
+        foreach ($array as $a) {
+            $arrayList->push($a);
+        }
+
+        $template = 'RecipientListPreview';
+        $preview = $arrayList->renderWith( $template );
+        $controller = Controller::curr();
+
+        if ($controller->getRequest()->isAjax()) {
+            $controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
+            return $preview;
+
+        }
+
+    }
+
+
+    public function doPreviewEmail() {
+        return $this->record->render();
     }
 
     public function preview($data)

@@ -26,7 +26,7 @@
 				}
 				var message = ss.i18n._t('NEWSLETTERADMIN.DELETECONFIRMMESSAGE',
 					'Are you sure you want to delete this '+item+'?');
-					
+
 				if (confirm(message)) {
 					this._super(e);
 				} else {
