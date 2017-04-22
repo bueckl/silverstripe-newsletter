@@ -55,6 +55,10 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $previewEmail = FormAction::create('doPreviewEmail', _t('Newsletter.PreviewEmail', 'Preview Email'))
                             ->addExtraClass('ss-ui-action-constructive')
                             ->setAttribute('data-icon', 'accept')
+                            ->setAttribute(
+                                'data-url',
+                                Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'emailpreview')
+                            )
                             ->setUseButtonTag(true);
 
             $actions->push($sendButton);
@@ -116,9 +120,12 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
      */
     public function emailpreview(SS_HTTPRequest $request = null)
     {
+        return $this->record->render();
+        //TODO figure out what to do with the rest here.
+        
         $emailVar = $request->getVar('email');
 
-        //$recipient = new Member(Member::$test_data);
+        $recipient = new Member(Member::$test_data);
 
         if ($request && !empty($emailVar)) {
             $recipient->Email = Convert::raw2js($emailVar);

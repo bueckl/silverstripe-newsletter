@@ -31,6 +31,7 @@ class NewsletterAdmin extends ModelAdmin {
         Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/ActionOnConfirmation.js');
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/RecipientsPreviewPopup.js');
+        Requirements::javascript(NEWSLETTER_DIR . '/javascript/EmailPreviewPopup.js');
         Requirements::css('newsletter/css/NewsletterAdmin.css');
     }
 
