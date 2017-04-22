@@ -30,16 +30,24 @@
         $(popup_button_selector).entwine({
 
             onclick: function(e){
-
+                // Show loading indicator
+                this.addClass('loading');
+                // Trigger save button
+                this.parents('form').trigger('submit', [this.parents('form').find('[name=action_doSave]')]);
                 var url = this.data('url');
                 var EditFormURL = this.data('edit-form-url');
-                $.ajax({
-                    url         : url,
-                    'success'   : function(data){
-                        dialog.html(data);
-                        dialog.dialog( "open" );
-                    }
-                });
+
+                // Wait for 1s before we query ajax and show the dialog
+                setTimeout(function() {
+                    $.ajax({
+                        url         : url,
+                        'success'   : function(data){
+                            dialog.html(data);
+                            dialog.dialog( "open" );
+                        }
+                    });
+                }, 1000);
+
                 return false;
             }
 
