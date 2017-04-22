@@ -70,7 +70,7 @@ class NewsletterSendController extends BuildTask
         // Array not DataList!
         $Recipients = $this->previewRecipients($newsletter);
 
-
+        $queueCount = 0;
         foreach ($Recipients as $R) {
                 //duplicate filtering
                 $existingQueue = SendRecipientQueue::get()->filter(array(
