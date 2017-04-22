@@ -25,8 +25,9 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             // save draft button
             $actions->fieldByName("action_doSave")
                 ->setTitle(_t('Newsletter.SAVE', "Save"))
-                ->removeExtraClass('ss-ui-action-constructive')
-                ->setAttribute('data-icon', 'addpage');
+                ;
+                //->removeExtraClass('ss-ui-action-constructive')
+                //->setAttribute('data-icon', 'addpage');
         } else {    //sending or sent, "save as new" button
             $saveAsNewButton = FormAction::create('doSaveAsNew', _t('Newsletter.SaveAsNew', "Save as new ..."));
             $actions->replaceField("action_doSave",
