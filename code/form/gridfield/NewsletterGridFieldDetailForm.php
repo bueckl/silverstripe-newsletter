@@ -16,6 +16,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
     private static $allowed_actions = array(
         'ItemEditForm',
         'emailpreview',
+        'sendtestmail',
         'doPreviewRecipientsForAjax',
     );
 
@@ -104,7 +105,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             }
 
             $navigator->customise(
-                new ArrayData(array('EmailPreviewLink' => $newsletter->Link('emailpreview'.$emailLink)))
+                new ArrayData(array('EmailPreviewLink' => $newsletter->Link('sendtestmail'.$emailLink)))
             );
             Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterAdminEmailPreview.js');
 
@@ -114,29 +115,78 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         }
     }
 
+
     /**
-     * Send the preview/test email
-     * @param SS_HTTPRequest $request
+     * Recipient for preview
+     * Always the first member on matching lists
+     * Name and email are cloaked
+     * TODO it might make more sense for this to be a public method on {@see Newsletter}
+     *
+     * @return Member|null
+     */
+    protected function getTestRecipient()
+    {
+        $newsletter = $this->record;
+        // Getting test recipient
+        // TODO this can be improved
+        $lists = $newsletter->MailingLists();
+        $arr = [];
+        foreach($lists as $list) {
+            // All recipients which are actually on the list.
+            $Recipients = $list->Members();
+            if ( $Recipients->Count()) {
+                foreach ($Recipients as $R ) {
+                    $arr[] = $R;
+                }
+            }
+        }
+        $recipient = null;
+        if (isset($arr[0])) {
+            $recipient = $arr[0];
+        }
+        // Cloak name  & email
+        $recipient->FirstName = 'John';
+        $recipient->Surname = 'Doe';
+        $recipient->Email = 'john@doe.com';
+        return $recipient;
+    }
+
+    /**
+     * Email preview
+     * @param SS_HTTPRequest|null $request
+     * @return string
      */
     public function emailpreview(SS_HTTPRequest $request = null)
     {
-        return $this->record->render();
-        //TODO figure out what to do with the rest here.
-        
-        $emailVar = $request->getVar('email');
+        $newsletter = $this->record;
+        $recipient = $this->getTestRecipient();
+        if(!$templateName = $newsletter->RenderTemplate) {
+            $templateName = 'SimpleNewsletterTemplate';
+        }
+        $newsletterEmail = new NewsletterEmail($newsletter, $recipient, true);
+        // Block stylesheets and JS that are not required (email templates should have inline CSS/JS)
+        Requirements::clear();
+        return HTTP::absoluteURLs($newsletterEmail->getData()->renderWith($templateName));
+    }
 
-        $recipient = new Member(Member::$test_data);
+    /**
+     * Send the preview/test email
+     * @param SS_HTTPRequest|null $request
+     * @return bool|SS_HTTPResponse
+     */
+    public function sendtestmail(SS_HTTPRequest $request = null)
+    {
+        $emailVar = $request->getVar('email');
+        $newsletter = $this->record;
+        $recipient = $this->getTestRecipient();
 
         if ($request && !empty($emailVar)) {
             $recipient->Email = Convert::raw2js($emailVar);
         } else {
             $recipient->Email = Member::currentUser()->Email;
         }
-
-        $newsletter = $this->record;
         $email = new NewsletterEmail($newsletter, $recipient, true);
         $email->send();
-
         return Controller::curr()->redirectBack();
     }
 
