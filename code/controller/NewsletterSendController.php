@@ -327,7 +327,8 @@ class NewsletterSendController extends BuildTask
                     }
 
                     //do more processing, in case there are more items to process, do nothing if we've reached the end
-                    $this->processQueueOnShutdown($newsletterID);
+                    //this has been taken out as we only want to process one batch at the time
+                    //$this->processQueueOnShutdown($newsletterID);
 
                     //wait to avoid overloading the email server with too many emails that look like spam
                     if (!empty(self::$throttle_batch_delay)) {

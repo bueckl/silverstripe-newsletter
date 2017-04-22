@@ -17,6 +17,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         'ItemEditForm',
         'emailpreview',
         'sendtestmail',
+        'processqueue',
         'doPreviewRecipientsForAjax',
     );
 
@@ -67,6 +68,20 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $actions->push($previewEmail);
 
         }
+
+        if ($this->record->Status == "Sending") {
+            $actions->push(
+                FormAction::create('doProcessQueue', 'Process Queue')
+                    ->addExtraClass('ss-ui-action-constructive')
+                    ->setAttribute('data-icon', 'accept')
+                    ->setAttribute(
+                        'data-url',
+                        Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'processqueue')
+                    )
+                    ->setUseButtonTag(true)
+            );
+        }
+
         return $actions;
     }
 
@@ -304,13 +319,16 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         //custom code
         $nsc = NewsletterSendController::inst();
         $nsc->enqueue($this->record);
-        $nsc->processQueueOnShutdown($this->record->ID);
+
+        //we don't want to process the queue here, as this is happening via the JS window
+        //$nsc->processQueueOnShutdown($this->record->ID);
 
 
         //javascript hides the success message appropriately
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterSendConfirmation.js');
         $message = _t('NewsletterAdmin.SendMessage',
-            'Send-out process started successfully. Check the progress in the "Sent To" tab');
+            //'Send-out process started successfully. Check the progress in the "Sent To" tab');
+            'Send-out process started successfully.');
         //end custom code
 
         $form->sessionMessage($message, 'good');
@@ -328,6 +346,32 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $controller->getRequest()->addHeader('X-Pjax', 'Content');
             return $controller->redirect($noActionURL, 302);
         }
+    }
+
+    public function processqueue()
+    {
+        // Process 1 newsletter at the time
+        $nsc = NewsletterSendController::inst();
+        $nsc::$items_to_batch_process = 1;
+        $nsc->processQueueOnShutdown($this->record->ID);
+
+        //echo $nsc::$items_to_batch_process;
+        //die;
+
+        $recordID = $this->record->ParentID ? $this->record->ParentID : $this->record->ID;
+
+        return json_encode([
+            'Status' => $this->record->Status,
+            'Remaining' => SendRecipientQueue::get()->filter([
+                'NewsletterID' => $recordID,
+                'Status' => 'Scheduled'
+            ])->count(),
+            // TODO this gives a wrong number because of the way we're deling with duplicates
+            // TODO consider reviewing the way we deal with duplicates
+            'Total' => SendRecipientQueue::get()->filter([
+                'NewsletterID' => $recordID
+            ])->count(),
+        ], JSON_PRETTY_PRINT);
     }
 
     public function doPreviewRecipientsForAjax() {
