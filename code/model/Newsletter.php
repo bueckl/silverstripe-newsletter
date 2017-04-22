@@ -225,18 +225,18 @@ class Newsletter extends DataObject implements CMSPreviewable{
                 new GridFieldPaginator(30)
             );
 
-             if ( !$this->ParentID || !$this->ParentID == 0 ) {
-
-                //Create the Sent To Queue grid
-                if (class_exists("GridFieldAjaxRefresh") && $this->SendRecipientQueue()->exists()) {
-                    //only use auto-refresh if there is a send out currently in-progress, otherwise no-point
-                if ($this->SendRecipientQueue()->filter(
-                    array('Status'=>array('Scheduled','InProgress')))->count() > 0) {
-                    $gridFieldConfig->addComponent(new GridFieldAjaxRefresh(5000,true));
-                }
-
-            }
-        }
+//             if ( !$this->ParentID || !$this->ParentID == 0 ) {
+//
+//                //Create the Sent To Queue grid
+//                if (class_exists("GridFieldAjaxRefresh") && $this->SendRecipientQueue()->exists()) {
+//                    //only use auto-refresh if there is a send out currently in-progress, otherwise no-point
+//                if ($this->SendRecipientQueue()->filter(
+//                    array('Status'=>array('Scheduled','InProgress')))->count() > 0) {
+//                    $gridFieldConfig->addComponent(new GridFieldAjaxRefresh(5000,true));
+//                }
+//
+//            }
+//        }
 
 
         // We dont show "Sent To" if sending Duplicated Newsletters aka Resends.

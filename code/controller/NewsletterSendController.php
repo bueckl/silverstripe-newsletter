@@ -173,6 +173,13 @@ class NewsletterSendController extends BuildTask
 
     public function processQueueOnShutdown($newsletterID)
     {
+        $newsletter = Newsletter::get()->byID($newsletterID);
+        if ($newsletter->ParentID) {
+            $this->duplicateID = $newsletter->ID;
+            $newsletter = Newsletter::get()->byID($newsletter->ParentID);
+            $newsletterID = $newsletter->ID;
+        }
+
         if (class_exists('MessageQueue')) {
             //start processing of email sending for this newsletter ID after shutdown
             MessageQueue::send(
@@ -328,6 +335,10 @@ class NewsletterSendController extends BuildTask
                     }
                 } else {
                     //mark the send process as complete
+                    if ($this->duplicateID) {
+                        //if we're dealing with a duplicate, make sure that the duplicate is marked as complete
+                        $newsletter = Newsletter::get()->byID($this->duplicateID);
+                    }
                     $newsletter->SentDate = SS_Datetime::now()->getValue();
                     $newsletter->Status = 'Sent';
                     $newsletter->write();
