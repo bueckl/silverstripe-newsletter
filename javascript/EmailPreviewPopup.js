@@ -26,13 +26,15 @@
         $(popup_button_selector).entwine({
 
             onclick: function(e){
+                var $this = this;
                 // Show loading indicator
-                this.addClass('loading');
+                $this.addClass('loading');
                 // Trigger save button
                 this.parents('form').trigger('submit', [this.parents('form').find('[name=action_doSave]')]);
                 var url = this.data('url');
                 // Wait for 1s before we query ajax and show the dialog
                 setTimeout(function() {
+                    $this.removeClass('loading');
                     var iframe = '<iframe style="width: 100%;height: 98%;" src="' + url + '"></iframe>';
                     dialog.html(iframe);
                     dialog.dialog( "open" );
