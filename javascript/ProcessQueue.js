@@ -47,6 +47,8 @@
                         }
                         if (data.Status == 'Sending') {
                             poll();
+                        } else if (data.Status == 'Sent') {
+                            location.reload();
                         }
                     }, 'json')
                 };
