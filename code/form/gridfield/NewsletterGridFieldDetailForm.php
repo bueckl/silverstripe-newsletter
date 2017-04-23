@@ -358,7 +358,8 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         //echo $nsc::$items_to_batch_process;
         //die;
 
-        $recordID = $this->record->ParentID ? $this->record->ParentID : $this->record->ID;
+        // $recordID = $this->record->ParentID ? $this->record->ParentID : $this->record->ID;
+        $recordID = $this->record->ID;
 
         return json_encode([
             'Status' => $this->record->Status,

@@ -96,6 +96,14 @@ class Newsletter extends DataObject implements CMSPreviewable{
         return $result;
     }
 
+    // Faking parent method
+    public function parent() {
+        if ($this->ParentID && $this->ParentID > 0) {
+            return DataObject::get_by_id('Newsletter', $this->ParentID);
+        } else {
+            return false;
+        }
+    }
     /**
      * Returns a FieldSet with which to create the CMS editing form.
      * You can use the extend() method of FieldSet to create customised forms for your other
@@ -189,8 +197,6 @@ class Newsletter extends DataObject implements CMSPreviewable{
             $map = $mailinglists->map('ID', 'Title');
 
             foreach ($map as $key => $m) {
-                $Filters = DataObject::get_by_id('MailingList', $key)->FiltersApplied;
-                //$map->push($key, $m . serialize($Filters));
                 $map->push($key, $m);
             }
 
@@ -204,8 +210,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
         }
 
         $fields->removeByName('NewAddedOnly');
-        $fields->insertAfter('MailingLists', FieldGroup::create('Foo',
-            $ParentIDTitleField,
+
+        $fields->insertAfter('MailingLists', FieldGroup::create('Cb',
             $cb = new CheckboxField('NewAddedOnly', 'NUR an Teilnehmer, welche diesen Newsletter noch nicht erhalten haben.')
         ));
 
@@ -244,14 +250,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
         if ( $this->ParentID > 0 ) {
 
-            $OriginalNewsletter = DataObject::get_by_id('Newsletter', $this->ParentID);
-
-            $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'),
-                $Dup = new LiteralField('Hint', '<div class="message notice">Dieser Newsletter ist ein Duplikat von <strong>'.$OriginalNewsletter->Subject.'</strong>. Um den Versand zu kontrollieren gehen Sie bitte zum Original.</div>')
-
-            );
-        } else {
-
+            // We show the SendRecipientQueue based on the Parent ID
             $sendRecipientGrid = GridField::create(
                 'SendRecipientQueue',
                 _t('NewsletterAdmin.SentTo', 'Sent to'),
@@ -260,8 +259,20 @@ class Newsletter extends DataObject implements CMSPreviewable{
             );
 
             $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
-        }
 
+        } else {
+            $sendRecipientGrid = GridField::create(
+                'SendRecipientQueue',
+                _t('NewsletterAdmin.SentTo', 'Sent to'),
+                SendRecipientQueue::get()->filterAny(array(
+                    'NewsletterID' => $this->ID,
+                    'ParentID' => $this->ID
+                )),
+                $gridFieldConfig
+            );
+
+            $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
+        }
 
 
         //only show restart queue button if the newsletter is stuck in "sending"

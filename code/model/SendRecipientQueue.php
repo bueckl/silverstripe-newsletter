@@ -14,7 +14,8 @@ class SendRecipientQueue extends DataObject {
     private static $db = array(
         "Status" => "Enum('Scheduled, InProgress, Sent, Failed, Bounced, BlackListed', 'Scheduled')",
         "RetryCount" => "Int",    //number of times this email got "stuck" in the queue
-        "isDuplicate" => 'Boolean' // Is a duplicate of another Mailing
+        "isDuplicate" => 'Boolean', // Is a duplicate of another Mailing
+        "ParentID" => "Int"
     );
 
     private static $has_one = array(
@@ -30,7 +31,8 @@ class SendRecipientQueue extends DataObject {
         "RetryCount",
         "ReceivedCount",
         "niceIsDuplicate" => "niceIsDuplicate",
-        "LastEdited"
+        "Newsletter.Subject",
+        "LastEdited" => "LastEdited.Nice"
     );
 
 

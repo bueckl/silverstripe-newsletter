@@ -71,8 +71,14 @@ class NewsletterSendController extends BuildTask
         $Recipients = $this->previewRecipients($newsletter);
 
         $queueCount = 0;
+
+        if ($newsletter->ParentID && $newsletter->ParentID > 0) {
+            $ParentID = $newsletter->ParentID;
+        }
+
         foreach ($Recipients as $R) {
                 //duplicate filtering
+                // Todo what about ParentID here, Jochen?
                 $existingQueue = SendRecipientQueue::get()->filter(array(
                     'MemberID' => $R['ID'],
                     'NewsletterID' => $newsletter->ID,
@@ -88,8 +94,11 @@ class NewsletterSendController extends BuildTask
                 // So we can easily track who has received a certain newsletter including
                 // Copies, Resends etc …
                 if ($newsletter->ParentID && $newsletter->ParentID > 0) {
-                    $queueItem->NewsletterID = $newsletter->ParentID;
+                    //NOPE!
+                    // $queueItem->NewsletterID = $newsletter->ParentID;
+                    $queueItem->NewsletterID = $newsletter->ID;
                     $queueItem->isDuplicate = true;
+                    $queueItem->ParentID = $newsletter->ParentID;
 
                 } else {
                     $queueItem->NewsletterID = $newsletter->ID;
@@ -176,25 +185,14 @@ class NewsletterSendController extends BuildTask
         $newsletter = Newsletter::get()->byID($newsletterID);
         if ($newsletter->ParentID) {
             $this->duplicateID = $newsletter->ID;
-            $newsletter = Newsletter::get()->byID($newsletter->ParentID);
-            $newsletterID = $newsletter->ID;
+            // nope
+            // $newsletter = Newsletter::get()->byID($newsletter->ParentID);
+            //$newsletterID = $newsletter->ID;
         }
 
-        if (class_exists('MessageQueue')) {
-            //start processing of email sending for this newsletter ID after shutdown
-            MessageQueue::send(
-                "newsletter",
-                new MethodInvocationMessage('NewsletterSendController', "process_queue_invoke", $newsletterID)
-            );
+        // We don't use messagequeu any longer
+        $this->processQueue($newsletterID);
 
-            MessageQueue::consume_on_shutdown();
-        } else {
-            // Do the sending in real-time, if there is not MessageQueue to do it out-of-process.
-            // Caution: Will only send the first batch (see $items_to_batch_process),
-            // needs to be continued manually afterwards, e.g. through the "restart queue processing"
-            // in the admin UI.
-            $this->processQueue($newsletterID);
-        }
     }
 
     /**
@@ -338,7 +336,8 @@ class NewsletterSendController extends BuildTask
                     //mark the send process as complete
                     if ($this->duplicateID) {
                         //if we're dealing with a duplicate, make sure that the duplicate is marked as complete
-                        $newsletter = Newsletter::get()->byID($this->duplicateID);
+                        //nope
+                        //$newsletter = Newsletter::get()->byID($this->duplicateID);
                     }
                     $newsletter->SentDate = SS_Datetime::now()->getValue();
                     $newsletter->Status = 'Sent';

@@ -15,7 +15,7 @@ class NewsletterAdmin extends ModelAdmin {
 
     private static $managed_models = array(
         "Newsletter" => array('title' => 'Mailing'),
-        "Newsletter_Sent" => array('title' => 'Sent Mailings'),
+        "Newsletter_Sent" => array('title' => 'Verschickte Mailings'),
         // "MailingList"
         // "Member"
     );
