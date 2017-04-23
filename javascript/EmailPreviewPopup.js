@@ -33,13 +33,9 @@
                 var url = this.data('url');
                 // Wait for 1s before we query ajax and show the dialog
                 setTimeout(function() {
-                    $.ajax({
-                        url         : url,
-                        'success'   : function(data){
-                            dialog.html(data);
-                            dialog.dialog( "open" );
-                        }
-                    });
+                    var iframe = '<iframe style="width: 100%;height: 98%;" src="' + url + '"></iframe>';
+                    dialog.html(iframe);
+                    dialog.dialog( "open" );
                 }, 1000);
 
                 return false;
