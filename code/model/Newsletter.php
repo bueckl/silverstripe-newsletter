@@ -245,25 +245,26 @@ class Newsletter extends DataObject implements CMSPreviewable{
 //        }
 
 
-        // We dont show "Sent To" if sending Duplicated Newsletters aka Resends.
-        // All recipients are show below the Original Newsletter
 
         if ( $this->ParentID > 0 ) {
 
             // We show the SendRecipientQueue based on the Parent ID
             $sendRecipientGrid = GridField::create(
                 'SendRecipientQueue',
-                _t('NewsletterAdmin.SentTo', 'Sent to'),
+                // _t('NewsletterAdmin.SentTo', 'Sent to'),
+                'Empfänger',
                 $this->SendRecipientQueue(),
                 $gridFieldConfig
             );
 
-            $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
-
         } else {
+
+            // On the Parent Record we show all recipients of the original AND Duplicated Newsletters …
+
             $sendRecipientGrid = GridField::create(
                 'SendRecipientQueue',
-                _t('NewsletterAdmin.SentTo', 'Sent to'),
+                // _t('NewsletterAdmin.SentTo', 'Sent to'),
+                'Empfänger',
                 SendRecipientQueue::get()->filterAny(array(
                     'NewsletterID' => $this->ID,
                     'ParentID' => $this->ID
@@ -271,9 +272,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
                 $gridFieldConfig
             );
 
-            $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
+            // $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
         }
 
+        $fields->addFieldToTab( 'Root.Empfänger', $sendRecipientGrid );
 
         //only show restart queue button if the newsletter is stuck in "sending"
         //only show the restart queue button if the user can run the build task (i.e. has full admin permissions)

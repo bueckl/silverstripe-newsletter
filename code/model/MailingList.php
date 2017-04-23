@@ -113,7 +113,7 @@ class MailingList extends DataObject {
         // This is potentially dangerous. Reinvestigate …
 
         $fields->addFieldsToTab(
-            'Root.Filtered recipients (' . $filteredRecipients->count() . ')', [
+            'Root.Empfänger mit diesen Kriterien (' . $filteredRecipients->count() . ')', [
             // LiteralField::create('FilteredRecipientsDesc','
 //                 <em>
 //                     These recipients are filtered based on the filtering options. <br>
@@ -124,50 +124,10 @@ class MailingList extends DataObject {
         ]);
 
 
+        // Additional manual added recipients -> removed to keep things lean. In order to add "special" users to a list
+        // we should create a filter … Like e.g a texfield "FreeMailingListFilter". We could than put a "secret" word into
+        // that field and add a "FreeMailingListFilter" to MailingList
 
-        // Additional recipients
-
-        /* TODO
-        Discuss with Anselm. This doesn't work because manually added users get overwritten when Mailing list members are re-calculated. Maybe we should simply drop that for now.
-
-
-        $additionalRecipients = $this->Members();
-        $grid = new GridField(
-            'Members',
-            _t('NewsletterAdmin.Recipients', 'Additional recipients for this mailing list'),
-            $additionalRecipients,
-            $config = GridFieldConfig::create()
-                ->addComponent(new GridFieldButtonRow('before'))
-                ->addComponent(new GridFieldToolbarHeader())
-                ->addComponent(new GridFieldFilterHeader())
-                ->addComponent(new GridFieldSortableHeader())
-                ->addComponent(new GridFieldEditableColumns())
-                ->addComponent(new GridFieldDeleteAction())
-                ->addComponent(new GridFieldRecipientUnlinkAction())
-                ->addComponent(new GridFieldEditButton())
-                ->addComponent(new GridFieldDetailForm())
-                ->addComponent(new GridFieldPaginator(100))
-                ->addComponent( $autocomplete = new GridFieldAddExistingAutocompleter('toolbar-header-right'))
-                ->addComponent(new GridFieldAddNewButton('before'))
-        );
-
-        $autocomplete->setSearchList(Member::get());
-        $autocomplete->setSearchFields(array(
-            'FirstName',
-            'Surname',
-            'Email'
-        ));
-
-        $config->removeComponentsByType('GridFieldAddNewButton');
-
-        // Nicht zwingend ein Eventteilnehmer. Kann irgendein Recipient sein
-        $config->addComponent($auto = new GridFieldAddExistingSearchButton());
-        $auto->setTitle(_t('Newsletter.AssignExistingRecipient', "Assign Recipient to Mailing List"));
-
-
-        $fields->addFieldToTab('Root.Additional recipients (' . $additionalRecipients->count() . ')',new CompositeField($grid));
-
-        END ADDITIONAL RECIPIENTS */
 
         $fields->dataFieldByName('Title')->setTitle('Name der Mailing-Liste');
 
