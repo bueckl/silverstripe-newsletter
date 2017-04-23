@@ -19,6 +19,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         'sendtestmail',
         'processqueue',
         'doPreviewRecipientsForAjax',
+        'doDeleteQueue'
     );
 
     public function updateCMSActions($actions)
@@ -70,6 +71,12 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                         'data-url',
                         Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'processqueue')
                     )
+                    ->setUseButtonTag(true)
+            );
+            $actions->push(
+                FormAction::create('doDeleteQueue', 'Delete Queue')
+                    ->addExtraClass('ss-ui-action-destructive')
+                    ->setAttribute('data-icon', 'delete')
                     ->setUseButtonTag(true)
             );
         }
@@ -350,6 +357,20 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $controller->getRequest()->addHeader('X-Pjax', 'Content');
             return $controller->redirect($noActionURL, 302);
         }
+    }
+
+    public function doDeleteQueue($data, $form)
+    {
+        foreach (SendRecipientQueue::get()->filter([
+            'NewsletterID' => $this->record->ID,
+            'Status' => 'Scheduled'
+        ]) as $qi) {
+            $qi->delete();
+        }
+        $this->record->Status = 'Draft';
+        $this->record->write();
+        $form->sessionMessage('Queue deleted', 'good');
+        return Controller::curr()->redirect($this->Link());
     }
 
     public function processqueue()

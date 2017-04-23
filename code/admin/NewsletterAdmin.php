@@ -33,6 +33,7 @@ class NewsletterAdmin extends ModelAdmin {
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/RecipientsPreviewPopup.js');
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/EmailPreviewPopup.js');
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/ProcessQueue.js');
+        Requirements::javascript(NEWSLETTER_DIR . '/javascript/DeleteQueue.js');
         Requirements::css('newsletter/css/NewsletterAdmin.css');
     }
 
