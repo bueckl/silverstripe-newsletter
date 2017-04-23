@@ -54,22 +54,14 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                             ->setAttribute('data-url', $link)
                             ->setUseButtonTag(true);
 
-            $previewEmail = FormAction::create('doPreviewEmail', _t('Newsletter.PreviewEmail', 'Preview Email'))
-                            ->addExtraClass('ss-ui-action-constructive')
-                            ->setAttribute('data-icon', 'accept')
-                            ->setAttribute(
-                                'data-url',
-                                Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'emailpreview')
-                            )
-                            ->setUseButtonTag(true);
 
             $actions->push($sendButton);
             $actions->push($previewRecipientsButton);
-            $actions->push($previewEmail);
 
         }
 
         if ($this->record->Status == "Sending") {
+
             $actions->push(
                 FormAction::create('doProcessQueue', 'Process Queue')
                     ->addExtraClass('ss-ui-action-constructive')
@@ -81,6 +73,18 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                     ->setUseButtonTag(true)
             );
         }
+
+        $previewEmail = FormAction::create('doPreviewEmail', _t('Newsletter.PreviewEmail', 'Preview Email'))
+                        ->addExtraClass('ss-ui-action-constructive')
+                        ->setAttribute('data-icon', 'accept')
+                        ->setAttribute(
+                            'data-url',
+                            Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'emailpreview')
+                        )
+                        ->setUseButtonTag(true);
+
+        $actions->push($previewEmail);
+
 
         return $actions;
     }
@@ -369,6 +373,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             ])->count(),
             // TODO this gives a wrong number because of the way we're deling with duplicates
             // TODO consider reviewing the way we deal with duplicates
+
             'Total' => SendRecipientQueue::get()->filter([
                 'NewsletterID' => $recordID
             ])->count(),

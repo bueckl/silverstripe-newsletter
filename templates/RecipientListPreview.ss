@@ -1,5 +1,5 @@
 <div style="padding: 30px;">
-<h2><strong>VORSCHAU EMPFÄNGER</strong><br></h2>
+<h2><strong>VORSCHAU EMPFÄNGER ($Me.Count)</strong><br></h2>
 
 <% if $Me.Count == 0 %>
     <div class="message bad" style="font-size: 21px; line-height: 30px; color: red; font-weight: bold; ">Für diese Auswahl liegen keine Empfänger vor.</div>
