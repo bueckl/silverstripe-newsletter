@@ -392,9 +392,10 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                 'NewsletterID' => $recordID,
                 'Status' => 'Scheduled'
             ])->count(),
-            // TODO this gives a wrong number because of the way we're deling with duplicates
-            // TODO consider reviewing the way we deal with duplicates
-
+            'Failed' => SendRecipientQueue::get()->filter([
+                'NewsletterID' => $recordID,
+                'Status' => 'Failed'
+            ])->count(),
             'Total' => SendRecipientQueue::get()->filter([
                 'NewsletterID' => $recordID
             ])->count(),
