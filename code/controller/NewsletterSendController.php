@@ -112,11 +112,14 @@ class NewsletterSendController extends BuildTask
     }
 
 
-
+    /**
+     * All recipients for the newsletter - as array
+     * @param Newsletter $newsletter
+     * @return array
+     */
     function previewRecipients(Newsletter $newsletter) {
 
         $lists = $newsletter->MailingLists();
-
         $RecipientsArray = array();
 
         foreach($lists as $list) {
@@ -130,52 +133,57 @@ class NewsletterSendController extends BuildTask
             }
         }
 
+        // Closure for making sure that we don't return duplicate recipients
+        $uniqueRecipients = function($arr) {
+            $recipientIDs = [];
+            $unique = [];
+            foreach ($arr as $recipient) {
+                if (!in_array($recipient['ID'], $recipientIDs)) {
+                    $unique[] = $recipient;
+                    $recipientIDs[] = $recipient['ID'];
+                }
+            }
+            return $unique;
+        };
 
-        // Special case: Only send to newly added recipients which never received a newsletter.
         $NewAddedOnly = $newsletter->NewAddedOnly;
 
-
+        // Special case: Only send to newly added recipients which never received a newsletter.
         if ($NewAddedOnly == 1) {
 
             // Get those recipients who DID receive this Newsletter (identified by "ParentID") in the past.
-            $AlreadyReceived = SendRecipientQueue:: get()->filter(array(
+            $AlreadyReceived = SendRecipientQueue:: get()->filterAny(array(
                 'NewsletterID' => $newsletter->ParentID,
+                'ParentID' => $newsletter->ParentID,
                 'Status' => 'Sent'
             ));
 
             $AlreadyReceivedArray = array();
 
-            // Building the Already Recieved array
+            // Building the Already Received array
             foreach ( $AlreadyReceived as $ar) {
                 $AlreadyReceivedArray[] = $ar->toMap();
             }
 
-
-            // Building the final Arrau which shows only the difference.
-            $FinalList = array();
+            // Building the final Array which shows only the difference.
 
             foreach ($RecipientsArray as $Key => $R) {
-
                 foreach ( $AlreadyReceivedArray as $A) {
                     if ( $A['MemberID'] == $R['ID'] ) {
                         unset($RecipientsArray[$Key]);
                     }
                 }
             }
-
-            return $RecipientsArray;
+            return $uniqueRecipients($RecipientsArray);
 
         } else {
-
             //Simply return all the Recipients from all the lists
-            return $RecipientsArray;
 
+            // Just for testing the uniqueRecipients method
+            //return $uniqueRecipients(array_merge($RecipientsArray, $RecipientsArray));
+            return $uniqueRecipients($RecipientsArray);
         }
-
-
-
-
-	}
+    }
 
 
 
