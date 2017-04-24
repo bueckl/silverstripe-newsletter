@@ -407,8 +407,16 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $arrayList->push($a);
         }
 
+
+        // We want an Object to be able to call methods on the template!
+        foreach ( $arrayList as $al ) {
+            $RecipientIDs[] = $al->ID;
+        }
+
         $template = 'RecipientListPreview';
-        $preview = $arrayList->renderWith( $template );
+
+        $Recipients = Member::get()->filterAny( 'ID', $RecipientIDs );
+        $preview = $Recipients->renderWith( $template );
         $controller = Controller::curr();
 
         if ($controller->getRequest()->isAjax()) {

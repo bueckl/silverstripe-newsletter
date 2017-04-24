@@ -24,15 +24,15 @@
     <table style="width: 100% !important; border: none;">
 <% loop $Me %>
     <tr>
-        <td nowrap>$Pos&nbsp;&nbsp;</td>
-        <td nowrap><strong>$Email&nbsp;&nbsp;</strong></td>
-        <td nowrap>$FirstName&nbsp;&nbsp;</td>
-        <td nowrap>$Surname&nbsp;&nbsp;</td>
-        <td nowrap>L: $Locale&nbsp;&nbsp;</td>
-        <td nowrap>I: $Invitation&nbsp;&nbsp;</td>
-        <td nowrap>M: $Market&nbsp;&nbsp;</td>
-        <td nowrap>GT: $GuestType&nbsp;&nbsp;</td>
-        <td nowrap>A: $ArrivalDate.Nice</td>
+        <td nowrap>$Pos</td>
+        <td nowrap><strong>$Email</strong></td>
+        <td nowrap>$FirstName</td>
+        <td nowrap>$Surname</td>
+        <td nowrap>L: $Locale</td>
+        <td nowrap>I: $Invitation</td>
+        <td nowrap>M: $Market</td>
+        <td nowrap>GT: $GuestType</td>
+        <td nowrap>A: $calculatedArrivalDate</td>
     </tr>
 <% end_loop %>
     </table>
