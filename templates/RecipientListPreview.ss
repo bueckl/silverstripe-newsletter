@@ -1,16 +1,41 @@
-<div style="padding: 30px;">
+<style>
+
+    .cms-content-tools {
+        padding: 0 !important;
+        background: transparent;
+        width: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 70;
+        border:none;
+        float: none;
+        clear: left;
+        position: relative;
+    }
+</style>
+
+<div class="cms-content-tools" style="padding: 30px;">
 <h2><strong>VORSCHAU EMPFÄNGER ($Me.Count)</strong><br></h2>
 
 <% if $Me.Count == 0 %>
     <div class="message bad" style="font-size: 21px; line-height: 30px; color: red; font-weight: bold; ">Für diese Auswahl liegen keine Empfänger vor.</div>
 <% end_if %>
 
-
-<div style="-webkit-column-count: 1; -moz-column-count: 1; column-count: 1; margin-bottom: 40px;">
+    <table style="width: 100% !important; border: none;">
 <% loop $Me %>
-    <div style="font-size: 13px; border-bottom: 1px solid #fff;">($Pos) $FirstName, $Surname ($Locale) => $Email</div>
+    <tr>
+        <td nowrap>$Pos&nbsp;&nbsp;</td>
+        <td nowrap><strong>$Email&nbsp;&nbsp;</strong></td>
+        <td nowrap>$FirstName&nbsp;&nbsp;</td>
+        <td nowrap>$Surname&nbsp;&nbsp;</td>
+        <td nowrap>L: $Locale&nbsp;&nbsp;</td>
+        <td nowrap>I: $Invitation&nbsp;&nbsp;</td>
+        <td nowrap>M: $Market&nbsp;&nbsp;</td>
+        <td nowrap>GT: $GuestType&nbsp;&nbsp;</td>
+        <td nowrap>A: $ArrivalDate.Nice</td>
+    </tr>
 <% end_loop %>
-</div>
+    </table>
 
 
 </div>
