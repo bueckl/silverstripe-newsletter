@@ -6,10 +6,9 @@
 <% end_if %>
 
 
-<div style="-webkit-column-count: 2; -moz-column-count: 2; column-count: 2; margin-bottom: 40px;">
+<div style="-webkit-column-count: 1; -moz-column-count: 1; column-count: 1; margin-bottom: 40px;">
 <% loop $Me %>
     <div style="font-size: 13px; border-bottom: 1px solid #fff;">($Pos) $FirstName, $Surname ($Locale) => $Email</div>
-
 <% end_loop %>
 </div>
 

@@ -159,7 +159,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         $arr = [];
         foreach($lists as $list) {
             // All recipients which are actually on the list.
-            $Recipients = $list->Members();
+            $Recipients = $list->Members()->sort('RAND()');
             if ( $Recipients->Count()) {
                 foreach ($Recipients as $R ) {
                     $arr[] = $R;
@@ -171,8 +171,8 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $recipient = $arr[0];
         }
         // Cloak name  & email
-        $recipient->FirstName = 'John';
-        $recipient->Surname = 'Doe';
+        // $recipient->FirstName = 'John';
+        // $recipient->Surname = 'Doe';
         $recipient->Email = 'john@doe.com';
         return $recipient;
     }
