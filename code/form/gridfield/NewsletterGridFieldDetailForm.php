@@ -409,6 +409,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
 
         // We want an Object to be able to call methods on the template!
+        $RecipientIDs = [];
         foreach ( $arrayList as $al ) {
             $RecipientIDs[] = $al->ID;
         }
