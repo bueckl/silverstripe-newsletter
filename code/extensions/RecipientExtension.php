@@ -306,16 +306,16 @@ class RecipientExtension extends DataExtension
         }
     }
 
-    public function canDelete($member = null) {
-        $can = parent::canDelete($member);
-        $queueditems = $this->owner->SendRecipientQueue();
-        if($queueditems->count()){
-            foreach($queueditems as $queueditem){
-                $can = $can && !($queueditem->Status === 'Scheduled' && $queueditem->Status === 'InProgress');
-            }
-        }
-        return $can;
-    }
+    //public function canDelete($member = null) {
+    //    $can = parent::canDelete($member);
+    //    $queueditems = $this->owner->SendRecipientQueue();
+    //    if($queueditems->count()){
+    //        foreach($queueditems as $queueditem){
+    //            $can = $can && !($queueditem->Status === 'Scheduled' && $queueditem->Status === 'InProgress');
+    //        }
+    //    }
+    //    return $can;
+    //}
 
     public function getFrontEndFields($params = null) {
         $fields = parent::getFrontEndFields($params);
