@@ -53,7 +53,9 @@
                         }
                         if (!closed) {
                             if (data.Status == 'Sending') {
-                                poll();
+                                setTimeout(function() {
+                                    poll();
+                                }, 1000);
                             } else if (data.Status == 'Sent') {
                                 location.reload();
                             }
