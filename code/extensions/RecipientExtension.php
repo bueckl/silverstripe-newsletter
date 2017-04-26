@@ -221,90 +221,90 @@ class RecipientExtension extends DataExtension
     }
 
 
-    /**
-     * Event handler called before writing to the database. we need to deal with the unique_identifier_field here
-     */
-    public function onBeforeWrite() {
+//    /**
+//     * Event handler called before writing to the database. we need to deal with the unique_identifier_field here
+//     */
+//    public function onBeforeWrite() {
+//
+//        parent::onBeforeWrite();
+//
+//        // If a recipient with the same "unique identifier" already exists with a different ID, don't allow merging.
+//        // Note: This does not a full replacement for safeguards in the controller layer (e.g. in a subscription form),
+//        // but rather a last line of defense against data inconsistencies.
+//
+//        // BACKEND CONTEXT!!!
+//        if( is_subclass_of(Controller::curr(), "LeftAndMain") ) {
+//
+//            if (empty($this->owner->Email)) {
+//                throw new ValidationException('Email is required',0);
+//            }
+//
+//            // Check if an Email exists but belongs to a different User
+//            // If so we dont want to add this user and so avoid duplicates
+//            $ExistingRecipient = Member::get()->filter('Email', $this->owner->Email)->First();
+//
+//            // Es gibt schon einen User mit dieser Email
+//            if (isset($ExistingRecipient)) {
+//
+//                // Wir ändern
+//                $ExistingRecipientID = $ExistingRecipient->ID;
+//
+//                if($ExistingRecipientID == $this->owner->ID) {
+//                    // Wir machen nix. Der record wird in der Folge aktualisert
+//
+//                } else {
+//                    // Wir versuchen erneut einen User mit der selben Email anzulegen
+//                    // STOP IT
+//                    // THIS BREAKS NEWSLETTER SENDING
+//                    throw new ValidationException('Already exists. please link an existing contact instead',0);
+//                }
+//
+//                // Wir legen komplett neu an
+//            } else {
+//                // Wir legen neu an
+//            }
+//        }
+//    }
 
-        parent::onBeforeWrite();
-
-        // If a recipient with the same "unique identifier" already exists with a different ID, don't allow merging.
-        // Note: This does not a full replacement for safeguards in the controller layer (e.g. in a subscription form),
-        // but rather a last line of defense against data inconsistencies.
-
-        // BACKEND CONTEXT!!!
-        if( is_subclass_of(Controller::curr(), "LeftAndMain") ) {
-
-            if (empty($this->owner->Email)) {
-                throw new ValidationException('Email is required',0);
-            }
-
-            // Check if an Email exists but belongs to a different User
-            // If so we dont want to add this user and so avoid duplicates
-            $ExistingRecipient = Member::get()->filter('Email', $this->owner->Email)->First();
-
-            // Es gibt schon einen User mit dieser Email
-            if (isset($ExistingRecipient)) {
-
-                // Wir ändern
-                $ExistingRecipientID = $ExistingRecipient->ID;
-
-                if($ExistingRecipientID == $this->owner->ID) {
-                    // Wir machen nix. Der record wird in der Folge aktualisert
-
-                } else {
-                    // Wir versuchen erneut einen User mit der selben Email anzulegen
-                    // STOP IT
-                    // THIS BREAKS NEWSLETTER SENDING
-                    throw new ValidationException('Already exists. please link an existing contact instead',0);
-                }
-
-                // Wir legen komplett neu an
-            } else {
-                // Wir legen neu an
-            }
-        }
-    }
-
-    public function onAfterWrite() {
-        parent::onAfterWrite();
-
-        $Recipient = Member::get()->Filter('Email', $this->owner->Email);
-
-        // Lets add user to the default mailing list
-        switch ( $this->owner->ClassName ) {
-
-            case "Subscriber":
-            // Subscriber Mailing List
-            $MailingListID = 3;
-            break;
-
-            case "Exhibitor":
-            // Exhibitor Mailing List
-            $MailingListID = 2;
-            break;
-
-            case "Visitor":
-                // Exhibitor Mailing List
-                $MailingListID = 1;
-                break;
-
-            default:
-            $MailingListID = false;
-        }
-
-        if ($MailingListID) {
-            //Is already subscribed. maybe just add the user to another list?
-            if (self::inMailingList( $Member->First(), $MailingListID )) {
-                throw new ValidationException($this->owner->Email.' already exists on this mailing list. In case you have made changes to this record; All good. Those have been stored.',0);
-            } else {
-                // Add the existing user to this new mailing list
-                $MailingList = DataObject::get_by_id('MailingList', $MailingListID);
-                $MailingList->Members()->add($Recipient->First());
-                $MailingList->write();
-            }
-        }
-    }
+//    public function onAfterWrite() {
+//        parent::onAfterWrite();
+//
+//        $Recipient = Member::get()->Filter('Email', $this->owner->Email);
+//
+//        // Lets add user to the default mailing list
+//        switch ( $this->owner->ClassName ) {
+//
+//            case "Subscriber":
+//            // Subscriber Mailing List
+//            $MailingListID = 3;
+//            break;
+//
+//            case "Exhibitor":
+//            // Exhibitor Mailing List
+//            $MailingListID = 2;
+//            break;
+//
+//            case "Visitor":
+//                // Exhibitor Mailing List
+//                $MailingListID = 1;
+//                break;
+//
+//            default:
+//            $MailingListID = false;
+//        }
+//
+//        if ($MailingListID) {
+//            //Is already subscribed. maybe just add the user to another list?
+//            if (self::inMailingList( $Member->First(), $MailingListID )) {
+//                throw new ValidationException($this->owner->Email.' already exists on this mailing list. In case you have made changes to this record; All good. Those have been stored.',0);
+//            } else {
+//                // Add the existing user to this new mailing list
+//                $MailingList = DataObject::get_by_id('MailingList', $MailingListID);
+//                $MailingList->Members()->add($Recipient->First());
+//                $MailingList->write();
+//            }
+//        }
+//    }
 
     //public function canDelete($member = null) {
     //    $can = parent::canDelete($member);
