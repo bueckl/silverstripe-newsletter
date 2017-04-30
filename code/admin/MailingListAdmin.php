@@ -20,7 +20,6 @@ class MailingListAdmin extends ModelAdmin {
         $gridField = $form->Fields()->fieldByName($this->sanitiseClassName($this->modelClass));
         $config = $gridField->getConfig();
         $config->removeComponentsByType('GridFieldDetailForm')->addComponents(new MailingListGridFieldDetailForm());
-        $config->addComponents(new GridFieldSyncMailingListButton('before'));
         $config->addComponent(new GridFieldCopyButton(), 'GridFieldEditButton');
         $config->getComponentByType('GridFieldDataColumns')->setDisplayFields(array(
             'ID' => '#',

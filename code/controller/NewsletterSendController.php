@@ -151,12 +151,25 @@ class NewsletterSendController extends BuildTask
         // Special case: Only send to newly added recipients which never received a newsletter.
         if ($NewAddedOnly == 1) {
 
-            // Get those recipients who DID receive this Newsletter (identified by "ParentID") in the past.
+            // Get those recipients who DID receive this Newsletter OR the Newsletter Parent in the past.
+            // $AlreadyReceived = SendRecipientQueue:: get()->filterAny(array(
+ //                'NewsletterID' => $newsletter->ParentID,
+ //                'ParentID' => $newsletter->ParentID,
+ //                'Status' => 'Sent'
+ //            ));
+
+
+            /* TODO FOR NEXT ROLL OUT, RESEND TO FAILED OR BOUNCED. THE FOLLOWING WORKS BUT NEEDS TO BE TESTED. THIS IS TESTED NOW AND WILL BE ROLLED OUT */
+
             $AlreadyReceived = SendRecipientQueue:: get()->filterAny(array(
                 'NewsletterID' => $newsletter->ParentID,
                 'ParentID' => $newsletter->ParentID,
                 'Status' => 'Sent'
+            ))->exclude(array(
+                'ParentID'=>$newsletter->ParentID,
+                'Status:not'=> 'Sent'
             ));
+
 
             $AlreadyReceivedArray = array();
 

@@ -42,9 +42,6 @@ class NewsletterAdmin extends ModelAdmin {
     {
         $form = parent::getEditForm($id, $fields);
 
-        $Important = new LiteralField('Hint1', '<div class="message bad">Wichtig! Vor dem Versand eines Newsletters müssen immer alle bestehenden Mailing-Listen aktualisiert werden.</div>');
-        $form->Fields()->push( $Important );
-
         //custom handling of the newsletter modeladmin with a specialized action menu for the detail form
         if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent") {
             $config = $form->Fields()->first()->getConfig();

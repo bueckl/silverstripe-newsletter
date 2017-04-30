@@ -122,6 +122,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
         $fields->removeByName('SendRecipientQueue');
         $fields->removeByName('TrackedLinks');
 
+        $Important = new LiteralField('Hint1', '<div class="message bad" style="font-size: 17px; margin: 0px 0; background: #cc0000; color: #fff; padding: 15px; 10px;">*** <strong>WICHTIG ***</strong> Vor dem Versand eines Newsletters müssen immer alle bestehenden Mailing-Listen aktualisiert werden. </div>');
+        $fields->insertBefore('Status', $Important );
+
+
         if ( $this->ParentID ) {
 
             $OriginalNewsletter = DataObject::get_by_id('Newsletter', $this->ParentID);
