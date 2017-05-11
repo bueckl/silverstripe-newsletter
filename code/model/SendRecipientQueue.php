@@ -24,6 +24,9 @@ class SendRecipientQueue extends DataObject {
     );
 
     private static $summary_fields = array(
+        "ID",
+        "NewsletterID",
+        "ParentID",
         "Status",
         "Member.FirstName",
         "Member.Surname",

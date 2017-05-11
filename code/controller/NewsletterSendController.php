@@ -165,11 +165,33 @@ class NewsletterSendController extends BuildTask
                 'NewsletterID' => $newsletter->ParentID,
                 'ParentID' => $newsletter->ParentID,
                 'Status' => 'Sent'
-            ))->exclude(array(
-                'ParentID'=>$newsletter->ParentID,
-                'Status:not'=> 'Sent'
             ));
 
+            $Bounced = $AlreadyReceived->filter(array(
+                'ParentID' => $newsletter->ParentID,
+                'Status' => 'Bounced'
+            ));
+
+
+            foreach ( $Bounced as $B ) {
+                // if received at least one for this ParentID which HASE been sent we skip excluding the member
+                $Count = SendRecipientQueue:: get()->filter(array(
+                    'ParentID' => $newsletter->ParentID,
+                    'MemberID' => $B->MemberID,
+                    'Status' => 'Sent'
+                ))->Count();
+
+                if ($Count > 0) {
+                    // Skip :: Do NOT exclude
+                } else {
+                    $AlreadyReceived = $AlreadyReceived->exclude('MemberID', $B->MemberID);
+                }
+
+            }
+
+            // A user could be twice on the list. We need to filter out both!
+            // debug::dump( $AlreadyReceived->filter('MemberID', 1794) ); die;
+            // debug::dump( $AlreadyReceived->filter('MemberID', 1794)->Count());
 
             $AlreadyReceivedArray = array();
 
@@ -178,11 +200,15 @@ class NewsletterSendController extends BuildTask
                 $AlreadyReceivedArray[] = $ar->toMap();
             }
 
+
             // Building the final Array which shows only the difference.
 
             foreach ($RecipientsArray as $Key => $R) {
                 foreach ( $AlreadyReceivedArray as $A) {
                     if ( $A['MemberID'] == $R['ID'] ) {
+                        // if ( $A['MemberID'] == 1794 ) {
+//                             debug::dump('Maria');
+//                         }
                         unset($RecipientsArray[$Key]);
                     }
                 }
