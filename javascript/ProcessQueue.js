@@ -55,7 +55,7 @@
                             if (data.Status == 'Sending') {
                                 setTimeout(function() {
                                     poll();
-                                }, 1000);
+                                }, 500);
                             } else if (data.Status == 'Sent') {
                                 location.reload();
                             }

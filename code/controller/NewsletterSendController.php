@@ -162,9 +162,9 @@ class NewsletterSendController extends BuildTask
 
             $AlreadyReceived = SendRecipientQueue:: get()->filterAny(array(
                 'NewsletterID' => $newsletter->ParentID,
-                'ParentID' => $newsletter->ParentID,
-                'Status' => 'Sent'
-            ));
+                'ParentID' => $newsletter->ParentID
+            ))->where('Status', 'Sent');
+
 
             $Bounced = $AlreadyReceived->filter(array(
                 'ParentID' => $newsletter->ParentID,
