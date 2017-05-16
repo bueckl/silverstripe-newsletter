@@ -159,7 +159,6 @@ class NewsletterSendController extends BuildTask
  //            ));
 
 
-            /* TODO FOR NEXT ROLL OUT, RESEND TO FAILED OR BOUNCED. THE FOLLOWING WORKS BUT NEEDS TO BE TESTED. THIS IS TESTED NOW AND WILL BE ROLLED OUT */
 
             $AlreadyReceived = SendRecipientQueue:: get()->filterAny(array(
                 'NewsletterID' => $newsletter->ParentID,
@@ -172,21 +171,22 @@ class NewsletterSendController extends BuildTask
                 'Status' => 'Bounced'
             ));
 
+            if ( $Bounced->Count > 0 ) {
+                foreach ( $Bounced as $B ) {
+                    // if received at least one for this ParentID which HASE been sent we skip excluding the member
+                    $Count = SendRecipientQueue:: get()->filter(array(
+                        'ParentID' => $newsletter->ParentID,
+                        'MemberID' => $B->MemberID,
+                        'Status' => 'Sent'
+                    ))->Count();
 
-            foreach ( $Bounced as $B ) {
-                // if received at least one for this ParentID which HASE been sent we skip excluding the member
-                $Count = SendRecipientQueue:: get()->filter(array(
-                    'ParentID' => $newsletter->ParentID,
-                    'MemberID' => $B->MemberID,
-                    'Status' => 'Sent'
-                ))->Count();
+                    if ($Count > 0) {
+                        // Skip :: Do NOT exclude
+                    } else {
+                        $AlreadyReceived = $AlreadyReceived->exclude('MemberID', $B->MemberID);
+                    }
 
-                if ($Count > 0) {
-                    // Skip :: Do NOT exclude
-                } else {
-                    $AlreadyReceived = $AlreadyReceived->exclude('MemberID', $B->MemberID);
                 }
-
             }
 
             // A user could be twice on the list. We need to filter out both!
