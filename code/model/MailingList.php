@@ -75,6 +75,7 @@ class MailingList extends DataObject {
         $FilterableFields->dataFieldByName('Filter_Member_CountryImport')->setTitle('CountryImport');
         $FilterableFields->dataFieldByName('Filter_Member_PhotoTermsAccepted')->setTitle('Foto Einverständniserklärung akzeptiert');
         $FilterableFields->dataFieldByName('Filter_Member_Locale')->setEmptyString('Bitte wählen')->setDescription('Keine Auswahl für Alle');
+        $FilterableFields->dataFieldByName('Filter_Member_AttendeeCheck')->setDescription('Ist Teilnehmer');
 
 
         $fields->addFieldsToTab('Root.Main', [
@@ -238,10 +239,11 @@ class MailingList extends DataObject {
      */
     public function FilteredRecipients() {
         $filtersApplied = unserialize($this->FiltersApplied);
-        $members = Member::get();
-        // $members = Group::get()->filter(array(
-        //     'Code' => 'attendees'
-        // ))->First()->Members();
+
+        //$members = Member::get();
+        $members = Group::get()->filter(array(
+            'Code' => 'attendees'
+        ))->First()->Members();
         
         foreach (self::get_filterable_fields_or_callbacks(true) as $fieldName => $callBack) {
             $restraint = isset($filtersApplied[$fieldName]) ? $filtersApplied[$fieldName] : false;
