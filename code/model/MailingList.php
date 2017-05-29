@@ -68,6 +68,7 @@ class MailingList extends DataObject {
 
 
         $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setTitle('Ich bin … / Art des Teilnehmers');
+        $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
         $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setDescription('Keine Auswahl für Alle');
         $FilterableFields->dataFieldByName('Filter_Member_WillAssist')->setTitle('Teilnahme bestätigt')->setDescription('Keine Auswahl für Alle');
         $FilterableFields->dataFieldByName('Filter_Member_NDAAccepted')->setTitle('Geheimhaltungserklärung akzeptiert');
@@ -238,7 +239,10 @@ class MailingList extends DataObject {
     public function FilteredRecipients() {
         $filtersApplied = unserialize($this->FiltersApplied);
         $members = Member::get();
-
+        // $members = Group::get()->filter(array(
+        //     'Code' => 'attendees'
+        // ))->First()->Members();
+        
         foreach (self::get_filterable_fields_or_callbacks(true) as $fieldName => $callBack) {
             $restraint = isset($filtersApplied[$fieldName]) ? $filtersApplied[$fieldName] : false;
             if ($restraint) {
