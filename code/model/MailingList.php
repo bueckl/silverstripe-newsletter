@@ -80,6 +80,15 @@ class MailingList extends DataObject {
         $FilterableFields->dataFieldByName('Filter_Member_AttendeeCheck')->setDescription('Ist Teilnehmer');
 
         // $FilterableFields->dataFieldByName('Filter_Member_PhotoCheck')->setDescription('Hat KEIN Profilbild');
+        $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
+        
+        
+        $FilterableFields->dataFieldByName('Filter_Member_isPkwWave1and2')->setTitle('Anreisen PKW , W1 + W2');
+        $FilterableFields->dataFieldByName('Filter_Member_isPkwWave3')->setTitle('Anreisen PKW , W3');
+        $FilterableFields->dataFieldByName('Filter_Member_isSchoenefeld')->setTitle('Anreisen Schönefeld');
+        $FilterableFields->dataFieldByName('Filter_Member_isTegel')->setTitle('Anreisen Tegel');
+        $FilterableFields->dataFieldByName('Filter_Member_isTrain')->setTitle('Anreisen Bahnhof');
+        
 
 
         $fields->addFieldsToTab('Root.Main', [
@@ -242,8 +251,8 @@ class MailingList extends DataObject {
      * @return DataList
      */
     public function FilteredRecipients() {
+        
         $filtersApplied = unserialize($this->FiltersApplied);
-
         $members = Member::get();
 
         foreach (self::get_filterable_fields_or_callbacks(true) as $fieldName => $callBack) {

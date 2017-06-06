@@ -23,8 +23,8 @@ class MailingListAdmin extends ModelAdmin {
         $config->addComponent(new GridFieldCopyButton(), 'GridFieldEditButton');
         $config->getComponentByType('GridFieldDataColumns')->setDisplayFields(array(
             'ID' => '#',
-            'Title' => 'Name',
-            'filteredRecipients.Count' => 'Contacts on list',
+            'Title' => 'Name'
+            // 'filteredRecipients.Count' => 'Contacts on list',
         ));
         return $form;
     }
