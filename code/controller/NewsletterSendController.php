@@ -47,7 +47,7 @@ class NewsletterSendController extends BuildTask
     protected $title = 'Newsletter Send Controller';
 
     protected $description = 'Triggers processing of the send queue the specific newsletter ID.
-		Usage: dev/tasks/NewsletterSendController?newsletter=#';
+        Usage: dev/tasks/NewsletterSendController?newsletter=#';
 
     public static function inst()
     {
@@ -57,13 +57,13 @@ class NewsletterSendController extends BuildTask
         return self::$inst;
     }
 
-	/**
-	 * Adds users to the queue for sending out a newsletter.
-	 * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
-	 * to the queue.
-	 *
-	 * @param $id The ID of the Newsletter DataObject to send
-	 */
+    /**
+     * Adds users to the queue for sending out a newsletter.
+     * Processed all users that are CURRENTLY in the mailing lists associated with this MailingList and adds them
+     * to the queue.
+     *
+     * @param $id The ID of the Newsletter DataObject to send
+     */
 
     function enqueue(Newsletter $newsletter) {
 
@@ -167,20 +167,21 @@ class NewsletterSendController extends BuildTask
 
 
             $Bounced = $AlreadyReceived->filter(array(
-                'ParentID' => $newsletter->ParentID,
                 'Status' => 'Bounced'
             ));
 
-            if ( $Bounced->Count > 0 ) {
+            if ( $Bounced->Count() > 0 ) {
                 foreach ( $Bounced as $B ) {
                     // if received at least one for this ParentID which HASE been sent we skip excluding the member
-                    $Count = SendRecipientQueue:: get()->filter(array(
-                        'ParentID' => $newsletter->ParentID,
+                    $Foo = SendRecipientQueue:: get()->filter(array(
+                        'ParentID' => $newsletter->ParentID
+                    ))->where(array(
                         'MemberID' => $B->MemberID,
                         'Status' => 'Sent'
-                    ))->Count();
+                    ));
 
-                    if ($Count > 0) {
+                    if ($Foo->Count() > 0) {
+                        //debug::dump($B->MemberID);
                         // Skip :: Do NOT exclude
                     } else {
                         $AlreadyReceived = $AlreadyReceived->exclude('MemberID', $B->MemberID);
