@@ -82,11 +82,15 @@ class SendRecipientQueue extends DataObject {
             );
 
             if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
+            
+            if ( $recipient->owner->BookingConfirmationPDF() && $newsletter->BookingConfirmation == true ) {
+                $attachment = $recipient->owner->BookingConfirmationPDF();
+            } 
 
             //HACK JOCHEN. ADDING ATTACHMENTS
-            if ( $newsletter->Attachment() ) {
-                $attachment = $newsletter->Attachment();
-            }
+            // if ( $newsletter->Attachment() ) {
+ //                $attachment = $newsletter->Attachment();
+ //            }
 
             if ( $attachment ) {
                 $file =  $attachment->getFullPath();

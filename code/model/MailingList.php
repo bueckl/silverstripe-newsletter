@@ -83,8 +83,8 @@ class MailingList extends DataObject {
         $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
         
         
-        $FilterableFields->dataFieldByName('Filter_Member_isPkwWave1and2')->setTitle('Anreisen PKW , W1 + W2');
-        $FilterableFields->dataFieldByName('Filter_Member_isPkwWave3')->setTitle('Anreisen PKW , W3');
+        // $FilterableFields->dataFieldByName('Filter_Member_isPkwWave1')->setTitle('Anreisen PKW, W1');
+        // $FilterableFields->dataFieldByName('Filter_Member_isPkwWave2und3')->setTitle('Anreisen PKW, W2 + W3');
         $FilterableFields->dataFieldByName('Filter_Member_isSchoenefeld')->setTitle('Anreisen Schönefeld');
         $FilterableFields->dataFieldByName('Filter_Member_isTegel')->setTitle('Anreisen Tegel');
         $FilterableFields->dataFieldByName('Filter_Member_isTrain')->setTitle('Anreisen Bahnhof');
