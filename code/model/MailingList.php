@@ -78,6 +78,7 @@ class MailingList extends DataObject {
         $FilterableFields->dataFieldByName('Filter_Member_Locale')->setEmptyString('Bitte wählen')->setDescription('Keine Auswahl für Alle');
         
         $FilterableFields->dataFieldByName('Filter_Member_AttendeeCheck')->setDescription('Ist Teilnehmer');
+        $FilterableFields->dataFieldByName('Filter_Member_CrewCheck')->setDescription('Crew Only');
 
         // $FilterableFields->dataFieldByName('Filter_Member_PhotoCheck')->setDescription('Hat KEIN Profilbild');
         $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
