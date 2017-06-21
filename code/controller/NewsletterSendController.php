@@ -124,7 +124,7 @@ class NewsletterSendController extends BuildTask
 
         foreach($lists as $list) {
             // All recipients which are actually on the list.
-            $Recipients = $list->Members();
+            $Recipients = $list->Members()->exclude('Blacklisted', 1);
 
             if ( $Recipients->Count()) {
                 foreach ($Recipients as $R ) {
