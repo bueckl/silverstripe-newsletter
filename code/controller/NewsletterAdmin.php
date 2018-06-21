@@ -17,7 +17,7 @@ class NewsletterAdmin extends ModelAdmin {
         "Newsletter" => array('title' => 'Mailing'),
         "Newsletter_SentExtension" => array('title' => 'Sent Mailings'),
         "MailingList",
-        "Recipient"
+        "Member"
     );
 
     /**
@@ -48,7 +48,7 @@ class NewsletterAdmin extends ModelAdmin {
                     "Content" => "HTMLText->LimitSentences",
             ));
         }
-        if($this->modelClass == "Recipient") {
+        if($this->modelClass == "Member") {
             $config = $form->Fields()->first()->getConfig();
             $config->getComponentByType('GridFieldDataColumns')
                 ->setFieldCasting(array(

@@ -70,7 +70,7 @@ class NewsletterSendController extends BuildTask {
             // a newsletter
             // Those params get defined on the Newsletter DataObject and are managed
             // through a CheckboxSetField
-            $Recipients = $list->Recipients();
+            $Recipients = $list->Members();
 
             $excludeParams = $newsletter->ExcludeParams;
             // Convert ExcludeParams to Array
@@ -80,7 +80,7 @@ class NewsletterSendController extends BuildTask {
                 if ($excludeParam == 'HasBooking') {
                     foreach ($Recipients as $R) {
 
-                        if ( Booking::get()->filter('RecipientID', $R->ID)->First() ) {
+                        if ( Booking::get()->filter('MemberID', $R->ID)->First() ) {
                             // We identify users who have a booking record. So we want
                             // to excllude those from the list of Recipients
                             $Recipients = $Recipients->exclude('ID', $R->ID);
@@ -94,7 +94,7 @@ class NewsletterSendController extends BuildTask {
                 if ($excludeParam == 'Confirmed') {
                     foreach ($Recipients as $R) {
 
-                        if ( $Booking = Booking::get()->filter('RecipientID', $R->ID)->First() ) {
+                        if ( $Booking = Booking::get()->filter('MemberID', $R->ID)->First() ) {
                             // We identify users who have a booking record.
                             // but will not attend ERGO confirmed = 0!
                             if ( $Booking->Confirmed == 0) {
@@ -112,7 +112,7 @@ class NewsletterSendController extends BuildTask {
             foreach($Recipients->column('ID') as $recipientID) {
                 //duplicate filtering
                 $existingQueue = SendRecipientQueue::get()->filter(array(
-                    'RecipientID' => $recipientID,
+                    'MemberID' => $recipientID,
                     'NewsletterID' => $newsletter->ID,
                     'Status' => array('Scheduled', 'InProgress')
                 ));
@@ -121,7 +121,7 @@ class NewsletterSendController extends BuildTask {
 
                 $queueItem = SendRecipientQueue::create();
                 $queueItem->NewsletterID = $newsletter->ID;
-                $queueItem->RecipientID = $recipientID;
+                $queueItem->MemberID = $recipientID;
                 $queueItem->write();
                 $queueCount++;
             }
@@ -147,7 +147,7 @@ class NewsletterSendController extends BuildTask {
         // Gather All Recipients for all Mailing Lists which belong to this Newsletter
         $Recipients = new ArrayList();
         foreach ( $MailingLists as $MailingList) {
-            foreach( $MailingList->Recipients() as $Recipient) {
+            foreach( $MailingList->Members() as $Recipient) {
                 $Recipients->push($Recipient);
             }
         }
@@ -162,8 +162,8 @@ class NewsletterSendController extends BuildTask {
         }
 
         // Calculate the difference
-        $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
-        $NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+        $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('MemberID'));
+        $NewRecipients = Member::get()->filterAny('ID', array_keys($diff));
 
         $Recipients = $NewRecipients;
 
@@ -308,7 +308,7 @@ class NewsletterSendController extends BuildTask {
                 //do the actual mail out
                 if (!empty($queueItems2) && $queueItems2->count() > 0) {
                     //fetch all the recipients at once in one query
-                    $recipients = Recipient::get()->filter(array('ID' => $queueItems2->column('RecipientID')));
+                    $recipients = Member::get()->filter(array('ID' => $queueItems2->column('RecipientID')));
                     if ($recipients->count() > 0) {
                         $recipientsMap = array();
                         foreach($recipients as $r) {

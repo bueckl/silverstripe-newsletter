@@ -15,7 +15,7 @@ class MailingList extends DataObject {
 
     /* a mailing list could contains many newsletter recipients */
     private static $many_many = array(
-        'Recipients' => "Recipient",
+        'Members' => "Member",
     );
 
     private static $belongs_many_many = array(
@@ -80,9 +80,9 @@ class MailingList extends DataObject {
         );
 
         $grid = new GridField(
-            'Recipients',
+            'Members',
             _t('NewsletterAdmin.Recipients', 'Mailing list recipients'),
-            $this->Recipients(),
+            $this->Members(),
             $config = GridFieldConfig::create()
                 ->addComponent(new GridFieldButtonRow('before'))
                 ->addComponent(new GridFieldToolbarHeader())
@@ -98,7 +98,7 @@ class MailingList extends DataObject {
                 ->addComponent(new GridFieldAddNewButton('before'))
         );
 
-        $autocomplete->setSearchList(Recipient::get());
+        $autocomplete->setSearchList(Member::get());
         $autocomplete->setSearchFields(array(
             'FirstName',
             'Surname',
@@ -118,7 +118,7 @@ class MailingList extends DataObject {
         $this->extend("updateCMSFields", $fields);
 
         if(!$this->ID)
-            $fields->removeByName('Recipients');
+            $fields->removeByName('Members');
 
         return $fields;
     }
@@ -139,10 +139,9 @@ class MailingList extends DataObject {
      * Returns all recipients who aren't blacklisted, and are verified.
      */
     public function ActiveRecipients() {
-        if($this->Recipients()  instanceof UnsavedRelationList ) {
+        if($this->Members()  instanceof UnsavedRelationList ) {
             return new ArrayList();
         }
-        //return $this->Recipients()->exclude('Blacklisted', 1)->exclude('Verified', 0);
-        return $this->Recipients();
+        return $this->Members();
     }
 }

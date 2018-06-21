@@ -260,7 +260,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
             // Gather All Recipients for all Mailing Lists which belong to this Newsletter
             $Recipients = new ArrayList();
             foreach ( $MailingLists as $MailingList) {
-                foreach( $MailingList->Recipients() as $Recipient) {
+                foreach( $MailingList->Members() as $Recipient) {
                     $Recipients->push($Recipient);
                 }
             }
@@ -275,10 +275,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
             // Calculate the difference
             $diff = array_diff_key($Recipients->map('ID'), $RecipientsRecievedArrayList->map('RecipientID'));
-            $NewRecipients = Recipient::get()->filterAny('ID', array_keys($diff));
+            $NewRecipients = Member::get()->filterAny('ID', array_keys($diff));
 
             $notSentToYetRecipientGrid = GridField::create(
-                'Recipient',
+                'Member',
                 _t('NewsletterAdmin.NotSentToYet', 'Nachträglich hinzugefügte Teilnehmer'),
                 $NewRecipients,
                 $gridFieldConfig

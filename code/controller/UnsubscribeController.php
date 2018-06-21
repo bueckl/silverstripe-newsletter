@@ -46,7 +46,7 @@ class UnsubscribeController extends Page_Controller {
     private function getRecipient(){
         $validateHash = Convert::raw2sql($this->urlParams['ValidateHash']);
         if($validateHash) {
-            $recipient = Recipient::get()->filter("ValidateHash", $validateHash)->first();
+            $recipient = Member::get()->filter("ValidateHash", $validateHash)->first();
             $now = date('Y-m-d H:i:s');
             if($now <= $recipient->ValidateHashExpired) return $recipient;
         }
@@ -214,7 +214,7 @@ class UnsubscribeController extends Page_Controller {
         $form = NewsletterContentControllerExtension::getUnsubscribeFormObject($this);
 
         $email = Convert::raw2sql($request->requestVar('email'));
-        $recipient = Recipient::get()->filter('Email',$email)->First();
+        $recipient = Member::get()->filter('Email',$email)->First();
 
         if ($recipient) {
             //get the IDs of all the Mailing Lists this user is subscribed to

@@ -18,7 +18,7 @@ class RecipientValidator extends RequiredFields {
 
         // Check if an Email exists but belongs to a different User
         // If so we dont want to add this user and so avoid duplicates
-        $ExistingRecipient = Recipient::get()->filter('Email', $data['Email'])->First();
+        $ExistingRecipient = Member::get()->filter('Email', $data['Email'])->First();
 
         if (isset($ExistingRecipient)) {
 
