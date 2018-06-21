@@ -1,6 +1,6 @@
 <?php
 
-class RecipientValidator extends RequiredFields {
+class MemberValidator extends RequiredFields {
 
     function php($data) {
 
