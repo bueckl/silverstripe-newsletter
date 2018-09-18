@@ -67,9 +67,12 @@ class MailingList extends DataObject {
         $FilterableFields = self::get_filterable_fields_or_callbacks();
 
 
-        $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setTitle('Ich bin … / Art des Teilnehmers');
+        // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setTitle('Ich bin … / Art des Teilnehmers');
+        // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setDescription('Keine Auswahl für Alle');
+
         $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
-        $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setDescription('Keine Auswahl für Alle');
+
+
         $FilterableFields->dataFieldByName('Filter_Member_WillAssist')->setTitle('Teilnahme bestätigt')->setDescription('Keine Auswahl für Alle');
         $FilterableFields->dataFieldByName('Filter_Member_NDAAccepted')->setTitle('Geheimhaltungserklärung akzeptiert');
         // $FilterableFields->dataFieldByName('Filter_Member_CountryImport')->setTitle('CountryImport');
