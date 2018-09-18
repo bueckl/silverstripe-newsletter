@@ -177,6 +177,9 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
         // Only show template selection if there's more than one template set
         $templateSource = $this->templateSource();
+        ksort($templateSource);
+
+        
         if(count($templateSource) > 1) {
             $fields->replaceField(
                 "RenderTemplate",
