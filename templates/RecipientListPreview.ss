@@ -31,7 +31,6 @@
         <td nowrap>L: $Locale</td>
         <td nowrap>I: $Invitation</td>
         <td nowrap>M: $Market</td>
-        <td nowrap>GT: $GuestType</td>
         <td nowrap>A: $calculatedArrivalDate</td>
     </tr>
 <% end_loop %>
