@@ -70,7 +70,7 @@ class MailingList extends DataObject {
         // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setTitle('Ich bin … / Art des Teilnehmers');
         // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setDescription('Keine Auswahl für Alle');
 
-        $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
+        // $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
 
 
         $FilterableFields->dataFieldByName('Filter_Member_WillAssist')->setTitle('Teilnahme bestätigt')->setDescription('Keine Auswahl für Alle');
@@ -81,18 +81,13 @@ class MailingList extends DataObject {
         $FilterableFields->dataFieldByName('Filter_Member_Locale')->setEmptyString('Bitte wählen')->setDescription('Keine Auswahl für Alle');
         
         $FilterableFields->dataFieldByName('Filter_Member_AttendeeCheck')->setDescription('Ist Teilnehmer');
-        $FilterableFields->dataFieldByName('Filter_Member_CrewCheck')->setDescription('Crew Only');
+       
+        // $FilterableFields->dataFieldByName('Filter_Member_CrewCheck')->setDescription('Crew Only');
 
         // $FilterableFields->dataFieldByName('Filter_Member_PhotoCheck')->setDescription('Hat KEIN Profilbild');
-        $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
+        // $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
         
-        
-        // $FilterableFields->dataFieldByName('Filter_Member_isPkwWave1')->setTitle('Anreisen PKW, W1');
-        // $FilterableFields->dataFieldByName('Filter_Member_isPkwWave2und3')->setTitle('Anreisen PKW, W2 + W3');
-        $FilterableFields->dataFieldByName('Filter_Member_isSchoenefeld')->setTitle('Anreisen Schönefeld');
-        $FilterableFields->dataFieldByName('Filter_Member_isTegel')->setTitle('Anreisen Tegel');
-        $FilterableFields->dataFieldByName('Filter_Member_isTrain')->setTitle('Anreisen Bahnhof');
-        
+            
 
 
         $fields->addFieldsToTab('Root.Main', [
