@@ -67,26 +67,12 @@ class MailingList extends DataObject {
         $FilterableFields = self::get_filterable_fields_or_callbacks();
 
 
-        // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setTitle('Ich bin … / Art des Teilnehmers');
-        // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setDescription('Keine Auswahl für Alle');
-
-        // $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
-
-
+        //$FilterableFields->dataFieldByName('Filter_Member_AutoSignUp')->setTitle('AutoSignUp');
         $FilterableFields->dataFieldByName('Filter_Member_WillAssist')->setTitle('Teilnahme bestätigt')->setDescription('Keine Auswahl für Alle');
         $FilterableFields->dataFieldByName('Filter_Member_NDAAccepted')->setTitle('Geheimhaltungserklärung akzeptiert');
-        // $FilterableFields->dataFieldByName('Filter_Member_CountryImport')->setTitle('CountryImport');
         $FilterableFields->dataFieldByName('Filter_Member_PhotoTermsAccepted')->setTitle('Foto Einverständniserklärung akzeptiert');
-        
-        $FilterableFields->dataFieldByName('Filter_Member_Locale')->setEmptyString('Bitte wählen')->setDescription('Keine Auswahl für Alle');
-        
+        $FilterableFields->dataFieldByName('Filter_Member_Locale')->setEmptyString('Bitte wählen')->setDescription('Keine Auswahl für Alle');        
         $FilterableFields->dataFieldByName('Filter_Member_AttendeeCheck')->setDescription('Ist Teilnehmer');
-       
-        // $FilterableFields->dataFieldByName('Filter_Member_CrewCheck')->setDescription('Crew Only');
-
-        // $FilterableFields->dataFieldByName('Filter_Member_PhotoCheck')->setDescription('Hat KEIN Profilbild');
-        // $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
-        
             
 
 

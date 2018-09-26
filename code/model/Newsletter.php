@@ -202,11 +202,13 @@ class Newsletter extends DataObject implements CMSPreviewable{
             $mailinglists = MailingList::get();
 
             $map = $mailinglists->map('ID', 'Title');
-
+            
             foreach ($map as $key => $m) {
                 $map->push($key, $m);
             }
+            
 
+            
             $fields->addFieldsToTab("Root.Main", array(
                 new CheckboxSetField(
                     "MailingLists",
