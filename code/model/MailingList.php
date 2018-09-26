@@ -126,10 +126,7 @@ class MailingList extends DataObject {
         ]);
 
 
-        // Additional manual added recipients -> removed to keep things lean. In order to add "special" users to a list
-        // we should create a filter … Like e.g a texfield "FreeMailingListFilter". We could than put a "secret" word into
-        // that field and add a "FreeMailingListFilter" to MailingList
-
+        
 
         $fields->dataFieldByName('Title')->setTitle('Name der Mailing-Liste');
 
@@ -197,8 +194,16 @@ class MailingList extends DataObject {
         $FilterableFields = new FieldList();
         $callBacksArr = [];
 
-        foreach (Config::inst()->get('MailingList', 'filter_classes') as $fc) {
+        $filterClasses = Config::inst()->get('MailingList', 'filter_classes');
+        
+        asort($filterClasses);
+
+        
+        foreach ($filterClasses as $fc) {
+            
             $filters = singleton($fc)->mailinglistFilters();
+            
+
             if ( $filters && count($filters > 0) ) {
 
                 $FilterableFields->add(HeaderField::create('Filters' . $fc .'Header', $fc, 3));
