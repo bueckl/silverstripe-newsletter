@@ -186,8 +186,8 @@ class NewsletterEmail extends Email {
             "Body" => $this->body,
             "BaseURL" => $this->BaseURL(),
             "IsEmail" => true,
-            "Recipient" => $this->Recipient,
-            "Member" => $this->Recipient // backwards compatibility,
+            "Recipient" => $this->recipient,
+            "Member" => $this->recipient // backwards compatibility,
         );
 
         if($this->template_data) {
