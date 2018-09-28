@@ -201,8 +201,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
             $mailinglists = MailingList::get();
 
-            $map = $mailinglists->map('ID', 'Title');
+            $map = $mailinglists->map('ID');
             
+            
+
             foreach ($map as $key => $m) {
                 $map->push($key, $m);
             }
@@ -213,7 +215,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
                 new CheckboxSetField(
                     "MailingLists",
                     _t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'),
-                    $map
+                    $mailinglists
                 )
             ));
         }
