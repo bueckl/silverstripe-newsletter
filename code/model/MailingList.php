@@ -195,9 +195,7 @@ class MailingList extends DataObject {
      * {
      *     return [
      *          'Country' => [
-     *              'Callback' => function($members, $restraint) {
-     *                  return $members->filter('Country', $restraint);
-     *              }
+     *                      
      *          ],
      *          'Name' => [
      *              'Field' => DropdownField::create('Name')
@@ -219,11 +217,14 @@ class MailingList extends DataObject {
         $FilterableFields = new FieldList();
         $callBacksArr = [];
 
+        $filterClasses = Config::inst()->get('MailingList', 'filter_classes');
+        
+        asort($filterClasses);
 
-        foreach (Config::inst()->get('MailingList', 'filter_classes') as $fc) {
+        foreach ($filterClasses as $fc) {
+
             $filters = singleton($fc)->mailinglistFilters();
 
-            // debug::dump($filters);
 
             if ( $filters && count($filters > 0) ) {
 

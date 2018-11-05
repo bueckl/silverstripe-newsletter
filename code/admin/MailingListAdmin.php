@@ -10,7 +10,7 @@ class MailingListAdmin extends ModelAdmin {
 
     private static $url_segment = 'mailinglists';
 
-    private static $menu_title = 'Mailing List Admin';
+    private static $menu_title = '7 - Mailing Listen';
 
 
     public function getEditForm($id = null, $fields = null) {
