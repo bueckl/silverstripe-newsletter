@@ -28,10 +28,9 @@
         <td nowrap><strong>$Email</strong></td>
         <td nowrap>$FirstName</td>
         <td nowrap>$Surname</td>
-        <td nowrap>L: $Locale</td>
-        <td nowrap>I: $Invitation</td>
-        <td nowrap>M: $Market</td>
-        <td nowrap>A: $calculatedArrivalDate</td>
+        <td nowrap>S: $SlotName</td>
+        <td nowrap>I/E: $InternalExternal</td>
+        <td nowrap>E: $Events.First.Name</td>
     </tr>
 <% end_loop %>
     </table>
