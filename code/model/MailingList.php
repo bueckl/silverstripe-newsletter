@@ -265,6 +265,8 @@ class MailingList extends DataObject {
         
         $filtersApplied = unserialize($this->FiltersApplied);
         $members = Member::get();
+        
+        $members = $members->exclude('Blacklisted', 1);
 
         foreach (self::get_filterable_fields_or_callbacks(true) as $fieldName => $callBack) {
             $restraint = isset($filtersApplied[$fieldName]) ? $filtersApplied[$fieldName] : false;
@@ -282,8 +284,10 @@ class MailingList extends DataObject {
         if($this->Members()  instanceof UnsavedRelationList ) {
             return new ArrayList();
         }
+        $Members = $this->Members();
+        $Members = $Members->exclude('Blacklisted', 1);
         //return $this->Members()->exclude('Blacklisted', 1)->exclude('Verified', 0);
-        return $this->Members();
+        return $Members;
     }
 
     public function updateRecipientsforMailingList() {
