@@ -83,13 +83,33 @@ class SendRecipientQueue extends DataObject {
 
             if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
             
-            if ( $recipient->owner->NdaPDF()->ID && $newsletter->BookingConfirmation == true ) {
+            if ( $recipient->owner->NdaPDF()->ID && $newsletter->NdaPDF == true ) {
                 $attachment = $recipient->owner->NdaPDF();
+                
+                if ( $attachment ) {
+                    $file =  $attachment->getFullPath();
+                    // We check the filesize in bytes in order to see if the file realy exists
+                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                        $email->attachFile( $file, $file );
+                    }
+                }
+                
             } 
 
-            // if ( $recipient->owner->BookingConfirmationPDF() && $newsletter->BookingConfirmation == true ) {
-            //     $attachment = $recipient->owner->BookingConfirmationPDF();
-            // } 
+            if ( $newsletter->Agenda == true ) {
+
+                // $Agenden = SecureDownload::allowed_downloads($recipient);
+ //                $Agenda = $Agenden->First();
+ //                $file = "/Users/jochenguelden/Sites/brandday/public/dms-assets/0/".$Agenda->Filename;
+ //
+ //                die($file);
+ //                // if ( $Agenda->Filename ) {
+ // //                    // We check the filesize in bytes in order to see if the file realy exists
+ // //                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+ //                        $email->attachFile( $file, $file );
+ //                //     }
+ //                // }
+            }
 
 
             //HACK JOCHEN. ADDING ATTACHMENTS
@@ -97,13 +117,14 @@ class SendRecipientQueue extends DataObject {
  //                $attachment = $newsletter->Attachment();
  //            }
 
-            if ( $attachment ) {
-                $file =  $attachment->getFullPath();
-                // We check the filesize in bytes in order to see if the file realy exists
-                if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                    $email->attachFile( $file, $file );
-                }
-            }
+            // if ( $attachment ) {
+            //     $file =  $attachment->getFullPath();
+            //     // We check the filesize in bytes in order to see if the file realy exists
+            //     if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+            //         $email->attachFile( $file, $file );
+            //     }
+            // }
+            
             //END ATTACHMENTS
 
             $success = $email->send();

@@ -173,7 +173,8 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         // Cloak name  & email
         // $recipient->FirstName = 'John';
         // $recipient->Surname = 'Doe';
-        $recipient->Email = 'john@doe.com';
+        // $recipient->Email = 'john@doe.com';
+
         return $recipient;
     }
 
@@ -186,10 +187,13 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
     {
         $newsletter = $this->record;
         $recipient = $this->getTestRecipient();
+        
+
         if(!$templateName = $newsletter->RenderTemplate) {
             $templateName = 'SimpleNewsletterTemplate';
         }
-        $newsletterEmail = new NewsletterEmail($newsletter, $recipient, true);
+        
+        $newsletterEmail = new NewsletterEmail($newsletter, $recipient, false);
         // Block stylesheets and JS that are not required (email templates should have inline CSS/JS)
         Requirements::clear();
         return HTTP::absoluteURLs($newsletterEmail->getData()->renderWith($templateName));
