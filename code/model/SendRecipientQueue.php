@@ -59,7 +59,7 @@ class SendRecipientQueue extends DataObject {
         if (empty($recipient)) $recipient = $this->Member();
 
         //check recipient not blacklisted and verified
-        if ($recipient && empty($recipient->Blacklisted) && !empty($recipient->Verified)) {
+        if ($recipient && empty($recipient->Blacklisted) ) {
 
             $email = new NewsletterEmail(
                 $newsletter,
