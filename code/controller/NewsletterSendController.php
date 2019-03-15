@@ -171,7 +171,7 @@ class NewsletterSendController extends BuildTask {
 
             //duplicate filtering
             $existingQueue = SendRecipientQueue::get()->filter(array(
-                'RecipientID' => $Recipient->ID,
+                'MemberID' => $Recipient->ID,
                 'NewsletterID' => $newsletter->ID,
                 'Status' => array('Scheduled', 'InProgress')
             ));
@@ -180,7 +180,7 @@ class NewsletterSendController extends BuildTask {
                 $queueItem = SendRecipientQueue::create();
                 $queueItem->Status = "Scheduled";
                 $queueItem->NewsletterID = $newsletter->ID;
-                $queueItem->RecipientID = $Recipient->ID;
+                $queueItem->MemberID = $Recipient->ID;
                 $queueItem->write();
                 $queueCount++;
             }
@@ -308,7 +308,7 @@ class NewsletterSendController extends BuildTask {
                 //do the actual mail out
                 if (!empty($queueItems2) && $queueItems2->count() > 0) {
                     //fetch all the recipients at once in one query
-                    $recipients = Member::get()->filter(array('ID' => $queueItems2->column('RecipientID')));
+                    $recipients = Member::get()->filter(array('ID' => $queueItems2->column('MemberID')));
                     if ($recipients->count() > 0) {
                         $recipientsMap = array();
                         foreach($recipients as $r) {
@@ -318,7 +318,7 @@ class NewsletterSendController extends BuildTask {
                         //send out the mails
                         foreach($queueItems2 as $item) {
                             try {
-                                $item->send($newsletter, $recipientsMap[$item->RecipientID]);
+                                $item->send($newsletter, $recipientsMap[$item->MemberID]);
                             } catch (Exception $e) {
                                 $item->Status = 'Failed';
                                 $item->write();
