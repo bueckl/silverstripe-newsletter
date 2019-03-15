@@ -111,7 +111,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
     public function emailpreview(SS_HTTPRequest $request = null) {
         $emailVar = $request->getVar('email');
 
-        $recipient = new Member(Member::$test_data);
+        $recipient = new Member(Member::currentUser());
         if ($request && !empty($emailVar)) {
             $recipient->Email = Convert::raw2js($emailVar);
         } else {
