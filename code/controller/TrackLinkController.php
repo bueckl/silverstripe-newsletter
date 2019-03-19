@@ -15,7 +15,7 @@ class TrackLinkController extends ContentController {
 
     function init() {
         parent::init();
-        return $this->redirect('/');
+        // return $this->redirect('/');
 
         if($params = $this->getURLParams()) {
             if(isset($params['Hash']) && ($hash = Convert::raw2sql($params['Hash']))) {
