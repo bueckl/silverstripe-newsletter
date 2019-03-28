@@ -112,17 +112,41 @@ class SendRecipientQueue extends DataObject {
             }
 
 
-            $attachments = $newsletter->Attachments();
+            $attachment = $newsletter->Attachment1();
 
-            if ( $newsletter->Attachments()->Count() > 0 ) {
+            if ( $attachment->ID > 0 ) {
 
-              foreach ( $attachments as $attachment ) {
                   $file =  $attachment->getFullPath();
                   // We check the filesize in bytes in order to see if the file realy exists
                   if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
                       $email->attachFile( $file, $file );
                   }
-              }
+
+            }
+
+
+            $attachment = $newsletter->Attachment2();
+
+            if ( $attachment->ID > 0 ) {
+
+                  $file =  $attachment->getFullPath();
+                  // We check the filesize in bytes in order to see if the file realy exists
+                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                      $email->attachFile( $file, $file );
+                  }
+
+            }
+
+
+            $attachment = $newsletter->Attachment3();
+
+            if ( $attachment->ID > 0 ) {
+
+                  $file =  $attachment->getFullPath();
+                  // We check the filesize in bytes in order to see if the file realy exists
+                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                      $email->attachFile( $file, $file );
+                  }
 
             }
 
