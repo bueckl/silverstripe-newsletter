@@ -25,6 +25,12 @@ class Newsletter extends DataObject implements CMSPreviewable{
         "TrackedLinks" => "Newsletter_TrackedLink"
     );
 
+    private static $has_one = array(
+        "Attachment1" => "File",
+        "Attachment2" => "File",
+        "Attachment3" => "File"
+    );
+
     private static $many_many = array(
         "MailingLists" => "MailingList"
     );
@@ -115,6 +121,33 @@ class Newsletter extends DataObject implements CMSPreviewable{
     public function getCMSFields() {
 
         $fields = parent::getCMSFields();
+
+        $fields->addFieldsToTab(
+
+               'Root.Attachments', array(
+               $uploadField1 = new UploadField(
+                   $name = 'Attachment1',
+                   $title = 'Dateianhang 1'
+               ),
+               $uploadField2 = new UploadField(
+                   $name = 'Attachment2',
+                   $title = 'Dateianhang 2'
+               ),
+               $uploadField3 = new UploadField(
+                   $name = 'Attachment3',
+                   $title = 'Dateianhang 3'
+               ))
+
+           );
+        $uploadField1->setAllowedMaxFileNumber(1);
+        $uploadField2->setAllowedMaxFileNumber(1);
+        $uploadField2->setAllowedMaxFileNumber(1);
+        $uploadField1->folderName = "attachments";
+        $uploadField2->folderName = "attachments";
+        $uploadField3->folderName = "attachments";
+        $uploadField1->setDisplayFolderName('attachments');
+        $uploadField2->setDisplayFolderName('attachments');
+        $uploadField3->setDisplayFolderName('attachments');
 
         $fields->removeFieldFromTab('Root', 'MailingLists');
         $fields->removeFieldFromTab('Root', 'Member');

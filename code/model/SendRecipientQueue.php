@@ -82,10 +82,10 @@ class SendRecipientQueue extends DataObject {
             );
 
             if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
-            
+
             if ( $recipient->owner->NdaPDF()->ID && $newsletter->NdaPDF == true ) {
                 $attachment = $recipient->owner->NdaPDF();
-                
+
                 if ( $attachment ) {
                     $file =  $attachment->getFullPath();
                     // We check the filesize in bytes in order to see if the file realy exists
@@ -93,8 +93,8 @@ class SendRecipientQueue extends DataObject {
                         $email->attachFile( $file, $file );
                     }
                 }
-                
-            } 
+
+            }
 
             if ( $newsletter->Agenda == true ) {
 
@@ -112,19 +112,22 @@ class SendRecipientQueue extends DataObject {
             }
 
 
-            //HACK JOCHEN. ADDING ATTACHMENTS
-            // if ( $newsletter->Attachment() ) {
- //                $attachment = $newsletter->Attachment();
- //            }
+            $attachments = $newsletter->Attachments();
 
-            // if ( $attachment ) {
-            //     $file =  $attachment->getFullPath();
-            //     // We check the filesize in bytes in order to see if the file realy exists
-            //     if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-            //         $email->attachFile( $file, $file );
-            //     }
-            // }
-            
+            if ( $newsletter->Attachments()->Count() > 0 ) {
+
+              foreach ( $attachments as $attachment ) {
+                  $file =  $attachment->getFullPath();
+                  // We check the filesize in bytes in order to see if the file realy exists
+                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                      $email->attachFile( $file, $file );
+                  }
+              }
+
+            }
+
+
+
             //END ATTACHMENTS
 
             $success = $email->send();
