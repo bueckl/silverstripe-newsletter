@@ -83,38 +83,10 @@ class SendRecipientQueue extends DataObject {
 
             if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
 
-            if ( $recipient->owner->NdaPDF()->ID && $newsletter->NdaPDF == true ) {
-                $attachment = $recipient->owner->NdaPDF();
-
-                if ( $attachment ) {
-                    $file =  $attachment->getFullPath();
-                    // We check the filesize in bytes in order to see if the file realy exists
-                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                        $email->attachFile( $file, $file );
-                    }
-                }
-
-            }
-
-            if ( $newsletter->Agenda == true ) {
-
-                // $Agenden = SecureDownload::allowed_downloads($recipient);
- //                $Agenda = $Agenden->First();
- //                $file = "/Users/jochenguelden/Sites/brandday/public/dms-assets/0/".$Agenda->Filename;
- //
- //                die($file);
- //                // if ( $Agenda->Filename ) {
- // //                    // We check the filesize in bytes in order to see if the file realy exists
- // //                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
- //                        $email->attachFile( $file, $file );
- //                //     }
- //                // }
-            }
-
 
             $attachment = $newsletter->Attachment1();
 
-            if ( $attachment->ID > 0 ) {
+            if ( $attachment ) {
 
                   $file =  $attachment->getFullPath();
                   // We check the filesize in bytes in order to see if the file realy exists
@@ -127,7 +99,7 @@ class SendRecipientQueue extends DataObject {
 
             $attachment = $newsletter->Attachment2();
 
-            if ( $attachment->ID > 0 ) {
+            if ( $attachment ) {
 
                   $file =  $attachment->getFullPath();
                   // We check the filesize in bytes in order to see if the file realy exists
@@ -140,7 +112,7 @@ class SendRecipientQueue extends DataObject {
 
             $attachment = $newsletter->Attachment3();
 
-            if ( $attachment->ID > 0 ) {
+            if ( $attachment ) {
 
                   $file =  $attachment->getFullPath();
                   // We check the filesize in bytes in order to see if the file realy exists
