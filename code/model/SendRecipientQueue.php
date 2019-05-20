@@ -123,6 +123,34 @@ class SendRecipientQueue extends DataObject {
             }
 
 
+             // This is normaly the PDF with the EAN Code
+            if ( $recipient->owner->BookingConfirmationPDF() && $newsletter->BookingConfirmation == true ) {
+
+                $attachment = $recipient->owner->BookingConfirmationPDF();
+
+                if ( $attachment ) {
+                    $file =  $attachment->getFullPath();
+                    // We check the filesize in bytes in order to see if the file realy exists
+                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                        $email->attachFile( $file, $file );
+                    }
+                }
+
+                // Attach Ticket in this Case: FIA Ticket 
+                // This is a special case for the AUDIFORMEL E EVENT
+
+                $Tickets = $recipient->owner->TicketPDFs();
+                
+                foreach ( $Tickets as $Ticket) {
+                    $file =  $Ticket->getFullPath();
+                    
+                    if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
+                        $email->attachFile( $file, $file );
+                    }
+                }
+
+            }
+
 
             //END ATTACHMENTS
 
