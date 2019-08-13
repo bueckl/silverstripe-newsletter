@@ -30,7 +30,7 @@
         <td nowrap>$FirstName</td>
         <td nowrap>$Surname</td>
         <td nowrap>I/E: $InternalExternal</td>
-        <td nowrap>E: $getSubevent</td>
+        <td nowrap>E: $getSubeventName</td>
         <td nowrap>E: $Hotel.NameMatch</td>
     </tr>
 <% end_loop %>
