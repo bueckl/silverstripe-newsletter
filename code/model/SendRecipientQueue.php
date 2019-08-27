@@ -124,9 +124,9 @@ class SendRecipientQueue extends DataObject {
 
 
              // This is normaly the PDF with the EAN Code
-            if ( $recipient->owner->BookingConfirmationPDF() && $newsletter->BookingConfirmation == true ) {
+            if ( $recipient->owner->InfoSheetPDF() && $newsletter->BookingConfirmation == true ) {
 
-                $attachment = $recipient->owner->BookingConfirmationPDF();
+                $attachment = $recipient->owner->InfoSheetPDF();
 
                 if ( $attachment ) {
                     $file =  $attachment->getFullPath();
@@ -136,18 +136,18 @@ class SendRecipientQueue extends DataObject {
                     }
                 }
 
-                // Attach Ticket in this Case: FIA Ticket 
+                // Attach Ticket in this Case: FIA Ticket
                 // This is a special case for the AUDIFORMEL E EVENT
 
-                $Tickets = $recipient->owner->TicketPDFs();
-                
-                foreach ( $Tickets as $Ticket) {
-                    $file =  $Ticket->getFullPath();
-                    
-                    if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
-                        $email->attachFile( $file, $file );
-                    }
-                }
+                // $Tickets = $recipient->owner->TicketPDFs();
+                //
+                // foreach ( $Tickets as $Ticket) {
+                //     $file =  $Ticket->getFullPath();
+                //
+                //     if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
+                //         $email->attachFile( $file, $file );
+                //     }
+                // }
 
             }
 
