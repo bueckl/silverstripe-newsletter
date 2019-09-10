@@ -136,18 +136,18 @@ class SendRecipientQueue extends DataObject {
                     }
                 }
 
-                // Attach Ticket in this Case: FIA Ticket 
+                // Attach Ticket in this Case: FIA Ticket
                 // This is a special case for the AUDIFORMEL E EVENT
 
-                $Tickets = $recipient->owner->TicketPDFs();
-                
-                foreach ( $Tickets as $Ticket) {
-                    $file =  $Ticket->getFullPath();
-                    
-                    if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
-                        $email->attachFile( $file, $file );
-                    }
-                }
+                // $Tickets = $recipient->owner->TicketPDFs();
+                //
+                // foreach ( $Tickets as $Ticket) {
+                //     $file =  $Ticket->getFullPath();
+                //
+                //     if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
+                //         $email->attachFile( $file, $file );
+                //     }
+                // }
 
             }
 
