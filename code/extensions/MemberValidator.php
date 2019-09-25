@@ -28,7 +28,7 @@ class MemberValidator extends RequiredFields {
                 $MailingListID = $data['MailingListID'];
 
                 // Is already subscribed. maybe just add the user to another list?
-                if (Recipient::inMailingList( $ExistingRecipient, $MailingListID )) {
+                if (Member::inMailingList( $ExistingRecipient, $MailingListID )) {
                     // TODO write correct error message and show message in form
                     $this->validationError('Email','You have already subscribed to this mailing list','required');
                 }
