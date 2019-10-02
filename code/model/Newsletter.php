@@ -64,7 +64,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
     private static $field_labels = array();
 
     public function FrontendLink() {
-      return NewsPressPage::get()->First()->Link() . '/newsletter/'.$this->ID;
+      return NewsPressPage::get()->First()->Link() . 'newsletter/'.$this->ID;
     }
     public function fieldLabels($includelrelations = true) {
         $labels = parent::fieldLabels($includelrelations);
