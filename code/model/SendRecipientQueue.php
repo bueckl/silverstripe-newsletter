@@ -181,7 +181,8 @@ class SendRecipientQueue extends DataObject {
 
                 if ( $recipient->TravelData()->Pendlerparkplatz == "YES" ) {
 
-                    $attachment = File::get()->filter('ID', 155866)->first();
+                    // $attachment = File::get()->filter('ID', 155866)->first();
+                    $attachment = File::get()->byID(155866);
 
                     if ( $attachment ) {
                         $file = $attachment->getFullPath();
