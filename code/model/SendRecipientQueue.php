@@ -164,17 +164,35 @@ class SendRecipientQueue extends DataObject {
                     }
                 }
 
-                
-                $attachment = $recipient->owner->LuggageTagPDF();
+                if ( $recipient->HotelID > 0 ) {
 
-                if ( $attachment ) {
-                    $file =  $attachment->getFullPath();
-                    // We check the filesize in bytes in order to see if the file realy exists
-                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                        $email->attachFile( $file, $file );
+                    $attachment = $recipient->owner->LuggageTagPDF();
+
+                    if ( $attachment ) {
+                        $file = $attachment->getFullPath();
+                        // We check the filesize in bytes in order to see if the file realy exists
+                        if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                            $email->attachFile( $file, $file );
+                        }
                     }
+    
                 }
 
+
+                if ( $recipient->TravelData()->Pendlerparkplatz == "YES" ) {
+
+                    $attachment = File::get()->filter('ID', 155866)->first();
+
+                    if ( $attachment ) {
+                        $file = $attachment->getFullPath();
+                        // We check the filesize in bytes in order to see if the file realy exists
+                        if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                            $email->attachFile( $file, $file );
+                        }
+                    }
+    
+                }
+                
                 
 
                 // Attach Ticket in this Case: FIA Ticket
