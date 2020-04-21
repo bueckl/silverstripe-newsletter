@@ -100,7 +100,7 @@ en:
     VerificationExpiredContent2: 'please resubmit the form if you still want to subscribe to our mailing lists!'
     VerifiedDesc: 'Has this user verified his subscription?'
     VerifySubject: 'Thanks for subscribing to our mailing lists, please verify your email'
-    Yes: Yes
+    Yes: 'Yes'
     BadEmailMessage: 'Email address not found'
     ConfirmUnsubscribeSubject: 'Confirmation of your unsubscribe request'
     FieldContent: Content
