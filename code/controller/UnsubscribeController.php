@@ -23,6 +23,12 @@ class UnsubscribeController extends Page_Controller {
 
     function init() {
         parent::init();
+
+
+        // Important hack to make translations work. JOCHEN!
+        i18n::set_locale(  i18n::get_locale_from_lang( $this->request->allParams()['Lang'] ) );
+        
+        
         // Requirements::css('newsletter/css/SubscriptionPage.css');
         Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
         Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
@@ -83,6 +89,7 @@ class UnsubscribeController extends Page_Controller {
         $recipient = $this->getRecipient();
         $mailinglists = $this->getMailingLists($recipient);
         if($recipient && $recipient->exists() && $mailinglists && $mailinglists->count()) {
+            
             $unsubscribeRecordIDs = array();
             
             $this->unsubscribeFromLists($recipient, $mailinglists, $unsubscribeRecordIDs);
@@ -179,12 +186,16 @@ class UnsubscribeController extends Page_Controller {
                 $recipient->generateValidateHashAndStore($days);
             }
 
+
             $templateData = array(
                 'FirstName' => $recipient->FirstName,
                 'UnsubscribeLink' =>
                     Director::absoluteBaseURL() . i18n::get_lang_from_locale($this->Locale). "/unsubscribe/index/".$recipient->ValidateHash."/$listIDs"
             );
             //send unsubscribe link email
+            // i18n::set_locale(Controller::curr()->Locale);
+
+
             $email = new Email();
             $email->setTo($recipient->Email);
             $from = Email::getAdminEmail();
