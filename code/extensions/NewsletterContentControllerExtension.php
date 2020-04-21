@@ -23,8 +23,8 @@ class NewsletterContentControllerExtension extends Extension{
 
         $actions = new FieldList(
             FormAction::create('sendLink',  _t('Newsletter.SendUnsubscribeLink', 'Send unsubscribe link'))
-                ->addExtraClass('ss-ui-action-constructive'),
-            Object::create('ResetFormAction', 'clear', _t('CMSMain_left.ss.RESET', 'Reset'))
+                ->addExtraClass('ss-ui-action-constructive btn btn-primary pull-right')
+            // Object::create('ResetFormAction', 'clear', _t('CMSMain_left.ss.RESET', 'Reset'))
         );
 
         $unsubscribeController = new UnsubscribeController();
