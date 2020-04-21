@@ -7,4 +7,4 @@ ContentController:
 Director:
   rules:
     'newsletterlinks/$Hash': 'TrackLinkController'
-    'unsubscribe//$Action/$ValidateHash/$IDs': 'UnsubscribeController'
+    '$Lang/unsubscribe//$Action/$ValidateHash/$IDs': 'UnsubscribeController'

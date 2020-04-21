@@ -86,8 +86,8 @@ class UnsubscribeController extends Page_Controller {
             $unsubscribeRecordIDs = array();
             
             $this->unsubscribeFromLists($recipient, $mailinglists, $unsubscribeRecordIDs);
-            
-            $url = Director::absoluteBaseURL() . $this->RelativeLink('done') . "/" . $recipient->ValidateHash . "/" .
+
+            $url = Director::absoluteBaseURL() .'/'.i18n::get_lang_from_locale($this->Locale).'/'. $this->RelativeLink('done') . "/" . $recipient->ValidateHash . "/" .
                 implode(",", $unsubscribeRecordIDs);
             Controller::curr()->redirect($url, 302);
             return $url;
@@ -182,7 +182,7 @@ class UnsubscribeController extends Page_Controller {
             $templateData = array(
                 'FirstName' => $recipient->FirstName,
                 'UnsubscribeLink' =>
-                    Director::absoluteBaseURL() . "unsubscribe/index/".$recipient->ValidateHash."/$listIDs"
+                    Director::absoluteBaseURL() . i18n::get_lang_from_locale($this->Locale). "/unsubscribe/index/".$recipient->ValidateHash."/$listIDs"
             );
             //send unsubscribe link email
             $email = new Email();

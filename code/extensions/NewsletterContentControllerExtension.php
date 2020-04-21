@@ -33,6 +33,7 @@ class NewsletterContentControllerExtension extends Extension{
         $form->setFormMethod('GET');
         $form->setFormAction(Controller::join_links(
         	Director::absoluteBaseURL(),
+            i18n::get_lang_from_locale(Controller::curr()->Locale),
         	$unsubscribeController->relativeLink('sendUnsubscribeLink')
         ));
         $form->addExtraClass('cms-search-form');
