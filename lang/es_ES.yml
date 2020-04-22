@@ -77,4 +77,4 @@ es_ES:
     GoodEmailMessage: 'Le hemos enviado un Email.'
     BadEmailMessage: 'Dirección de Email no encontrado.'
     ConfirmUnsubscribeSubject: 'Anulación de su suscripción'
-    UNSUBSCRIBESUCCESS: 'Gracias.<br>Se ha dado de baja con éxito.'
+    UNSUBSCRIBESUCCESS: '<h3>Gracias.</h3><p>Se ha dado de baja con éxito.</p>'

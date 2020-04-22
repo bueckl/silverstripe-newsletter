@@ -140,13 +140,13 @@ class UnsubscribeController extends Page_Controller {
                 //     "<ul>".$listTitles."</ul>"
                 // );
 
-                $content =
-                    _t('Newsletter.UNSUBSCRIBESUCCESS', 'Thank you.<br />You have been unsubscribed successfully');
+                $content = 
+                    _t('Newsletter.UNSUBSCRIBESUCCESS', '<h3>Thank you!</h3><p>You have been unsubscribed successfully</p>');
 
-                    
+
             }else{
                 $content =
-                    _t('Newsletter.UNSUBSCRIBESUCCESS', 'Thank you.<br />You have been unsubscribed successfully');
+                    _t('Newsletter.UNSUBSCRIBESUCCESS', '<h3>Thank you!</h3><p>You have been unsubscribed successfully</p>');
             }
         }
 
