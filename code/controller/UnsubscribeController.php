@@ -190,7 +190,7 @@ class UnsubscribeController extends Page_Controller {
             $templateData = array(
                 'FirstName' => $recipient->FirstName,
                 'UnsubscribeLink' =>
-                    Director::absoluteBaseURL() . i18n::get_lang_from_locale($this->Locale). "/unsubscribe/index/".$recipient->ValidateHash."/$listIDs"
+                    Director::absoluteBaseURL() . $request->allParams()['Lang']. "/unsubscribe/index/".$recipient->ValidateHash."/$listIDs"
             );
             //send unsubscribe link email
             // i18n::set_locale(Controller::curr()->Locale);
@@ -200,7 +200,13 @@ class UnsubscribeController extends Page_Controller {
             $email->setTo($recipient->Email);
             $from = Email::getAdminEmail();
             $email->setFrom($from);
-            $email->setTemplate('UnsubscribeLinkEmail');
+            
+            if ( $request->allParams()['Lang'] == "en" ) {
+                $email->setTemplate('UnsubscribeLinkEmail');
+            }else {
+                $email->setTemplate('UnsubscribeLinkEmail_es');
+            }
+            
             $email->setSubject(_t(
                 'Newsletter.ConfirmUnsubscribeSubject',
                 "Confirmation of your unsubscribe request"

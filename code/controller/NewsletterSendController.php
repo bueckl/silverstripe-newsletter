@@ -61,8 +61,10 @@ class NewsletterSendController extends BuildTask {
     * @param $id The ID of the Newsletter DataObject to send
     */
     function enqueue(Newsletter $newsletter) {
+
         $lists = $newsletter->MailingLists();
         $queueCount = 0;
+
         foreach($lists as $list) {
 
             // TODO: I introduced "ExcludedParams" here in order
