@@ -151,10 +151,10 @@ class UnsubscribeController extends Page_Controller {
         }
 
         return $this->customise(array(
-            'Title' => '<br><br>',
+            'Title' => '',
             'Content' => $content,
             // 'Form' => $form
-        ))->renderWith('Page');
+        ))->renderWith('UnsubscriptionPage');
         }
 
 
