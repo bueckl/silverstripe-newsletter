@@ -94,7 +94,7 @@ class UnsubscribeController extends Page_Controller {
             
             $this->unsubscribeFromLists($recipient, $mailinglists, $unsubscribeRecordIDs);
 
-            $url = Director::absoluteBaseURL() .'/'.i18n::get_lang_from_locale($this->Locale).'/'. $this->RelativeLink('done') . "/" . $recipient->ValidateHash . "/" .
+            $url = Director::absoluteBaseURL() .'/'.$this->request->allParams()['Lang'].'/'. $this->RelativeLink('done') . "/" . $recipient->ValidateHash . "/" .
                 implode(",", $unsubscribeRecordIDs);
             Controller::curr()->redirect($url, 302);
             return $url;
@@ -102,7 +102,7 @@ class UnsubscribeController extends Page_Controller {
             return $this->customise(array(
                 'Title' => _t('Newsletter.INVALIDLINK', 'Invalid Link'),
                 'Content' => _t('Newsletter.INVALIDUNSUBSCRIBECONTENT', 'This unsubscribe link is invalid')
-            ))->renderWith('Page');
+            ))->renderWith('UnsubscriptionPage');
         }
     }
 

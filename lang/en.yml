@@ -93,7 +93,7 @@ en:
     SubscriptionSubmitted: 'Subscription Completed!'
     SubscritionSubmittedContent2: 'The verification link will be valid for %s days. If you did not mean to subscribe, simply ignore the verification email'
     UNSUBSCRIBEFROMLISTSSUCCESS: '<h3>Thank you, %s.</h3><br />You will no longer receive: %s.'
-    UNSUBSCRIBESUCCESS: '<h3>Thank you.</h3><p>You have been unsubscribed successfully</p>'
+    UNSUBSCRIBESUCCESS: '<h3>Thank you.</h3><p>You have been unsubscribed successfully.</p>'
     ValidEmail: 'Please enter your email address'
     VerificationExpired: 'The verification link has been expired'
     VerificationExpiredContent1: 'The verification link is only validate for %s days.'
