@@ -133,12 +133,17 @@ class UnsubscribeController extends Page_Controller {
                 }
                 $recipient = $this->getRecipient();
                 $title = $recipient->FirstName?$recipient->FirstName:$recipient->Email;
-                $content = sprintf(
-                    _t('Newsletter.UNSUBSCRIBEFROMLISTSSUCCESS',
-                        '<h3>Thank you, %s.</h3><br />You will no longer receive: %s.'),
-                    $title,
-                    "<ul>".$listTitles."</ul>"
-                );
+                // $content = sprintf(
+                //     _t('Newsletter.UNSUBSCRIBEFROMLISTSSUCCESS',
+                //         '<h3>Thank you, %s.</h3><br />You will no longer receive: %s.'),
+                //     $title,
+                //     "<ul>".$listTitles."</ul>"
+                // );
+
+                $content =
+                    _t('Newsletter.UNSUBSCRIBESUCCESS', 'Thank you.<br />You have been unsubscribed successfully');
+
+                    
             }else{
                 $content =
                     _t('Newsletter.UNSUBSCRIBESUCCESS', 'Thank you.<br />You have been unsubscribed successfully');
