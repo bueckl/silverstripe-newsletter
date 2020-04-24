@@ -122,7 +122,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
             'Subject'
         );
 
-        $fields->removeByName("SentDate");
+        // $fields->removeByName("SentDate");
+        
         if ($this->Status == "Sent") {
             $fields->addFieldToTab(
                 'Root.Main',
@@ -137,7 +138,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
         $fields->dataFieldByName('ReplyTo')
             ->setValue(Email::getAdminEmail())
-            ->setAttribute('placeholder', 'admin@example.org')
+            ->setAttribute('placeholder', 'admin@palm')
             ->setDescription(_t(
                 'Newsletter.ReplyToDesc',
                 'Any undeliverable emails will be collected in this mailbox'
