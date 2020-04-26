@@ -120,6 +120,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
         $newsletter = $this->record;
         $email = new NewsletterEmail($newsletter, $recipient, true);
+        Debug::log( $email->body );
         $email->send();
 
         return Controller::curr()->redirectBack();
