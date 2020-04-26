@@ -30,6 +30,7 @@ class NewsletterAdmin extends ModelAdmin {
 
         Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
         Requirements::javascript(NEWSLETTER_DIR . '/javascript/ActionOnConfirmation.js');
+        Requirements::javascript(NEWSLETTER_DIR . '/javascript/EmailPreviewPopup.js');
         Requirements::css('newsletter/css/NewsletterAdmin.css');
     }
 
@@ -80,14 +81,14 @@ class NewsletterAdmin extends ModelAdmin {
                 $theme = false;
             }
 
-            if($theme) {
-                if(file_exists("../".THEMES_DIR."/".$theme."/templates/email")){
-                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/email";
-                }
-                if(file_exists("../".THEMES_DIR."/".$theme."/templates/Email")){
-                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/Email";
-                }
-            }
+            // if($theme) {
+ //                if(file_exists("../".THEMES_DIR."/".$theme."/templates/email")){
+ //                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/email";
+ //                }
+ //                if(file_exists("../".THEMES_DIR."/".$theme."/templates/Email")){
+ //                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/Email";
+ //                }
+ //            }
 
             $project = project();
 

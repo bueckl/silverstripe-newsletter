@@ -13,7 +13,8 @@ class NewsletterGridFieldDetailForm extends GridFieldDetailForm {
 class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_ItemRequest {
     private static $allowed_actions = array(
         'ItemEditForm',
-        'emailpreview'
+        'emailpreview',
+        'doPreviewEmail'      
     );
 
     public function updateCMSActions($actions) {
@@ -53,6 +54,18 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                     ->setAttribute('data-icon', 'accept')
                     ->setUseButtonTag(true), 'action_doSave');
         }
+        
+        $previewEmail = FormAction::create('doPreviewEmail', _t('Newsletter.PreviewEmail', 'Preview Email'))
+                        ->addExtraClass('ss-ui-action-constructive')
+                        ->setAttribute('data-icon', 'accept')
+                        ->setAttribute(
+                            'data-url',
+                            Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'doPreviewEmail')
+                        )
+                        ->setUseButtonTag(true);
+
+        $actions->push($previewEmail);
+        
         return $actions;
     }
 
@@ -95,6 +108,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $navigator->customise(
                 new ArrayData(array('EmailPreviewLink' => $newsletter->Link('emailpreview'.$emailLink)))
             );
+            
             Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterAdminEmailPreview.js');
 
             return $navigator->renderWith('NewsletterAdmin_SilverStripeNavigator');
@@ -120,7 +134,6 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
         $newsletter = $this->record;
         $email = new NewsletterEmail($newsletter, $recipient, true);
-        Debug::log( $email->body );
         $email->send();
 
         return Controller::curr()->redirectBack();
@@ -312,6 +325,10 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $controller->getRequest()->addHeader('X-Pjax', 'Content');
             return $controller->redirect($noActionURL, 302);
         }
+    }
+
+    public function doPreviewEmail() {
+        return $this->record->render();
     }
 
     public function preview($data) {

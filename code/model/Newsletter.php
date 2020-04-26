@@ -432,7 +432,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
         Requirements::clear();
 
         // Create recipient with some test data
-        $recipient = new Recipient(Recipient::$test_data);
+        $recipient = new Member(RecipientExtension::$test_data);
         $newsletterEmail = new NewsletterEmail($this, $recipient, true);
         return HTTP::absoluteURLs($newsletterEmail->getData()->renderWith($templateName));
     }
