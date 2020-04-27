@@ -16,6 +16,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
         "SendFrom" => "Varchar(255)",
         "ReplyTo" => "Varchar(255)",
         "RenderTemplate" => "Varchar",
+        "CustomDate" => "Varchar(255)",
         "ExcludeParams" => "Varchar(255)"
     );
 
@@ -122,7 +123,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
             'Subject'
         );
 
-        // $fields->removeByName("SentDate");
+        $fields->removeByName("SentDate");
+        
+        
+        $fields->addFieldToTab('Root.Main' TextField::create('CustomDate'));
         
         if ($this->Status == "Sent") {
             $fields->addFieldToTab(
