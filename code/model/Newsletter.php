@@ -126,7 +126,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
         $fields->removeByName("SentDate");
         
         
-        $fields->addFieldToTab('Root.Main' TextField::create('CustomDate'));
+        $fields->addFieldToTab('Root.Main', TextField::create('CustomDate'));
         
         if ($this->Status == "Sent") {
             $fields->addFieldToTab(
