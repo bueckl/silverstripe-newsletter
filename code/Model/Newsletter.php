@@ -4,9 +4,14 @@
  */
 
 /**
- * Single newsletter instance. 
+ * Single newsletter instance.
  */
-class Newsletter extends DataObject implements CMSPreviewable{
+namespace Newsletter\Model;
+
+use SilverStripe\ORM\CMSPreviewable;
+use SilverStripe\ORM\DataObject;
+
+class Newsletter extends DataObject implements CMSPreviewable {
 
 	private static $db = array(
 		"Status"				=> "Enum('Draft, Sending, Sent', 'Draft')",
@@ -27,10 +32,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	private static $many_many = array(
 		"MailingLists"			=> "MailingList"
 	);
-	
+
 	private static $singular_name   = 'Mailing';
 	private static $plural_name     = 'Mailings';
-	
+
 
 	private static $searchable_fields = array(
 		"Subject",
@@ -58,7 +63,15 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	);
 
 	private static $field_labels = array();
-	
+
+    public function PreviewLink($action = null) {
+
+    }
+
+    public function getMimeType() {
+
+    }
+
 	public function fieldLabels($includelrelations = true) {
 		$labels = parent::fieldLabels($includelrelations);
 
@@ -114,7 +127,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 			new ReadonlyField('Status', $this->fieldLabel('Status')),
 			'Subject'
 		);
-		
+
 		$fields->removeByName("SentDate");
 		if ($this->Status == "Sent") {
 			$fields->addFieldToTab(
@@ -132,7 +145,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 			->setValue(Email::getAdminEmail())
 			->setAttribute('placeholder', 'admin@example.org')
 			->setDescription(_t(
-				'Newsletter.ReplyToDesc', 
+				'Newsletter.ReplyToDesc',
 				'Any undeliverable emails will be collected in this mailbox'
 			));
 
@@ -141,8 +154,8 @@ class Newsletter extends DataObject implements CMSPreviewable{
 		$fields->removeByName('TrackedLinks');
 
 		if($this->Status != 'Sent') {
-			$contentHelp = '<strong>' 
-				. _t('Newsletter.FormattingHelp', 'Formatting Help') 
+			$contentHelp = '<strong>'
+				. _t('Newsletter.FormattingHelp', 'Formatting Help')
 				. '</strong><br />';
 			$contentHelp .= '<ul>';
 			foreach($this->getAvailablePlaceholders() as $title => $description) {
@@ -157,13 +170,13 @@ class Newsletter extends DataObject implements CMSPreviewable{
 		$templateSource = $this->templateSource();
 		if(count($templateSource) > 1) {
 			$fields->replaceField(
-				"RenderTemplate", 
+				"RenderTemplate",
 				new DropdownField("RenderTemplate", _t('NewsletterAdmin.RENDERTEMPLATE',
-					'Template the newsletter render to'), 
+					'Template the newsletter render to'),
 				$templateSource)
-			);	
+			);
 
-			
+
 
 			if(!$this->ID) {
 				// $explanation1 = _t("Newletter.TemplateExplanation1",
@@ -190,28 +203,28 @@ class Newsletter extends DataObject implements CMSPreviewable{
 // 				);
 			}
 		} else {
-			$fields->replaceField("RenderTemplate", 
+			$fields->replaceField("RenderTemplate",
 				new HiddenField('RenderTemplate', false, key($templateSource))
 			);
 		}
-		
-		
+
+
 		// JOCHEN TODO: This is where we could hook in to apply further filters on the mailing list
 		// http://takeaway.bigfork.co.uk/a-beginners-introduction-to-using-entwine-in-silverstripe
 
-		
-		
+
+
 		if($this && $this->exists()){
-			
+
 			$mailinglists = MailingList::get();
 
 			$fields->removeByName("MailingLists");
 			$fields->removeByName("ExcludeParams");
-			
+
 			$fields->addFieldsToTab("Root.Main", array(
 				new CheckboxSetField(
-					"MailingLists", 
-					_t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'), 
+					"MailingLists",
+					_t('Newsletter.SendTo', "Send To", 'Selects mailing lists from set of checkboxes'),
 					$mailinglists->map('ID', 'FullTitle')
 				),
 				new CheckboxSetField(
@@ -223,13 +236,13 @@ class Newsletter extends DataObject implements CMSPreviewable{
 					)
 				)
 			));
-			
-			
 
-			
+
+
+
 		}
-		
-		
+
+
 
 		if($this->Status === 'Sending' || $this->Status === 'Sent') {
 			//make the whole field read-only
@@ -276,7 +289,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 						sprintf(
 							'<a href="%s" class="ss-ui-button" data-icon="arrow-circle-double">%s</a>',
 							$restartLink,
-							_t('Newsletter.RestartQueue', 'Restart queue processing')	
+							_t('Newsletter.RestartQueue', 'Restart queue processing')
 						)
 					)
 				);
@@ -300,7 +313,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	}
 
 	/**
-	 * return array containing all possible email templates file name 
+	 * return array containing all possible email templates file name
 	 * under the folders of both theme and project specific folder.
 	 *
 	 * @return array
@@ -308,7 +321,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	public function templateSource(){
 		$paths = NewsletterAdmin::template_paths();
 
-		$templates = array( 
+		$templates = array(
 			"SimpleNewsletterTemplate" => _t('TemplateList.SimpleNewsletterTemplate', 'Simple Newsletter Template')
 		);
 
@@ -348,11 +361,11 @@ class Newsletter extends DataObject implements CMSPreviewable{
 	public function getAvailablePlaceholders() {
 		return array(
 			'UnsubscribeLink' => _t(
-				'Newsletter.PlaceholderUnsub', 
+				'Newsletter.PlaceholderUnsub',
 				'Personalized link to unsubscribe from newsletter'
 			),
 			'AbsoluteBaseURL' => _t(
-				'Newsletter.PlaceholderAbsoluteUrl', 
+				'Newsletter.PlaceholderAbsoluteUrl',
 				'Absolute URL to the website'
 			),
 			'To' => _t(
@@ -421,7 +434,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
 	function getContentBody(){
 		$content = $this->obj('Content');
-		
+
 		$this->extend("updateContentBody", $content);
 		return $content;
 	}
@@ -468,13 +481,13 @@ class Newsletter extends DataObject implements CMSPreviewable{
  * @package newsletter
  */
 class Newsletter_TrackedLink extends DataObject {
-	
+
 	private static $db = array(
 		'Original' => 'Varchar(255)',
 		'Hash' => 'Varchar(100)',
 		'Visits' => 'Int'
 	);
-	
+
 	private static $has_one = array(
 		'Newsletter' => 'Newsletter'
 	);
@@ -484,13 +497,13 @@ class Newsletter_TrackedLink extends DataObject {
 		"Original" => "Link URL",
 		"Visits" => "Visit Counts"
 	);
-	
+
 	/**
 	 * Generate a unique hash
 	 */
 	function onBeforeWrite() {
 		parent::onBeforeWrite();
-		
+
 		if(!$this->Hash) $this->Hash = md5(time() + rand());
 	}
 
@@ -502,7 +515,7 @@ class Newsletter_TrackedLink extends DataObject {
 	 */
 	function Link() {
 		if(!$this->Hash) $this->write();
-		
+
 		return 'newsletterlinks/'. $this->Hash;
 	}
 }

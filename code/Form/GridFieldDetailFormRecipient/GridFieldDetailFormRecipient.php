@@ -1,11 +1,18 @@
 <?php
+namespace Newsletter\Form\GridFieldDetailFormRecipient;
 
+use Newsletter\Model\Recipient;
+use SilverStripe\Control\PjaxResponseNegotiator;
+use SilverStripe\Control\Session;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\ORM\ValidationException;
 
 class GridFieldDetailFormRecipient extends GridFieldDetailForm {
 }
 
 class GridFieldDetailFormRecipient_ItemRequest extends GridFieldDetailForm_ItemRequest {
-	
+
 	private static $allowed_actions = array(
 		'edit',
 		'view',
@@ -24,11 +31,11 @@ class GridFieldDetailFormRecipient_ItemRequest extends GridFieldDetailForm_ItemR
         $form->setActions($formActions);
         return $form;
 	}
-	
+
 	// Save Recipient or update Relation to Mailing List
-	
+
 	public function doSave($data, $form) {
-		
+
 		// debug::dump($this->record);
 //
 // 		// new record
@@ -38,22 +45,22 @@ class GridFieldDetailFormRecipient_ItemRequest extends GridFieldDetailForm_ItemR
 //
 // 			// Update
 // 		}
-		
+
 		// Save the existing recipient
 		if (Recipient::RecipientExists($data['Email'])) {
 			//throw new ValidationException('You can\'t add a recipient twice to the same mailing list!',0);
 		} else {
 			// just update the many relation for the current mailing list
 		}
-		
+
 		// debug::dump($data);
 		// debug::dump($form);
-		
+
 		$controller = $this->getToplevelController();
 		// debug::dump($controller);
 		// die;
-		
-		
+
+
 		$new_record = $this->record->ID == 0;
 		$controller = $this->getToplevelController();
 		$list = $this->gridField->getList();

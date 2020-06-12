@@ -9,6 +9,12 @@
  * @package forms
  * @subpackage fields-gridfield
  */
+namespace Newsletter\Form\GridfieldAddNewRecipientButton;
+
+use SilverStripe\Control\Controller;
+use SilverStripe\Forms\GridField\GridField_HTMLProvider;
+use SilverStripe\View\ArrayData;
+
 class GridFieldAddNewRecipientButton implements GridField_HTMLProvider {
 
 	protected $targetFragment;

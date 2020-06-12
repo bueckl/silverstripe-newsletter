@@ -6,26 +6,35 @@
 /**
  * Newsletter administration section
  */
-class NewsletterAdmin extends ModelAdmin {
+namespace Newsletter\Controller;
+
+use Newsletter\Form\Gridfield\NewsletterGridFieldDetailForm;
+use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\ORM\Search\SearchContext;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\View\Requirements;
+use SilverStripe\View\SSViewer;
+
+class NewsletterAdmin extends ModelAdmin{
 
 	private static $url_segment = 'newsletter';
 	private static $menu_title = 'Newsletter';
 	private static $menu_icon = 'newsletter/images/newsletter-icon.png';
 	public $showImportForm = false;
 
-	private static $managed_models = array(
-		"Newsletter" => array('title' => 'Mailing'),
-		"Newsletter_Sent" => array('title' => 'Sent Mailings'),
-		"MailingList",
-		"Recipient"
-	);
+	private static $managed_models = [
+        "Newsletter" => array('title' => 'Mailing'),
+        "Newsletter_Sent" => array('title' => 'Sent Mailings'),
+        "MailingList",
+        "Recipient"
+    ];
 
-	/** 
-	 * @var array Array of template paths to check 
-	 */	
+	/**
+	 * @var array Array of template paths to check
+	 */
 	static $template_paths = null; //could be customised in _config.php
 
-	public function init() { 
+	public function init() {
 		parent::init();
 
 		Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
@@ -49,27 +58,27 @@ class NewsletterAdmin extends ModelAdmin {
 			));
 		}
 		if($this->modelClass == "Recipient") {
-			
+
 			$config = $form->Fields()->first()->getConfig();
 			$config->getComponentByType('GridFieldDataColumns')
 				->setFieldCasting(array(
 					"Blacklisted" => "Boolean->Nice",
 					"Verified" => "Boolean->Nice",
 			));
-			
+
 			// $config->removeComponentsByType('GridFieldDetailForm')
 // 				->addComponents(new GridFieldDetailFormRecipient());
 //
 // 			if($gridField = $config->getComponentByType('GridFieldDetailFormRecipient')) {
 // 				$gridField->setItemRequestClass('GridFieldDetailFormRecipient_ItemRequest');
 // 			}
-			
+
 		}
 		return $form;
 	}
 
 	/**
-	 * looked-up the email template_paths. 
+	 * looked-up the email template_paths.
 	 * if not set, will look up both theme folder and project folder
 	 * in both cases, email folder exsits or Email folder exists
 	 * return an array containing all folders pointing to the bunch of email templates
@@ -78,7 +87,7 @@ class NewsletterAdmin extends ModelAdmin {
 	 */
 	public static function template_paths() {
 		if(!isset(self::$template_paths)) {
-			if(class_exists('SiteConfig') && ($config = SiteConfig::current_site_config()) && $config->Theme) {
+			if(class_exists(SiteConfig::class) && ($config = SiteConfig::current_site_config()) && $config->Theme) {
 				$theme = $config->Theme;
 			} elseif(SSViewer::current_custom_theme()) {
 				$theme = SSViewer::current_custom_theme();
@@ -92,18 +101,18 @@ class NewsletterAdmin extends ModelAdmin {
 				if(file_exists("../".THEMES_DIR."/".$theme."/templates/email")){
 					self::$template_paths[] = THEMES_DIR."/".$theme."/templates/email";
 				}
-				
+
 				if(file_exists("../".THEMES_DIR."/".$theme."/templates/Email")){
 					self::$template_paths[] = THEMES_DIR."/".$theme."/templates/Email";
 				}
 			}
 
 			$project = project();
-			
+
 			if(file_exists("../". $project . '/templates/email')){
 				self::$template_paths[] = $project . '/templates/email';
 			}
-			
+
 			if(file_exists("../". $project . '/templates/Email')){
 				self::$template_paths[] = $project . '/templates/Email';
 			}

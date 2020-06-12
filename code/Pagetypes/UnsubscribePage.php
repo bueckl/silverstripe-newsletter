@@ -6,6 +6,10 @@
  *
  * @package newsletter
  */
+namespace Newsletter\Pagetype;
+
+use Page;
+use PageController;
 
 class UnsubscriptionPage extends Page {
 
@@ -14,7 +18,7 @@ class UnsubscriptionPage extends Page {
 	);
 }
 
-class UnsubscriptionPage_Controller extends Page_Controller {
+class UnsubscriptionPage_Controller extends PageController {
 
 	function Form() {
 		return $this->renderWith('UnsubscribeRequestForm');

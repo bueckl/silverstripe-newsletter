@@ -7,12 +7,16 @@
  * Adding this class to a {@link GridFieldConfig} of a {@link GridField} adds a header title with a summary of the
  * Status of the contained records
  */
+namespace Newsletter\Form\Gridfield;
+
+use SilverStripe\Forms\GridField\GridField_HTMLProvider;
+
 class GridFieldNewsletterSummaryHeader implements GridField_HTMLProvider {
 	public function getHTMLFragments( $gridField) {
 		if ($gridField && $gridField->getModelClass() && $gridField->getModelClass() == "SendRecipientQueue") {
 			$list = $gridField->getList();
 
-			$scheduled = $list->filter(array('Status'=>'Scheduled'))->count();			
+			$scheduled = $list->filter(array('Status'=>'Scheduled'))->count();
 			$progress = $list->filter(array('Status'=>'InProgress'))->count();
 			$sent = $list->filter(array('Status'=>'Sent'))->count();
 			$failed = $list->filter(array('Status'=>array('Failed','Bounced','BlackListed')))->count();

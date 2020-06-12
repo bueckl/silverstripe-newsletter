@@ -21,6 +21,27 @@
  * @package forms
  * @subpackage fields-gridfield
  */
+namespace Newsletter\Form;
+
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridField_ActionProvider;
+use SilverStripe\Forms\GridField\GridField_DataManipulator;
+use SilverStripe\Forms\GridField\GridField_FormAction;
+use SilverStripe\Forms\GridField\GridField_HTMLProvider;
+use SilverStripe\Forms\GridField\GridField_URLHandler;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\View\ArrayData;
+use LogicException;
+use SilverStripe\View\SSViewer;
+
 class GridFieldAddExistingAutocompleterCustom
 	implements GridField_HTMLProvider, GridField_ActionProvider, GridField_DataManipulator, GridField_URLHandler {
 
@@ -196,12 +217,12 @@ class GridFieldAddExistingAutocompleterCustom
 	 * Returns a json array of a search results that can be used by for example Jquery.ui.autosuggestion
 	 *
 	 * @param GridField $gridField
-	 * @param SS_HTTPRequest $request
+	 * @param HTTPRequest $request
 	 */
 	public function doSearch($gridField, $request) {
 		$dataClass = $gridField->getList()->dataClass();
 		$allList = $this->searchList ? $this->searchList : DataList::create($dataClass);
-		
+
 		$searchFields = ($this->getSearchFields())
 			? $this->getSearchFields()
 			: $this->scaffoldSearchFields($dataClass);
@@ -221,9 +242,9 @@ class GridFieldAddExistingAutocompleterCustom
 			->filterAny($params)
 			->sort(strtok($searchFields[0], ':'), 'ASC')
 			->limit($this->getResultsLimit());
-		
-		
-		
+
+
+
 		$json = array();
 		Config::nest();
 		Config::inst()->update('SSViewer', 'source_file_comments', false);
@@ -232,7 +253,7 @@ class GridFieldAddExistingAutocompleterCustom
 			$json[$result->ID] = html_entity_decode($viewer->process($result));
 		}
 		Config::unnest();
-		return Convert::array2json($json);
+		return json_encode($json);
 	}
 
 	/**

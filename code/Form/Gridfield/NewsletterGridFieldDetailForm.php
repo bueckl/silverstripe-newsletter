@@ -7,6 +7,30 @@
  * Provides view and edit forms at Newsletter gridfield dataobjects,
  * giving special buttons for sending out the newsletter
  */
+namespace Newsletter\Form\Gridfield;
+
+use Newsletter\Controller\NewsletterSendController;
+use Newsletter\Model\Newsletter;
+use Newsletter\Model\NewsletterEmail;
+use Newsletter\Model\Recipient;
+use SilverStripe\CMS\Controllers\SilverStripeNavigator;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\PjaxResponseNegotiator;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\FormField;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\Security\Security;
+use SilverStripe\View\ArrayData;
+use SilverStripe\View\Requirements;
+
 class NewsletterGridFieldDetailForm extends GridFieldDetailForm {
 }
 
@@ -74,7 +98,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 			$navigator = new SilverStripeNavigator($newsletter);
 
 			//create the link the send a preview email
-			$member = Member::currentUser();
+			$member = Security::getCurrentUser();
 			$emailLink = '?email=';
 			if ($member) {
 				$emailLink .= $member->Email;
@@ -93,16 +117,16 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 
 	/**
 	 * Send the preview/test email
-	 * @param SS_HTTPRequest $request
+	 * @param HTTPRequest $request
 	 */
-	public function emailpreview(SS_HTTPRequest $request = null) {
+	public function emailpreview(HTTPRequest $request = null) {
 		$emailVar = $request->getVar('email');
 
 		$recipient = new Recipient(Recipient::$test_data);
 		if ($request && !empty($emailVar)) {
 			$recipient->Email = Convert::raw2js($emailVar);
 		} else {
-			$recipient->Email = Member::currentUser()->Email;
+			$recipient->Email = Security::getCurrentUser()->Email;
 		}
 
 		$newsletter = $this->record;
@@ -149,7 +173,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
 				$newNewsletter->MailingLists()->addMany($origMailinglists);
 			}
 			Config::inst()->update('Newsletter', 'validation_enabled', true);
-			
+
 			$newNewsletter->Status = 'Draft';  //custom: changing the status of to indicate we are sending
 
 			//add a (1) (2) count to new newsletter names if the subject name already exists elsewhere

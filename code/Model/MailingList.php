@@ -4,45 +4,65 @@
  */
 
 /**
- * Represents a specific containner of newsletter recipients 
+ * Represents a specific containner of newsletter recipients
  */
+namespace Newsletter\Model;
+
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldButtonRow;
+use SilverStripe\Forms\GridField\GridFieldConfig;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\GridField\GridFieldEditButton;
+use SilverStripe\Forms\GridField\GridFieldFilterHeader;
+use SilverStripe\Forms\GridField\GridFieldPaginator;
+use SilverStripe\Forms\GridField\GridFieldSortableHeader;
+use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TabSet;
+use SilverStripe\ORM\DataObject;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
+
 class MailingList extends DataObject {
 
 	/* the database fields */
-	private static $db = array(
-		'Title'					=> "Varchar",
-		// 'EventIDForControl'		=> "Int",
-	);
+	private static $db = [
+        'Title' => "Varchar",
+        // 'EventIDForControl'		=> "Int",
+    ];
 
 	/* a mailing list could contains many newsletter recipients */
-	private static $many_many = array(
-		'Recipients'			=> "Recipient",
-	);
+	private static $many_many = [
+        'Recipients' => Recipient::class,
+    ];
 
 	private static $belongs_many_many = array(
-		'Newsletters'			=> "Newsletter",
+		'Newsletters' => Newsletter::class,
 	);
 
 	private static $singular_name = 'Mailing-Liste';
 
 	private static $plural_name = 'Mailing-Listen';
-	
+
 	private static $default_sort = 'ID DESC';
-	
-	private static $summary_fields = array(
-		'Title',
-		'ActiveRecipients.Count'
-	);
-	
+
+	private static $summary_fields = [
+        'Title',
+        'ActiveRecipients.Count'
+    ];
+
 	public function requireDefaultRecords() {
-		
+
 		//parent::requireDefaultRecords();
 		return;
 		$defaultLists =  MailingList::create();
 		$defaultLists->ID = 1;
 		$defaultLists->Title = 'Visitors Mailing List';
 		$defaultLists->write();
-		
+
 		$defaultLists->write();
 
 
@@ -57,24 +77,24 @@ class MailingList extends DataObject {
 		$defaultLists->write();
 
 	}
-	
-	
+
+
 	private static $searchable_fields = array(
 		'Title'
 	);
 
 	public function fieldLabels($includelrelations = true) {
 		$labels = parent::fieldLabels($includelrelations);
-		
+
 		$labels["Title"] = _t('Newsletter.FieldTitle', "Title");
 		$labels["FullTitle"] = _t('Newsletter.FieldTitle', "Title");
 		$labels["ActiveRecipients.Count"] = _t('Newsletter.Recipients', "Recipients");
-		
+
 		return $labels;
 	}
-	
 
-			
+
+
 	function getCMSFields() {
 		$fields = new FieldList();
 
@@ -84,7 +104,7 @@ class MailingList extends DataObject {
 		$fields->addFieldToTab('Root.Main',
 			$TitleField = new TextField('Title',_t('NewsletterAdmin.MailingListTitle','Mailing List Title'))
 		);
-		
+
 
 		$grid = new GridField(
 			'Recipients',
@@ -112,7 +132,7 @@ class MailingList extends DataObject {
 			'Email',
 			'Company.CompanyName'
 		));
-		
+
 		$config->removeComponentsByType('GridFieldAddNewButton');
 
 		// Nicht zwingend ein Eventteilnehmer. Kann irgendein Recipient sein
@@ -122,10 +142,10 @@ class MailingList extends DataObject {
 
 		$fields->addFieldToTab('Root.Main',new CompositeField($grid));
 		$fields->findOrMakeTab('Root.Main')->setTitle('');
-		
+
 		$this->extend("updateCMSFields", $fields);
-		
-		if(!$this->ID) 
+
+		if(!$this->ID)
 			$fields->removeByName('Recipients');
 
 		return $fields;

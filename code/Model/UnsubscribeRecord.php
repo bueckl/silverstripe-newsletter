@@ -7,11 +7,15 @@
  * Record to keep track of when a {@link Recipient} has
  * unsubscribed from a {@link MailingList}.
  */
+namespace Newsletter\Model;
+
+use SilverStripe\ORM\DataObject;
+
 class UnsubscribeRecord extends DataObject {
-	private static $has_one = array(
-		'MailingList' => 'MailingList',
-		'Recipient' => 'Recipient'
-	);
+	private static $has_one = [
+        'MailingList' => MailingList::class,
+        'Recipient' => Recipient::class
+    ];
 
 	/**
 	 * Unsubscribe the recipient from a specific mailing list

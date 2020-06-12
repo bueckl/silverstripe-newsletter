@@ -6,8 +6,27 @@
 /**
  * Create a form that a user can use to unsubscribe from a mailing list
  */
-class UnsubscribeController extends Page_Controller {
-	
+namespace Newsletter\Controller;
+
+use Newsletter\Model\Recipient;
+use Newsletter\Model\UnsubscribeRecord;
+use PageController;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\View\Requirements;
+
+class UnsubscribeController extends PageController {
+
 	static public $days_unsubscribe_link_alive = 30;
 
 	private static $allowed_actions = array(
@@ -51,7 +70,7 @@ class UnsubscribeController extends Page_Controller {
 			if($now <= $recipient->ValidateHashExpired) return $recipient;
 		}
 	}
-	
+
 	private function getMailingLists($recipient = null){
 		$siteConfig = DataObject::get_one("SiteConfig");
 		if($siteConfig->GlobalUnsubscribe){
@@ -129,11 +148,11 @@ class UnsubscribeController extends Page_Controller {
 				$content = sprintf(
 					_t('Newsletter.UNSUBSCRIBEFROMLISTSSUCCESS',
 						'<h3>Thank you, %s.</h3><br />You will no longer receive: %s.'),
-					$title, 
+					$title,
 					"<ul>".$listTitles."</ul>"
 				);
 			}else{
-				$content = 
+				$content =
 					_t('Newsletter.UNSUBSCRIBESUCCESS', 'Thank you.<br />You have been unsubscribed successfully');
 			}
 		}
@@ -151,7 +170,7 @@ class UnsubscribeController extends Page_Controller {
 	function resubscribe() {
 		if(isset($_POST['Hash']) && isset($_POST['UnsubscribeRecordIDs'])){
 			$recipient = DataObject::get_one(
-				'Recipient', 
+				'Recipient',
 				"\"ValidateHash\" = '" . Convert::raw2sql($_POST['Hash']) . "'"
 			);
 			$mailinglists = $this->getMailingListsByUnsubscribeRecords($_POST['UnsubscribeRecordIDs']);
@@ -184,11 +203,11 @@ class UnsubscribeController extends Page_Controller {
 			$content = sprintf(
 				_t('Newsletter.RESUBSCRIBEFROMLISTSSUCCESS',
 					'<h3>Thank you. %s!</h3><br />You have been resubscribed to: %s.'),
-				$title, 
+				$title,
 				"<ul>".$listTitles."</ul>"
 			);
 		}else{
-			$content = 
+			$content =
 				_t('Newsletter.RESUBSCRIBESUCCESS', 'Thank you.<br />You have been resubscribed successfully');
 		}
 
@@ -210,7 +229,7 @@ class UnsubscribeController extends Page_Controller {
 	}
 
 	/** Send an email with a link to unsubscribe from all this user's newsletters */
-	public function sendUnsubscribeLink(SS_HTTPRequest $request) {
+	public function sendUnsubscribeLink(HTTPRequest $request) {
 		//get the form object (we just need its name to set the session message)
 		$form = NewsletterContentControllerExtension::getUnsubscribeFormObject($this);
 

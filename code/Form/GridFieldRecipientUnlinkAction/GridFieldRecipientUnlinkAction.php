@@ -18,6 +18,15 @@
  * @package forms
  * @subpackage fields-gridfield
  */
+namespace Newsletter\Form\GridFieldRecipientUnlinkAction;
+
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridField_ActionProvider;
+use SilverStripe\Forms\GridField\GridField_ColumnProvider;
+use SilverStripe\Forms\GridField\GridField_FormAction;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
+
 class GridFieldRecipientUnlinkAction implements GridField_ColumnProvider, GridField_ActionProvider {
 
 	/**
@@ -111,7 +120,7 @@ class GridFieldRecipientUnlinkAction implements GridField_ColumnProvider, GridFi
 				->addExtraClass('gridfield-button-unlink')
 				->setAttribute('title', _t('GridAction.UnlinkRelation', "Unlink"))
 				->setAttribute('data-icon', 'chain--minus');
-		
+
 		return $field->Field();
 	}
 

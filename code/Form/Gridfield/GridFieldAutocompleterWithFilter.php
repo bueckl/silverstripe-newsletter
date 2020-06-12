@@ -1,9 +1,19 @@
-<?php 
+<?php
 /**
  * @package  newsletter
  */
+namespace Newsletter\Form\Gridfield;
 
-class GridFieldAutocompleterWithFilter extends GridFieldAddExistingAutocompleter{
+use http\Exception\InvalidArgumentException;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
+use SilverStripe\ORM\DataList;
+use LogicException;
+use SilverStripe\View\SSViewer;
+
+class GridFieldAutocompleterWithFilter extends GridFieldAddExistingAutocompleter {
 	/**
 	 * When set, the returned search result will be filered accoringly
 	 * $filters = array('Name'=>'bob'); // only bob in the list
@@ -30,13 +40,13 @@ class GridFieldAutocompleterWithFilter extends GridFieldAddExistingAutocompleter
 	 * Returns a json array of a search results that can be used by for example Jquery.ui.autosuggestion
 	 *
 	 * @param GridField $gridField
-	 * @param SS_HTTPRequest $request 
+	 * @param HTTPRequest $request
 	 * @return sting in JSON fromat
 	 */
 	public function doSearch($gridField, $request) {
 		$dataClass = $gridField->getList()->dataClass();
 		$allList = $this->searchList ? $this->searchList : DataList::create($dataClass);
-		
+
 		$searchFields = ($this->getSearchFields())
 			? $this->getSearchFields()
 			: $this->scaffoldSearchFields($dataClass);
