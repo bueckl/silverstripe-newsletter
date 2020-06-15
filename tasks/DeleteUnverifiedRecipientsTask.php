@@ -1,6 +1,6 @@
 <?php
 
-class DeleteUnverifiedRecipientsTask extends DailyTask{
+class DeleteUnverifiedRecipientsTask extends \SilverStripe\Control\CliController {
 	static $trunk_length = 50;
 
 	public function process() {
@@ -18,9 +18,9 @@ class DeleteUnverifiedRecipientsTask extends DailyTask{
 		set_time_limit(18000);
 		ini_set('memory_limit','512M');
 
-		$days =  SubscriptionPage::get_days_verification_link_alive();
+		$days =  \Newsletter\Pagetype\SubscriptionPage::get_days_verification_link_alive();
 
-		$objects = DataList::create('Recipient')
+		$objects = \SilverStripe\ORM\DataList::create('Recipient')
 			->where("\"Recipient\".\"Verified\" = 0 AND \"Recipient\".\"Created\" < NOW() - INTERVAL $days DAY")
 			->limit(self::$trunk_length, $offset);
 
