@@ -7,7 +7,16 @@
  */
 namespace Newsletter\Model;
 
+use CustomSilvertripeMailer\SMTPEmail;
+use Newsletter\Controller\UnsubscribeController;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
+use SilverStripe\View\SSViewer_FromString;
 
 class NewsletterEmail extends SMTPEmail {
 
@@ -64,7 +73,7 @@ class NewsletterEmail extends SMTPEmail {
 
 		$this->populateTemplate(new ArrayData(array(
 			'UnsubscribeLink' => $this->UnsubscribeLink(),
-			'SiteConfig' => DataObject::get_one('SiteConfig'),
+			'SiteConfig' => DataObject::get_one(SiteConfig::class),
 			'AbsoluteBaseURL' => Director::absoluteBaseURLWithAuth()
 		)));
 
@@ -126,7 +135,7 @@ class NewsletterEmail extends SMTPEmail {
 				}
 			}
 			// replace the body
-			$output = new HTMLText();
+			$output = new DBHTMLText();
 			$output->setValue($text);
 			$this->body = $output;
 		}
@@ -163,15 +172,15 @@ class NewsletterEmail extends SMTPEmail {
 
 			if($static_base_url = self::get_static_base_url()) {
 				$base_url_changed = true;
-				$base_url = Config::inst()->get('Director', 'alternate_base_url');
-				Config::inst()->update('Director', 'alternate_base_url', $static_base_url);
+				$base_url = Config::inst()->get(Director::class, 'alternate_base_url');
+				Config::inst()->update(Director::class, 'alternate_base_url', $static_base_url);
 			} else {
 				$base_url_changed = false;
 			}
 			$link =  Director::absoluteBaseURL() . "unsubscribe/index/".$this->recipient->ValidateHash."/$listIDs";
 			if ($base_url_changed) {
 				// remove our alternative base URL
-				Config::inst()->update('Director', 'alternate_base_url', $base_url);
+				Config::inst()->update(Director::class, 'alternate_base_url', $base_url);
 			}
 
 			return $link;
