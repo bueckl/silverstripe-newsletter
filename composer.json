@@ -13,16 +13,9 @@
 		"email": "julian@silverstripe.com"
 	}
 	],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/ss-koshala/silverstripe-messagequeue.git"
-        }
-    ],
 	"require":
 	{
-        "silverstripe/framework": "~4.0",
-		"silverstripe/messagequeue": "dev-master"
+        "silverstripe/framework": "~4.0"
 	},
 	"autoload": {
 		"classmap": ["tests/behat/"]

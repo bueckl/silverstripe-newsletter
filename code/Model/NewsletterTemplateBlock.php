@@ -8,6 +8,7 @@
 namespace Newsletter\Model;
 
 use SilverStripe\ORM\DataObject;
+use Brandday\Model\Event;
 
 class NewsletterTemplateBlock extends DataObject
 {

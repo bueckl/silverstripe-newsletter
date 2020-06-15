@@ -4,8 +4,19 @@
  * Adds functions to the ContentController, functions that can be accessed on any page. For example,
  * the global unsubscribe form.
  */
+namespace Newsletter\Extensions;
 
-class NewsletterContentControllerExtension extends Extension{
+use Newsletter\Controller\UnsubscribeController;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Extension;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\EmailField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
+
+class NewsletterContentControllerExtension extends Extension {
 
 	/**
 	 * Utility method to get the unsubscribe form
@@ -25,8 +36,9 @@ class NewsletterContentControllerExtension extends Extension{
 		$actions = new FieldList(
 			FormAction::create('sendLink',  _t('Newsletter.SendUnsubscribeLink', 'Send unsubscribe link'))
 				->addExtraClass('ss-ui-action-constructive'),
-			Object::create('ResetFormAction', 'clear', _t('CMSMain_left.ss.RESET', 'Reset'))
+            Injector::inst()->create('ResetFormAction', 'clear', _t('CMSMain_left.ss.RESET', 'Reset'))
 		);
+
 
 		$unsubscribeController = new UnsubscribeController();
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * URL rules for the CMS module
- * 
+ *
  * @package newsletter
  */
 if(!(defined('NEWSLETTER_DIR'))){
@@ -9,7 +9,7 @@ if(!(defined('NEWSLETTER_DIR'))){
 }
 
 if (class_exists('MessageQueue')) {
-	MessageQueue::add_interface("default", array( "queues" => "/.*/",
+	\MessageQueue\MessageQueue::add_interface("default", array( "queues" => "/.*/",
 		"implementation" => "SimpleDBMQ",
 		"encoding" => "php_serialize",
 		"send" => array( "onShutdown" => "all" ),
