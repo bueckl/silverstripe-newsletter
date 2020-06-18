@@ -8,6 +8,8 @@
  */
 namespace Newsletter\Model;
 
+use Newsletter\Form\GridFieldRecipientUnlinkAction\GridFieldRecipientUnlinkAction;
+use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
@@ -23,10 +25,15 @@ use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\UnsavedRelationList;
+use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchButton;
 use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
 
 class MailingList extends DataObject {
+
+    private static $table_name = 'MailingList';
 
 	/* the database fields */
 	private static $db = [

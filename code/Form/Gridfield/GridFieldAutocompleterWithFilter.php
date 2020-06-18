@@ -86,7 +86,7 @@ class GridFieldAutocompleterWithFilter extends GridFieldAddExistingAutocompleter
 		foreach($results as $result) {
 			$json[$result->ID] = SSViewer::fromString($this->resultsFormat)->process($result);
 		}
-		return Convert::array2json($json);
+		return json_encode($json);
 	}
 
 }

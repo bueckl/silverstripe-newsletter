@@ -8,10 +8,23 @@
  */
 namespace Newsletter\Model;
 
+use SilverStripe\Control\Controller;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TabSet;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\Security\RandomGenerator;
 
 class Recipient extends DataObject {
+
+    private static $table_name = 'Recipient';
 
 	private static $db = [
         'Email'					=> "Varchar(255)",
@@ -171,16 +184,16 @@ class Recipient extends DataObject {
 		$fields->addFieldsToTab(
 			'Root.Main',
 			array(
-				Object::create('TextField', 'Salutation',$this->fieldLabel('Salutation')),
-				Object::create('TextField', 'FirstName',$this->fieldLabel('First Name')),
-				Object::create('TextField', 'MiddleName',$this->fieldLabel('Middle Name')),
-				Object::create('TextField', 'Surname',$this->fieldLabel('Surname'))
+			    Injector::inst()->create(TextField::class, 'Salutation',$this->fieldLabel('Salutation')),
+                Injector::inst()->create(TextField::class, 'FirstName',$this->fieldLabel('First Name')),
+                Injector::inst()->create(TextField::class, 'MiddleName',$this->fieldLabel('Middle Name')),
+                Injector::inst()->create(TextField::class, 'Surname',$this->fieldLabel('Surname'))
 			)
 		);
 
 		if (!empty($this->ID)) {
 			$fields->addFieldToTab('Root.Main',
-				Object::create('CheckboxSetField',
+                Injector::inst()->create(CheckboxSetField::class,
 					'MailingLists',
 					$this->fieldLabel('MailingLists'),
 					MailingList::get()->map('ID', 'FullTitle')
@@ -190,27 +203,40 @@ class Recipient extends DataObject {
 		$fields->addFieldsToTab(
 			'Root.Main',
 			array(
-				Object::create('ReadonlyField', 'BouncedCount',$this->fieldLabel('BouncedCount')),
-				Object::create('CheckboxField', 'Verified',$this->fieldLabel('Verified'))
-					->setDescription(
-						_t('Newsletter.VerifiedDesc', 'Has this user verified his subscription?')
-					),
-				Object::create('CheckboxField', 'Blacklisted',$this->fieldLabel('Blacklisted'))
-					->setDescription(
-						_t(
-							'Newsletter.BlacklistedDesc',
-							'Excluded from emails, either by automated process or manually. '
-							. 'An invalid address or undeliverable email will eventually result in blacklisting.'
-						)
-					),
-				Object::create('ReadonlyField', 'ReceivedCount',$this->fieldLabel('ReceivedCount'))
-					->setDescription(
-						_t(
-							'Newsletter.ReceivedCountDesc',
-							'Number of emails sent without undeliverable errors. '
-							. 'Only one indication that an email has actually been received and read.'
-						)
-					)
+                Injector::inst()->create(
+                    ReadonlyField::class,
+                    'BouncedCount',
+                    $this->fieldLabel('BouncedCount')
+                ),
+                Injector::inst()->create(
+                    CheckboxField::class,
+                    'Verified',
+                    $this->fieldLabel('Verified')
+                )->setDescription(
+                    _t('Newsletter.VerifiedDesc', 'Has this user verified his subscription?')
+                ),
+                Injector::inst()->create(
+                    CheckboxField::class,
+                    'Blacklisted',
+                    $this->fieldLabel('Blacklisted')
+                )->setDescription(
+                    _t(
+                        'Newsletter.BlacklistedDesc',
+                        'Excluded from emails, either by automated process or manually. '
+                        . 'An invalid address or undeliverable email will eventually result in blacklisting.'
+                    )
+                ),
+                Injector::inst()->create(
+                    ReadonlyField::class,
+                    'ReceivedCount',
+                    $this->fieldLabel('ReceivedCount')
+                )->setDescription(
+                    _t(
+                        'Newsletter.ReceivedCountDesc',
+                        'Number of emails sent without undeliverable errors. '
+                        . 'Only one indication that an email has actually been received and read.'
+                    )
+                )
 			)
 		);
 
@@ -278,7 +304,7 @@ class Recipient extends DataObject {
 		do {
 			$generator = new RandomGenerator();
 			$hash = $generator->randomToken();
-		} while(DataObject::get_one('Recipient', "\"ValidateHash\" = '$hash'"));
+		} while(DataObject::get_one(Recipient::class, "\"ValidateHash\" = '$hash'"));
 
 		$this->ValidateHash = $hash;
 		$this->ValidateHashExpired = date('Y-m-d H:i:s', time() + (86400 * $lifetime));

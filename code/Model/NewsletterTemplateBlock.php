@@ -7,11 +7,15 @@
  **/
 namespace Newsletter\Model;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use Brandday\Model\Event;
+use SilverStripe\View\Parsers\ShortcodeParser;
 
 class NewsletterTemplateBlock extends DataObject
 {
+    private static $table_name = 'NewsletterTemplateBlock';
+
     private static $db = [
         'Title' => 'Varchar',
         'Content' => 'HTMLText'
@@ -99,7 +103,7 @@ class NewsletterTemplateBlock extends DataObject
      * Returns a list of fields for editing the shortcode's attributes
      * in the insert shortcode popup window
      *
-     * @return Fieldlist
+     * @return FieldList
      **/
     // public function getShortcodeFields()
     // {

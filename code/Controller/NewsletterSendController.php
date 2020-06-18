@@ -17,6 +17,8 @@
  */
 namespace Newsletter\Controller;
 
+use MessageQueue\MessageQueue;
+use MessageQueue\MethodInvocationMessage;
 use Newsletter\Model\Newsletter;
 use Newsletter\Model\Recipient;
 use Newsletter\Model\SendRecipientQueue;
@@ -110,11 +112,15 @@ class NewsletterSendController extends BuildTask {
 	}
 
 	function processQueueOnShutdown($newsletterID) {
-		if (class_exists('MessageQueue')) {
+		if (class_exists(MessageQueue::class)) {
 			//start processing of email sending for this newsletter ID after shutdown
 			MessageQueue::send(
 				"newsletter",
-				new MethodInvocationMessage('NewsletterSendController', "process_queue_invoke", $newsletterID)
+				new MethodInvocationMessage(
+				    NewsletterSendController::class,
+                    "process_queue_invoke",
+                    $newsletterID
+                )
 			);
 
 			MessageQueue::consume_on_shutdown();

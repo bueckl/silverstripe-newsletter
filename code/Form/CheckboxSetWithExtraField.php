@@ -4,7 +4,13 @@
  */
 namespace Newsletter\Form;
 
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\FormField;
+use SilverStripe\ORM\ArrayLib;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\View\Requirements;
 
 class CheckboxSetWithExtraField extends CheckboxSetField {
@@ -162,7 +168,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 				if(!empty($this->extraValue)){
 					foreach($this->extraValue as $label => $val){
 						if($val)
-						$extraValue[$label] = Convert::json2array($val);
+						$extraValue[$label] = json_decode($val);
 					}
 				}
 
@@ -206,7 +212,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 				}
 			}
 
-			if(isset($filtered)) return Convert::array2json($filtered);
+			if(isset($filtered)) return json_encode($filtered);
 			else return '';
 		}
 
@@ -241,7 +247,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 					if($k == 'Value'){
 						$record->$fieldname = implode(",", $v);
 					}else{
-						$record->$k = Convert::array2json($v);
+						$record->$k = json_encode($v);
 					}
 				}
 			} else {

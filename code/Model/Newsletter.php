@@ -13,6 +13,8 @@ use SilverStripe\ORM\DataObject;
 
 class Newsletter extends DataObject implements CMSPreviewable {
 
+    private static $table_name = 'Newsletter';
+
 	private static $db = array(
 		"Status"				=> "Enum('Draft, Sending, Sent', 'Draft')",
 		"Subject"				=> "Varchar(255)",
@@ -25,12 +27,12 @@ class Newsletter extends DataObject implements CMSPreviewable {
 	);
 
 	private static $has_many = array(
-		"SendRecipientQueue"	=> "SendRecipientQueue",
-		"TrackedLinks"			=> "Newsletter_TrackedLink"
+		"SendRecipientQueue"	=> SendRecipientQueue::class,
+		"TrackedLinks"			=> NewsletterTrackedLink::class
 	);
 
 	private static $many_many = array(
-		"MailingLists"			=> "MailingList"
+		"MailingLists"			=> MailingList::class
 	);
 
 	private static $singular_name   = 'Mailing';
@@ -480,7 +482,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
  *
  * @package newsletter
  */
-class Newsletter_TrackedLink extends DataObject {
+class NewsletterTrackedLink extends DataObject {
 
 	private static $db = array(
 		'Original' => 'Varchar(255)',

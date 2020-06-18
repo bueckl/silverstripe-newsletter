@@ -18,7 +18,7 @@ class UnsubscriptionPage extends Page {
 	);
 }
 
-class UnsubscriptionPage_Controller extends PageController {
+class UnsubscriptionPageController extends PageController {
 
 	function Form() {
 		return $this->renderWith('UnsubscribeRequestForm');

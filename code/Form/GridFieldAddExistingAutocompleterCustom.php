@@ -247,7 +247,7 @@ class GridFieldAddExistingAutocompleterCustom
 
 		$json = array();
 		Config::nest();
-		Config::inst()->update('SSViewer', 'source_file_comments', false);
+		Config::modify()->set(SSViewer::class, 'source_file_comments', false);
 		$viewer = SSViewer::fromString($this->resultsFormat);
 		foreach($results as $result) {
 			$json[$result->ID] = html_entity_decode($viewer->process($result));

@@ -11,6 +11,9 @@ namespace Newsletter\Model;
 use SilverStripe\ORM\DataObject;
 
 class SendRecipientQueue extends DataObject {
+
+    private static $table_name = 'SendRecipientQueue';
+
 	/**
 	 *	Status has 4 possible values: "Sent", (mail() returned TRUE), "Failed" (mail() returned FALSE),
 	 * 	"Bounced" ({@see $email_bouncehandler}), or "BlackListed" (sending to is disabled).

@@ -13,6 +13,7 @@
  */
 namespace Newsletter\Controller;
 
+use Newsletter\Model\NewsletterTrackedLink;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\Control\Cookie;
 use SilverStripe\Core\Convert;
@@ -26,7 +27,7 @@ class TrackLinkController extends ContentController {
 		if($params = $this->getURLParams()) {
 			if(isset($params['Hash']) && ($hash = Convert::raw2sql($params['Hash']))) {
 
-				$link = DataObject::get_one('Newsletter_TrackedLink', "\"Hash\" = '$hash'");
+				$link = DataObject::get_one(NewsletterTrackedLink::class, "\"Hash\" = '$hash'");
 
 				if($link) {
 					// check for them visiting this link before

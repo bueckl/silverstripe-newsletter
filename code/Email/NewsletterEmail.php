@@ -111,13 +111,13 @@ class NewsletterEmail extends SMTPEmail {
 					foreach($sorted as $link => $length) {
 						$SQL_link = Convert::raw2sql($link);
 
-						$tracked = DataObject::get_one('Newsletter_TrackedLink',
+						$tracked = DataObject::get_one(NewsletterTrackedLink::class,
 								"\"NewsletterID\" = '". $id . "' AND \"Original\" = '". $SQL_link ."'");
 
 						if(!$tracked) {
 							// make one.
 
-							$tracked = new Newsletter_TrackedLink();
+							$tracked = new NewsletterTrackedLink();
 							$tracked->Original = $link;
 							$tracked->NewsletterID = $id;
 							$tracked->write();
@@ -173,14 +173,14 @@ class NewsletterEmail extends SMTPEmail {
 			if($static_base_url = self::get_static_base_url()) {
 				$base_url_changed = true;
 				$base_url = Config::inst()->get(Director::class, 'alternate_base_url');
-				Config::inst()->update(Director::class, 'alternate_base_url', $static_base_url);
+				Config::modify()->set(Director::class, 'alternate_base_url', $static_base_url);
 			} else {
 				$base_url_changed = false;
 			}
 			$link =  Director::absoluteBaseURL() . "unsubscribe/index/".$this->recipient->ValidateHash."/$listIDs";
 			if ($base_url_changed) {
 				// remove our alternative base URL
-				Config::inst()->update(Director::class, 'alternate_base_url', $base_url);
+                Config::modify()->set(Director::class, 'alternate_base_url', $base_url);
 			}
 
 			return $link;

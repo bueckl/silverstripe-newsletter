@@ -8,6 +8,8 @@
  */
 namespace Newsletter\Controller;
 
+use Newsletter\Extensions\NewsletterContentControllerExtension;
+use Newsletter\Model\MailingList;
 use Newsletter\Model\Recipient;
 use Newsletter\Model\UnsubscribeRecord;
 use PageController;
@@ -17,12 +19,14 @@ use SilverStripe\Control\Email\Email;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\Requirements;
 
 class UnsubscribeController extends PageController {
@@ -72,7 +76,7 @@ class UnsubscribeController extends PageController {
 	}
 
 	private function getMailingLists($recipient = null){
-		$siteConfig = DataObject::get_one("SiteConfig");
+		$siteConfig = DataObject::get_one(SiteConfig::class);
 		if($siteConfig->GlobalUnsubscribe){
 			return $mailinglists = $recipient->MailingLists();
 		}else{
@@ -92,7 +96,7 @@ class UnsubscribeController extends PageController {
 		$mailinglists = new ArrayList();
 		if($unsubscribeRecords->count()){
 			foreach($unsubscribeRecords as $record){
-				$list = DataObject::get_by_id("MailingList", $record->MailingListID);
+				$list = DataObject::get_by_id(MailingList::class, $record->MailingListID);
 				if($list && $list->exists()){
 					$mailinglists->push($list);
 				}
@@ -170,7 +174,7 @@ class UnsubscribeController extends PageController {
 	function resubscribe() {
 		if(isset($_POST['Hash']) && isset($_POST['UnsubscribeRecordIDs'])){
 			$recipient = DataObject::get_one(
-				'Recipient',
+                Recipient::class,
 				"\"ValidateHash\" = '" . Convert::raw2sql($_POST['Hash']) . "'"
 			);
 			$mailinglists = $this->getMailingListsByUnsubscribeRecords($_POST['UnsubscribeRecordIDs']);
@@ -257,9 +261,9 @@ class UnsubscribeController extends PageController {
 			//send unsubscribe link email
 			$email = new Email();
 			$email->setTo($recipient->Email);
-			$from = Email::getAdminEmail();
+			$from = $email->config()->get('admin_email');
 			$email->setFrom($from);
-			$email->setTemplate('UnsubscribeLinkEmail');
+			$email->setHTMLTemplate('UnsubscribeLinkEmail');
             $email->setSubject(_t(
                 'Newsletter.ConfirmUnsubscribeSubject',
                 "Confirmation of your unsubscribe request"

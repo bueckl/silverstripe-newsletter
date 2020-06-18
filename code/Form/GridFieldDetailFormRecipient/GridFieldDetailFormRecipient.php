@@ -2,8 +2,10 @@
 namespace Newsletter\Form\GridFieldDetailFormRecipient;
 
 use Newsletter\Model\Recipient;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\PjaxResponseNegotiator;
 use SilverStripe\Control\Session;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\ORM\ValidationException;
@@ -19,6 +21,11 @@ class GridFieldDetailFormRecipient_ItemRequest extends GridFieldDetailForm_ItemR
 		'read',
 		'ItemEditForm',
 	);
+
+    public function session() {
+        $request = Injector::inst()->get(HTTPRequest::class);
+        return $request->getSession();
+    }
 
 	function ItemEditForm() {
         $form = parent::ItemEditForm();
@@ -95,8 +102,8 @@ class GridFieldDetailFormRecipient_ItemRequest extends GridFieldDetailForm_ItemR
 				$controller->getRequest()->addHeader('X-Pjax', 'CurrentForm');
 				return $responseNegotiator->respond($controller->getRequest());
 			}
-			Session::set("FormInfo.{$form->FormName()}.errors", array());
-			Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
+			$this->session()->set("FormInfo.{$form->FormName()}.errors", array());
+            $this->session()->set("FormInfo.{$form->FormName()}.data", $form->getData());
 			return $controller->redirectBack();
 		}
 

@@ -8,7 +8,32 @@
  */
 namespace Newsletter\Pagetype;
 
+use Newsletter\Controller\UnsubscribeController;
+use Newsletter\Model\MailingList;
+use Newsletter\Model\Recipient;
 use Page;
+use PageController;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\CompositeField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+use SilverStripe\Forms\LabelField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\View\Requirements;
 
 class SubscriptionPage extends Page {
 
@@ -55,7 +80,7 @@ class SubscriptionPage extends Page {
 			$page->SendNotification = 1;
 			$page->ShowInMenus = false;
 			$page->write();
-			$page->publish('Stage', 'Live');
+            $page->owner->copyVersionToStage('Stage', 'Live');
 		}
 	}
 
@@ -181,7 +206,7 @@ class SubscriptionPage extends Page {
 		);
 
 		$subscriptionTab->push(
-			new HtmlEditorField(
+			new HTMLEditorField(
 				'OnCompleteMessage',
 				_t('Newsletter.OnCompletion', 'Message shown on subscription completion')
 			)
@@ -201,7 +226,7 @@ class SubscriptionPage extends Page {
 /**
  * @package newsletter
  */
-class SubscriptionPage_Controller extends Page_Controller {
+class SubscriptionPageController extends PageController {
 
 	private static $allowed_actions = array(
 		'index',
@@ -231,7 +256,7 @@ class SubscriptionPage_Controller extends Page_Controller {
 		if($this->URLParams['Action'] === 'completed' || $this->URLParams['Action'] == 'submitted') return;
 		$dataFields = singleton('Recipient')->getFrontEndFields()->dataFields();
 
-		if($this->CustomLabel) $customLabel = Convert::json2array($this->CustomLabel);
+		if($this->CustomLabel) $customLabel = json_decode($this->CustomLabel);
 
 		$fields = array();
 		if($this->Fields){
@@ -240,7 +265,7 @@ class SubscriptionPage_Controller extends Page_Controller {
 
 		$recipientInfoSection = new CompositeField();
 
-		$requiredFields = Convert::json2array($this->Required);
+		$requiredFields = json_decode($this->Required);
 		if(!empty($fields)){
 			foreach($fields as $field){
 				if(isset($dataFields[$field]) && $dataFields[$field]){
@@ -394,7 +419,7 @@ JS
 	 *
 	 * @param array
 	 * @param Form
-	 * @param SS_HTTPRequest
+	 * @param HTTPRequest
 	 *
 	 * @return Redirection
 	 */
@@ -507,7 +532,7 @@ JS
 
 	function submitted(){
 		if($id = $this->urlParams['ID']){
-			$recipientData = DataObject::get_by_id("Recipient", $id)->toMap();
+			$recipientData = DataObject::get_by_id(Recipient::class, $id)->toMap();
 		}
 
 		$daysExpired = SubscriptionPage::get_days_verification_link_alive();
@@ -529,7 +554,7 @@ JS
 
 	function subscribeverify() {
 		if($hash = $this->urlParams['ID']) {
-			$recipient = DataObject::get_one("Recipient", "\"ValidateHash\" = '".Convert::raw2sql($hash)."'");
+			$recipient = DataObject::get_one(Recipient::class, "\"ValidateHash\" = '".Convert::raw2sql($hash)."'");
 			if($recipient && $recipient->exists()){
 				$now = date('Y-m-d H:i:s');
 				if($now <= $recipient->ValidateHashExpired) {
@@ -554,9 +579,10 @@ JS
 					if($this->SendNotification){
 						$email = new Email();
 						$email->setTo($recipient->Email);
-						$from = $this->NotificationEmailFrom?$this->NotificationEmailFrom:Email::getAdminEmail();
+						$from = $this->NotificationEmailFrom ? $this->NotificationEmailFrom :
+                            $email->config()->get('admin_email');
 						$email->setFrom($from);
-						$email->setTemplate('SubscriptionConfirmationEmail');
+						$email->setHTMLTemplate('SubscriptionConfirmationEmail');
         				$email->setSubject(_t(
         					'Newsletter.ConfirmSubject',
         					"Confirmation of your subscription to our mailing lists"
@@ -592,7 +618,7 @@ JS
 
 	function completed() {
 		if($id = $this->urlParams['ID']){
-			$recipientData = DataObject::get_by_id("Recipient", $id)->toMap();
+			$recipientData = DataObject::get_by_id(Recipient::class, $id)->toMap();
 		}
 		return $this->customise(array(
     		'Title' => _t('Newsletter.SubscriptionCompleted', 'Subscription Completed!'),

@@ -12,6 +12,10 @@ namespace Newsletter\Model;
 use SilverStripe\ORM\DataObject;
 
 class UnsubscribeRecord extends DataObject {
+
+    private static $table_name = 'UnsubscribeRecord';
+
+
 	private static $has_one = [
         'MailingList' => MailingList::class,
         'Recipient' => Recipient::class

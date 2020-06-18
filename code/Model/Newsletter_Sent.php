@@ -13,6 +13,8 @@ namespace Newsletter\Model;
 
 class Newsletter_Sent extends Newsletter {
 
+    private static $table_name = 'Newsletter_Sent';
+
 	private static $singular_name = "Sent Newsletters";
 	private static $plural_name = "Sent Newsletters";
 }
