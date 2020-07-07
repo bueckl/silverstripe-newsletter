@@ -1,13 +1,13 @@
-Member:
+SilverStripe\Security\Member:
   extensions:
-    - RecipientExtension
-SiteConfig:
+    - Newsletter\Extensions\RecipientExtension
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - NewsletterSiteConfig
-ContentController:
+    - Newsletter\Extensions\NewsletterSiteConfig
+SilverStripe\CMS\Controllers\ContentController:
   extensions:
-    - NewsletterContentControllerExtension
-Director:
+    - Newsletter\Extensions\NewsletterContentControllerExtension
+SilverStripe\Control\Director:
   rules:
-    'newsletterlinks/$Hash': 'TrackLinkController'
-    'unsubscribe//$Action/$ValidateHash/$IDs': 'UnsubscribeController'
+    'newsletterlinks/$Hash': 'Newsletter\Controller\TrackLinkController'
+    'unsubscribe//$Action/$ValidateHash/$IDs': 'Newsletter\Controller\UnsubscribeController'
