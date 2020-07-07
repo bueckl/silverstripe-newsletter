@@ -44,13 +44,13 @@ class NewsletterAdmin extends ModelAdmin {
     public function init() {
         parent::init();
 
-        Requirements::javascript('/javascript/SilverStripeNavigator.js');
-        Requirements::javascript('/javascript/ActionOnConfirmation.js');
-        Requirements::javascript('/javascript/RecipientsPreviewPopup.js');
-        Requirements::javascript('/javascript/EmailPreviewPopup.js');
-        Requirements::javascript('/javascript/ProcessQueue.js');
-        Requirements::javascript('/javascript/DeleteQueue.js');
-        Requirements::css('newsletter/css/NewsletterAdmin.css');
+//        Requirements::javascript('silverstripe/newsletter:javascript/SilverStripeNavigator.js');
+        Requirements::javascript('silverstripe/newsletter:javascript/ActionOnConfirmation.js');
+        Requirements::javascript('silverstripe/newsletter:javascript/RecipientsPreviewPopup.js');
+        Requirements::javascript('silverstripe/newsletter:javascript/EmailPreviewPopup.js');
+        Requirements::javascript('silverstripe/newsletter:javascript/ProcessQueue.js');
+        Requirements::javascript('silverstripe/newsletter:javascript/DeleteQueue.js');
+        Requirements::css('silverstripe/newsletter:css/NewsletterAdmin.css');
     }
 
 
