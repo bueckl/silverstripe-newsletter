@@ -2,7 +2,11 @@
 namespace Newsletter\Admin;
 
 use CopyButton\GridFieldCopyButton;
+use Newsletter\Form\Gridfield\MailingListGridFieldDetailForm;
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\GridField\GridFieldEditButton;
 
 class MailingListAdmin extends ModelAdmin {
 
@@ -23,9 +27,9 @@ class MailingListAdmin extends ModelAdmin {
 
         $gridField = $form->Fields()->fieldByName($this->sanitiseClassName($this->modelClass));
         $config = $gridField->getConfig();
-        $config->removeComponentsByType('GridFieldDetailForm')->addComponents(new MailingListGridFieldDetailForm());
-        $config->addComponent(new GridFieldCopyButton(), 'GridFieldEditButton');
-        $config->getComponentByType('GridFieldDataColumns')->setDisplayFields(array(
+        $config->removeComponentsByType(GridFieldDetailForm::class)->addComponents(new MailingListGridFieldDetailForm());
+        $config->addComponent(new GridFieldCopyButton(), GridFieldEditButton::class);
+        $config->getComponentByType(GridFieldDataColumns::class)->setDisplayFields(array(
             'ID' => '#',
             'Title' => 'Name'
             // 'filteredRecipients.Count' => 'Contacts on list',

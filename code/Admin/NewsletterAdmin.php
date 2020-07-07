@@ -1,8 +1,16 @@
 <?php
 namespace Newsletter\Admin;
 
+use Newsletter\Form\Gridfield\NewsletterGridFieldDetailForm;
+use Newsletter\Model\Newsletter;
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\ORM\Search\SearchContext;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\Requirements;
+use SilverStripe\View\SSViewer;
 
 /**
  * @package  newsletter
@@ -18,12 +26,12 @@ class NewsletterAdmin extends ModelAdmin {
     private static $menu_icon    = 'newsletter/images/newsletter-icon.png';
     public $showImportForm       = false;
 
-    private static $managed_models = array(
+    private static $managed_models = [
         "Newsletter" => array('title' => 'Mailing'),
         "Newsletter_Sent" => array('title' => 'Verschickte Mailings'),
         // "MailingList"
         // "Member"
-    );
+    ];
 
     /**
      * @var array Array of template paths to check
@@ -50,19 +58,19 @@ class NewsletterAdmin extends ModelAdmin {
         //custom handling of the newsletter modeladmin with a specialized action menu for the detail form
         if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent") {
             $config = $form->Fields()->first()->getConfig();
-            $config->removeComponentsByType('GridFieldDetailForm')
+            $config->removeComponentsByType(GridFieldDetailForm::class)
                 ->addComponents(new NewsletterGridFieldDetailForm());
             if ($this->modelClass == "Newsletter_Sent") {
-                $config->removeComponentsByType('GridFieldAddNewButton');
+                $config->removeComponentsByType(GridFieldAddNewButton::class);
             }
-            $config->getComponentByType('GridFieldDataColumns')
+            $config->getComponentByType(GridFieldDataColumns::class)
                 ->setFieldCasting(array(
                     "Content" => "HTMLText->LimitSentences",
             ));
         }
         if ($this->modelClass == "Member") {
             $config = $form->Fields()->first()->getConfig();
-            $config->getComponentByType('GridFieldDataColumns')
+            $config->getComponentByType(GridFieldDataColumns::class)
                 ->setFieldCasting(array(
                     "Blacklisted" => "Boolean->Nice",
                     "Verified" => "Boolean->Nice",
@@ -148,7 +156,7 @@ class NewsletterAdmin extends ModelAdmin {
         $context = parent::getSearchContext();
 
         if($this->modelClass === "Newsletter_Sent") {
-            $context = singleton("Newsletter")->getDefaultSearchContext();
+            $context = singleton(Newsletter::class)->getDefaultSearchContext();
             foreach($context->getFields() as $field) $field->setName(sprintf('q[%s]', $field->getName()));
             foreach($context->getFilters() as $filter) $filter->setFullName(sprintf('q[%s]', $filter->getFullName()));
         }
