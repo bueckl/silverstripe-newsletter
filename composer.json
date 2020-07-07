@@ -15,8 +15,7 @@
 	],
 	"require":
 	{
-		"silverstripe/framework": "~4.0",
-		"silverstripe/gridfieldajaxrefresh": "*"
+		"silverstripe/framework": "~4.0"
 	},
 	"autoload": {
 		"classmap": ["tests/behat/"]
