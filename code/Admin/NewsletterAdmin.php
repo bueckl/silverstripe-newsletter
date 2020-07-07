@@ -3,11 +3,14 @@ namespace Newsletter\Admin;
 
 use Newsletter\Form\Gridfield\NewsletterGridFieldDetailForm;
 use Newsletter\Model\Newsletter;
+use Newsletter\Model\Newsletter_Sent;
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\ORM\Search\SearchContext;
+use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\SSViewer;
@@ -27,8 +30,8 @@ class NewsletterAdmin extends ModelAdmin {
     public $showImportForm       = false;
 
     private static $managed_models = [
-        "Newsletter" => array('title' => 'Mailing'),
-        "Newsletter_Sent" => array('title' => 'Verschickte Mailings'),
+        Newsletter::class => array('title' => 'Mailing'),
+        Newsletter_Sent::class => array('title' => 'Verschickte Mailings'),
         // "MailingList"
         // "Member"
     ];
@@ -41,12 +44,12 @@ class NewsletterAdmin extends ModelAdmin {
     public function init() {
         parent::init();
 
-        Requirements::javascript(CMS_DIR . '/javascript/SilverStripeNavigator.js');
-        Requirements::javascript(NEWSLETTER_DIR . '/javascript/ActionOnConfirmation.js');
-        Requirements::javascript(NEWSLETTER_DIR . '/javascript/RecipientsPreviewPopup.js');
-        Requirements::javascript(NEWSLETTER_DIR . '/javascript/EmailPreviewPopup.js');
-        Requirements::javascript(NEWSLETTER_DIR . '/javascript/ProcessQueue.js');
-        Requirements::javascript(NEWSLETTER_DIR . '/javascript/DeleteQueue.js');
+        Requirements::javascript('/javascript/SilverStripeNavigator.js');
+        Requirements::javascript('/javascript/ActionOnConfirmation.js');
+        Requirements::javascript('/javascript/RecipientsPreviewPopup.js');
+        Requirements::javascript('/javascript/EmailPreviewPopup.js');
+        Requirements::javascript('/javascript/ProcessQueue.js');
+        Requirements::javascript('/javascript/DeleteQueue.js');
         Requirements::css('newsletter/css/NewsletterAdmin.css');
     }
 
@@ -56,11 +59,11 @@ class NewsletterAdmin extends ModelAdmin {
         $form = parent::getEditForm($id, $fields);
 
         //custom handling of the newsletter modeladmin with a specialized action menu for the detail form
-        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent") {
+        if ($this->modelClass == Newsletter::class || $this->modelClass == Newsletter_Sent::class) {
             $config = $form->Fields()->first()->getConfig();
             $config->removeComponentsByType(GridFieldDetailForm::class)
                 ->addComponents(new NewsletterGridFieldDetailForm());
-            if ($this->modelClass == "Newsletter_Sent") {
+            if ($this->modelClass == Newsletter_Sent::class) {
                 $config->removeComponentsByType(GridFieldAddNewButton::class);
             }
             $config->getComponentByType(GridFieldDataColumns::class)
@@ -68,7 +71,7 @@ class NewsletterAdmin extends ModelAdmin {
                     "Content" => "HTMLText->LimitSentences",
             ));
         }
-        if ($this->modelClass == "Member") {
+        if ($this->modelClass == Member::class) {
             $config = $form->Fields()->first()->getConfig();
             $config->getComponentByType(GridFieldDataColumns::class)
                 ->setFieldCasting(array(
@@ -90,13 +93,16 @@ class NewsletterAdmin extends ModelAdmin {
     public static function template_paths() {
 
         if(!isset(self::$template_paths)) {
-            if(class_exists('SiteConfig') && ($config = SiteConfig::current_site_config()) && $config->Theme) {
+            if(class_exists(SiteConfig::class) &&
+                ($config = SiteConfig::current_site_config()) && $config->Theme) {
                 $theme = $config->Theme;
-            } elseif(SSViewer::current_custom_theme()) {
-                $theme = SSViewer::current_custom_theme();
-            } else if(SSViewer::current_theme()){
-                $theme = SSViewer::current_theme();
-            } else {
+            }
+//            elseif(SSViewer::current_custom_theme()) {
+//                $theme = SSViewer::current_custom_theme();
+//            } else if(SSViewer::current_theme()){
+//                $theme = SSViewer::current_theme();
+//            }
+            else {
                 $theme = false;
             }
 
@@ -129,8 +135,8 @@ class NewsletterAdmin extends ModelAdmin {
 
     public function getList() {
         $list = parent::getList();
-        if ($this->modelClass == "Newsletter" || $this->modelClass == "Newsletter_Sent" ){
-            if ($this->modelClass == "Newsletter") {
+        if ($this->modelClass == Newsletter::class || $this->modelClass == Newsletter_Sent::class ){
+            if ($this->modelClass == Newsletter::class) {
                 $statusFilter = array("Draft", "Sending");
 
                 //using a editform detail request, that should allow Newsletter_Sent objects and regular Newsletters
@@ -153,9 +159,9 @@ class NewsletterAdmin extends ModelAdmin {
     * @return SearchContext
     */
     public function getSearchContext() {
-        $context = parent::getSearchContext();
+        $context = Injectable::singleton($this->modelClass)->getDefaultSearchContext();
 
-        if($this->modelClass === "Newsletter_Sent") {
+        if($this->modelClass === Newsletter_Sent::class) {
             $context = singleton(Newsletter::class)->getDefaultSearchContext();
             foreach($context->getFields() as $field) $field->setName(sprintf('q[%s]', $field->getName()));
             foreach($context->getFilters() as $filter) $filter->setFullName(sprintf('q[%s]', $filter->getFullName()));

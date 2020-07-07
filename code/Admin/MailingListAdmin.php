@@ -3,6 +3,7 @@ namespace Newsletter\Admin;
 
 use CopyButton\GridFieldCopyButton;
 use Newsletter\Form\Gridfield\MailingListGridFieldDetailForm;
+use Newsletter\Model\MailingList;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
@@ -11,7 +12,7 @@ use SilverStripe\Forms\GridField\GridFieldEditButton;
 class MailingListAdmin extends ModelAdmin {
 
     private static $managed_models = array(
-        'MailingList'  => array('title' => 'Mailing-Listen')
+        MailingList::class  => array('title' => 'Mailing-Listen')
     );
 
     public $showImportForm = false;
@@ -25,7 +26,9 @@ class MailingListAdmin extends ModelAdmin {
 
         $form = parent::getEditForm($id, $fields);
 
-        $gridField = $form->Fields()->fieldByName($this->sanitiseClassName($this->modelClass));
+        $gridFieldName = $this->sanitiseClassName($this->modelClass);
+        $gridField = $form->Fields()->fieldByName($gridFieldName);
+
         $config = $gridField->getConfig();
         $config->removeComponentsByType(GridFieldDetailForm::class)->addComponents(new MailingListGridFieldDetailForm());
         $config->addComponent(new GridFieldCopyButton(), GridFieldEditButton::class);
