@@ -24,7 +24,7 @@ class NewsletterTemplateBlock extends DataObject
 
     private static $plural_name = 'Textbausteine';
 
-    public static $belongs_many_many = [
+    private static $belongs_many_many = [
 //        'Events' => Event::class
     ];
 
