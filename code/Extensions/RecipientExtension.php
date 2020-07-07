@@ -22,7 +22,7 @@ class RecipientExtension extends DataExtension
         'ReceivedCount' => "Int",
         // both subscribe and unsebscribe process need to valid this hash for security
         'ValidateHash' => "Varchar(160)",
-        'ValidateHashExpired' => "SS_Datetime",
+        'ValidateHashExpired' => "Datetime",
         'Verified' => "Boolean(1)",
     ];
 
