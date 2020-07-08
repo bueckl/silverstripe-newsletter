@@ -9,6 +9,7 @@ use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\Email\Email;
 use SilverStripe\Control\HTTP;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CheckboxSetField;
@@ -23,6 +24,7 @@ use SilverStripe\Forms\GridField\GridFieldPaginator;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\CMSPreviewable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
@@ -230,11 +232,11 @@ class Newsletter extends DataObject implements CMSPreviewable {
         }
 
         $fields->dataFieldByName('SendFrom')
-            ->setValue(Email::getAdminEmail())
+            ->setValue(Email::config()->get('admin_email'))
             ->setAttribute('placeholder', 'My Name <admin@example.org>');
 
         $fields->dataFieldByName('ReplyTo')
-            ->setValue(Email::getAdminEmail())
+            ->setValue(Email::config()->get('admin_email'))
             ->setAttribute('placeholder', 'admin@example.org')
             ->setDescription(_t(
                 'Newsletter.ReplyToDesc',
@@ -532,7 +534,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
     }
 
     public function Link($action = null) {
-        return Controller::join_links(singleton('NewsletterAdmin')->Link('Newsletter'),
+        return Controller::join_links(singleton(NewsletterAdmin::class)->Link('Newsletter'),
             '/EditForm/field/Newsletter/item/', $this->ID, $action);
     }
 
@@ -540,7 +542,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
      * @return String
      */
     public function CMSEditLink() {
-        return Controller::join_links(singleton('NewsletterAdmin')->Link('Newsletter'),
+        return Controller::join_links(singleton(NewsletterAdmin::class)->Link('Newsletter'),
         '/EditForm/field/Newsletter/item/', $this->ID, 'edit');
     }
 
