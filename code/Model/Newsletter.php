@@ -125,7 +125,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
         foreach(self::$required_fields as $field) {
             if (empty($this->$field)) {
-                $result->error(_t('Newsletter.FieldRequired',
+                $result->addError(_t('Newsletter.FieldRequired',
                 '"{field}" field is required',
                 array('field' => isset(self::$field_labels[$field])?self::$field_labels[$field]:$field)
                 ));
@@ -135,7 +135,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
         if (!empty($this->ID)) {
             foreach(self::$required_relations as $relation) {
                 if ($this->$relation()->Count() == 0) {
-                    $result->error(_t('Newsletter.RelationRequired',
+                    $result->addError(_t('Newsletter.RelationRequired',
                         'Select at least one "{relation}"',
                             array('relation' => $relation)
                     ));
@@ -149,7 +149,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
     // Faking parent method
     public function parent() {
         if ($this->ParentID && $this->ParentID > 0) {
-            return DataObject::get_by_id('Newsletter', $this->ParentID);
+            return DataObject::get_by_id(Newsletter::class, $this->ParentID);
         } else {
             return false;
         }
