@@ -187,9 +187,9 @@ class Newsletter extends DataObject implements CMSPreviewable {
         $uploadField1->folderName = "attachments";
         $uploadField2->folderName = "attachments";
         $uploadField3->folderName = "attachments";
-        $uploadField1->setDisplayFolderName('attachments');
-        $uploadField2->setDisplayFolderName('attachments');
-        $uploadField3->setDisplayFolderName('attachments');
+        $uploadField1->setFolderName('attachments');
+        $uploadField2->setFolderName('attachments');
+        $uploadField3->setFolderName('attachments');
 
         $fields->removeFieldFromTab('Root', 'MailingLists');
         $fields->removeFieldFromTab('Root', 'Member');
