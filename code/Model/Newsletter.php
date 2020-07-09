@@ -573,6 +573,8 @@ class Newsletter extends DataObject implements CMSPreviewable {
  */
 class Newsletter_TrackedLink extends DataObject {
 
+    private static $table_name = 'Newsletter_TrackedLink';
+
     private static $db = [
         'Original' => 'Varchar(255)',
         'Hash' => 'Varchar(100)',

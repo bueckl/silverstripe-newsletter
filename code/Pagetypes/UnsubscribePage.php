@@ -10,6 +10,8 @@ namespace Newsletter\Pagetypes;
 
 class UnsubscriptionPage extends \Page {
 
+    private static $table_name = 'UnsubscriptionPage';
+
     private static $defaults = array(
         'Content' => 'Enter your email address and we will send you an email with an unsubscribe link'
     );

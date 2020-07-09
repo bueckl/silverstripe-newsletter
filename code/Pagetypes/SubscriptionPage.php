@@ -33,6 +33,8 @@ use SilverStripe\View\Requirements;
 
 class SubscriptionPage extends \Page {
 
+    private static $table_name = 'SubscriptionPage';
+
     private static $db = [
         'Fields' => 'Text',
         'Required' => 'Text',
