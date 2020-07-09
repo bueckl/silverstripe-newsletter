@@ -93,9 +93,12 @@ class MailingList extends DataObject {
         // $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
 
 
-        $FilterableFields->dataFieldByName('Filter_Member_WillAssist')
-            ->setTitle('Teilnahme bestätigt')
-            ->setDescription('Keine Auswahl für Alle');
+        if($FilterableFields->dataFieldByName('Filter_Member_WillAssist')) {
+            $FilterableFields->dataFieldByName('Filter_Member_WillAssist')
+                ->setTitle('Teilnahme bestätigt')
+                ->setDescription('Keine Auswahl für Alle');
+        }
+
 
         // $FilterableFields->dataFieldByName('Filter_Member_NDAAccepted')->setTitle('Geheimhaltungserklärung akzeptiert');
         // // $FilterableFields->dataFieldByName('Filter_Member_CountryImport')->setTitle('CountryImport');
