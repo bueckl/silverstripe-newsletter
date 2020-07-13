@@ -53,7 +53,7 @@ class SendRecipientQueue extends DataObject {
     ];
 
     public function niceIsDuplicate() {
-        return ( $this->isDuplicate ) ? 'JA' : '-';
+        return $this->isDuplicate;
     }
     public function ReceivedCount() {
         return $this->Member()->ReceivedCount;
