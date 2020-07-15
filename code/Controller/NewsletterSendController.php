@@ -2,7 +2,9 @@
 namespace Newsletter\Controller;
 use Newsletter\Model\Newsletter;
 use Newsletter\Model\SendRecipientQueue;
+use Newsletter\Traits\Helper;
 use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Member;
 
@@ -24,6 +26,7 @@ use SilverStripe\Security\Member;
  */
 class NewsletterSendController extends BuildTask
 {
+    use Helper;
 
     /**
      * @var int number of emails to send out in "batches" to avoid spin up costs
@@ -303,7 +306,7 @@ class NewsletterSendController extends BuildTask
             $newsletter = Newsletter::get()->byID($newsletterID);
             echo "<h2>Queued sendout for newsletter: $newsletter->Subject (ID: $newsletter->ID)</h2>";
         } else {
-            user_error("Usage: dev/tasks/NewsletterSendController?newsletter=#");
+            user_error("Usage: dev/tasks/".$this->sanitiseClassName(NewsletterSendController::class)."?newsletter=#");
         }
     }
 
@@ -318,7 +321,7 @@ class NewsletterSendController extends BuildTask
                 $this->cleanUpStalledQueue($newsletterID);
 
                 // Start a transaction
-                $conn = DB::getConn();
+                $conn = DB::get_conn();
                 if ($conn->supportsTransactions()) {
                     $conn->transactionStart();
                 }

@@ -3,8 +3,10 @@ namespace Newsletter\Model;
 
 
 use Newsletter\Admin\NewsletterAdmin;
+use Newsletter\Controller\NewsletterSendController;
 use Newsletter\Email\NewsletterEmail;
 use Newsletter\Form\Gridfield\GridFieldNewsletterSummaryHeader;
+use Newsletter\Traits\Helper;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\Control\Controller;
@@ -40,6 +42,8 @@ use SilverStripe\View\Requirements;
  * Single newsletter instance.
  */
 class Newsletter extends DataObject implements CMSPreviewable {
+
+    use Helper;
 
     private static $table_name = 'Newsletter';
 
@@ -374,7 +378,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
             $restartLink = Controller::join_links(
                 Director::absoluteBaseURL(),
-                'dev/tasks/NewsletterSendController?newsletter='.$this->ID
+                'dev/tasks/'.$this->sanitiseClassName(NewsletterSendController::class).'?newsletter='.$this->ID
             );
 
             $fields->addFieldToTab('Root.Restart if stucked …',
