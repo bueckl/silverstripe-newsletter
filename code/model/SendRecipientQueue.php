@@ -194,35 +194,35 @@ class SendRecipientQueue extends DataObject {
                     }
                 }
 
-                if ( $recipient->HotelID > 0 ) {
+                // if ( $recipient->HotelID > 0 ) {
 
-                    $attachment = $recipient->owner->LuggageTagPDF();
+                //     $attachment = $recipient->owner->LuggageTagPDF();
 
-                    if ( $attachment ) {
-                        $file = $attachment->getFullPath();
-                        // We check the filesize in bytes in order to see if the file realy exists
-                        if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                            $email->attachFile( $file, $file );
-                        }
-                    }
+                //     if ( $attachment ) {
+                //         $file = $attachment->getFullPath();
+                //         // We check the filesize in bytes in order to see if the file realy exists
+                //         if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                //             $email->attachFile( $file, $file );
+                //         }
+                //     }
     
-                }
+                // }
 
 
-                if ( $recipient->TravelData()->Pendlerparkplatz == "YES" ) {
+                // if ( $recipient->TravelData()->Pendlerparkplatz == "YES" ) {
 
-                    // $attachment = File::get()->filter('ID', 155866)->first();
-                    $attachment = File::get()->byID(155866);
+                //     // $attachment = File::get()->filter('ID', 155866)->first();
+                //     $attachment = File::get()->byID(155866);
 
-                    if ( $attachment ) {
-                        $file = $attachment->getFullPath();
-                        // We check the filesize in bytes in order to see if the file realy exists
-                        if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                            $email->attachFile( $file, $file );
-                        }
-                    }
+                //     if ( $attachment ) {
+                //         $file = $attachment->getFullPath();
+                //         // We check the filesize in bytes in order to see if the file realy exists
+                //         if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                //             $email->attachFile( $file, $file );
+                //         }
+                //     }
     
-                }
+                // }
                 
                 
 
