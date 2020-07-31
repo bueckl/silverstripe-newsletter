@@ -126,7 +126,7 @@ class Newsletter extends DataObject implements CMSPreviewable{
 
         $fields->addFieldsToTab(
 
-               'Root.Attachments', array(
+               'Root.Attachments', [
                $uploadField1 = new UploadField(
                    $name = 'Attachment1',
                    $title = 'Dateianhang 1'
@@ -138,15 +138,15 @@ class Newsletter extends DataObject implements CMSPreviewable{
                $uploadField3 = new UploadField(
                    $name = 'Attachment3',
                    $title = 'Dateianhang 3'
-               )),
+               ),
                $uploadField4 = new UploadField(
                    $name = 'Attachment4',
                    $title = 'Dateianhang 4'
-               )),
+               ),
                $uploadField5 = new UploadField(
                    $name = 'Attachment5',
                    $title = 'Dateianhang 5'
-               ))
+               )]
 
            );
         $uploadField1->setAllowedMaxFileNumber(1);
