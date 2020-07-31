@@ -28,7 +28,9 @@ class Newsletter extends DataObject implements CMSPreviewable{
     private static $has_one = array(
         "Attachment1" => "File",
         "Attachment2" => "File",
-        "Attachment3" => "File"
+        "Attachment3" => "File",
+        "Attachment4" => "File",
+        "Attachment5" => "File"
     );
 
     private static $many_many = array(
@@ -136,18 +138,32 @@ class Newsletter extends DataObject implements CMSPreviewable{
                $uploadField3 = new UploadField(
                    $name = 'Attachment3',
                    $title = 'Dateianhang 3'
+               )),
+               $uploadField4 = new UploadField(
+                   $name = 'Attachment4',
+                   $title = 'Dateianhang 4'
+               )),
+               $uploadField5 = new UploadField(
+                   $name = 'Attachment5',
+                   $title = 'Dateianhang 5'
                ))
 
            );
         $uploadField1->setAllowedMaxFileNumber(1);
         $uploadField2->setAllowedMaxFileNumber(1);
-        $uploadField2->setAllowedMaxFileNumber(1);
+        $uploadField3->setAllowedMaxFileNumber(1);
+        $uploadField4->setAllowedMaxFileNumber(1);
+        $uploadField5->setAllowedMaxFileNumber(1);
         $uploadField1->folderName = "attachments";
         $uploadField2->folderName = "attachments";
         $uploadField3->folderName = "attachments";
+        $uploadField4->folderName = "attachments";
+        $uploadField5->folderName = "attachments";
         $uploadField1->setDisplayFolderName('attachments');
         $uploadField2->setDisplayFolderName('attachments');
         $uploadField3->setDisplayFolderName('attachments');
+        $uploadField4->setDisplayFolderName('attachments');
+        $uploadField5->setDisplayFolderName('attachments');
 
         $fields->removeFieldFromTab('Root', 'MailingLists');
         $fields->removeFieldFromTab('Root', 'Member');

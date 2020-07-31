@@ -136,6 +136,32 @@ class SendRecipientQueue extends DataObject {
             }
 
 
+            $attachment = $newsletter->Attachment4();
+
+            if ( $attachment ) {
+
+                  $file =  $attachment->getFullPath();
+                  // We check the filesize in bytes in order to see if the file realy exists
+                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                      $email->attachFile( $file, $file );
+                  }
+
+            }
+
+
+             $attachment = $newsletter->Attachment5();
+
+            if ( $attachment ) {
+
+                  $file =  $attachment->getFullPath();
+                  // We check the filesize in bytes in order to see if the file realy exists
+                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                      $email->attachFile( $file, $file );
+                  }
+
+            }
+
+
             // This is normaly the PDF with the EAN Code
             if ( $recipient->owner->BookingConfirmationPDF() && $newsletter->BookingConfirmation == true ) {
 
