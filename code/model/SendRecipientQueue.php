@@ -83,6 +83,33 @@ class SendRecipientQueue extends DataObject {
 
             if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
 
+            // This is normaly the PDF with the EAN Code
+            if ( $recipient->owner->InvitationPDF() && $newsletter->Invitation == true ) {
+
+                $attachment = $recipient->owner->InvitationPDF();
+
+                if ( $attachment ) {
+                    $file =  $attachment->getFullPath();
+                    // We check the filesize in bytes in order to see if the file realy exists
+                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
+                        $email->attachFile( $file, $file );
+                    }
+                }
+
+                // Attach Ticket in this Case: FIA Ticket
+                // This is a special case for the AUDIFORMEL E EVENT
+
+                // $Tickets = $recipient->owner->TicketPDFs();
+                //
+                // foreach ( $Tickets as $Ticket) {
+                //     $file =  $Ticket->getFullPath();
+                //
+                //     if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
+                //         $email->attachFile( $file, $file );
+                //     }
+                // }
+
+            }
 
             $attachment = $newsletter->Attachment();
 
@@ -191,33 +218,7 @@ class SendRecipientQueue extends DataObject {
             }
 
 
-            // This is normaly the PDF with the EAN Code
-            if ( $recipient->owner->InvitationPDF() && $newsletter->Invitation == true ) {
-
-                $attachment = $recipient->owner->InvitationPDF();
-
-                if ( $attachment ) {
-                    $file =  $attachment->getFullPath();
-                    // We check the filesize in bytes in order to see if the file realy exists
-                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                        $email->attachFile( $file, $file );
-                    }
-                }
-
-                // Attach Ticket in this Case: FIA Ticket
-                // This is a special case for the AUDIFORMEL E EVENT
-
-                // $Tickets = $recipient->owner->TicketPDFs();
-                //
-                // foreach ( $Tickets as $Ticket) {
-                //     $file =  $Ticket->getFullPath();
-                //
-                //     if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
-                //         $email->attachFile( $file, $file );
-                //     }
-                // }
-
-            }
+          
 
 
 
