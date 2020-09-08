@@ -265,10 +265,10 @@ class Newsletter extends DataObject implements CMSPreviewable{
         $fields->removeByName('NewAddedOnly');
 
         $fields->insertAfter('MailingLists', FieldGroup::create('Cb',
-            $cb = new CheckboxField('NewAddedOnly', 'NUR an Teilnehmer, welche diesen Newsletter noch nicht erhalten haben.')
+            $cb = new CheckboxField('NewAddedOnly', 'Nur an User, welche diesen Newsletter noch nicht erhalten haben.')
         ));
 
-        $cb->setDescription('Diese Checkbox setzen wir nur, wenn es sich bei dem Newsletter um ein Duplikat handelt. Man also z.B Die Einladung erneut verschicken möchte – und seit dem letzten Versand neue Teilnehmer hinzugekommen sind!');
+        $cb->setDescription('Diese Checkbox setzen wir nur, wenn es sich bei dem Newsletter um ein Duplikat handelt. Man also z.B Die Einladung erneut verschicken möchte – und seit dem letzten Versand neue User hinzugekommen sind!');
 
 
         if($this->Status === 'Sending' || $this->Status === 'Sent') {
