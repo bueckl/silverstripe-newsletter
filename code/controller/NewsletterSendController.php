@@ -306,6 +306,7 @@ class NewsletterSendController extends BuildTask
 
         if (!empty($newsletterID)) {
             $newsletter = Newsletter::get()->byID($newsletterID);
+
             if (!empty($newsletter)) {
                 //try to clean up any stuck items
                 $this->cleanUpStalledQueue($newsletterID);
@@ -324,6 +325,7 @@ class NewsletterSendController extends BuildTask
                             ->sort('Created ASC')
                             ->limit(self::$items_to_batch_process);
 
+
                     //set them all to "in process" at once
                     foreach ($queueItems as $item) {
                         $item->Status = 'InProgress';
@@ -333,14 +335,13 @@ class NewsletterSendController extends BuildTask
                     // Commit transaction
                     if ($conn->supportsTransactions()) {
                         $conn->transactionEnd();
+
                     }
                 } catch (Exception $e) {
-
                     // Rollback
                     if ($conn->supportsTransactions()) {
                         $conn->transactionRollback();
                     }
-
                     //retry the processing
                     $this->processQueueOnShutdown($newsletterID);
                 }
@@ -352,6 +353,7 @@ class NewsletterSendController extends BuildTask
                 }
 
                 //do the actual mail out
+
                 if (!empty($queueItems2) && $queueItems2->count() > 0) {
                     //fetch all the recipients at once in one query
                     $recipients = Member::get()->filter(array('ID' => $queueItems2->column('MemberID')));
@@ -366,6 +368,14 @@ class NewsletterSendController extends BuildTask
                             try {
                                 $item->send($newsletter, $recipientsMap[$item->MemberID]);
                             } catch (Exception $e) {
+
+                                $this->testEmailWriter = new SS_LogEmailWriter('jochenguelden@me.com');
+                                
+                                
+                                SS_Log::log('Email test', SS_LOG::ERR, array(
+                                    'my-array' => $e->getMessage()
+                                ));
+
                                 $item->Status = 'Failed';
                                 $item->write();
                             }
