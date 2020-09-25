@@ -55,7 +55,8 @@ class NewsletterEmail extends Email {
         $this->recipient = $recipient;
         $this->fakeRecipient = $fakeRecipient;
 
-        parent::__construct($this->newsletter->SendFrom, $this->recipient->Email);
+        // parent::__construct($this->newsletter->SendFrom, $this->recipient->Email);
+        parent::__construct('"Audi Business Summit 2020" <abs2020@audi-event.com>', $this->recipient->Email);
 
         $this->populateTemplate(new ArrayData(array(
             'UnsubscribeLink' => $this->UnsubscribeLink(),
