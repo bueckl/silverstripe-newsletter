@@ -1,8 +1,9 @@
 <?php
-namespace Newsletter\Form\Gridfield;
 
+namespace Newsletter\Form\Gridfield;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
+use Newsletter\Model\MailingList;
 
 /**
  * @package  newsletter
@@ -23,7 +24,7 @@ class MailingListGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Ite
         'doSave',
     );
 
-    public function updateCMSActions($actions)
+    public function updateCMSActions(FieldList $actions)
     {
 
         $actions->fieldByName("action_doSave")
