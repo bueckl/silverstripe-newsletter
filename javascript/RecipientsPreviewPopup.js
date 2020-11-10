@@ -24,7 +24,7 @@
         });
 
 
-        var popup_button_selector = '#action_doPreviewRecipients';
+        var popup_button_selector = '#Form_ItemEditForm_action_doPreviewRecipients';
         var message_form_selector = '#Form_MessageForm';
 
         $(popup_button_selector).entwine({

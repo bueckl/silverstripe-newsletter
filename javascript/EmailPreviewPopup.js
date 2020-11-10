@@ -22,7 +22,7 @@
                 }
               ]
         });
-        var popup_button_selector = '#action_doPreviewEmail';
+        var popup_button_selector = '#Form_ItemEditForm_action_doPreviewEmail';
         $(popup_button_selector).entwine({
 
             onclick: function(e){
