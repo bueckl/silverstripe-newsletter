@@ -68,7 +68,13 @@ class NewsletterEmail extends Email {
         $this->recipient = $recipient;
         $this->fakeRecipient = $fakeRecipient;
 
-        parent::__construct($this->newsletter->SendFrom, $this->recipient->Email);
+        if($this->recipient instanceof DataObject) {
+            $recipientEmail = $this->recipient->Email;
+        } else {
+            $recipientEmail = $this->recipient['Email'];
+        }
+
+        parent::__construct($this->newsletter->SendFrom, $recipientEmail);
 
         $this->populateTemplate(new ArrayData(array(
             'UnsubscribeLink' => $this->UnsubscribeLink(),
