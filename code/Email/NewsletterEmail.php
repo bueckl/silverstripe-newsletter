@@ -76,10 +76,10 @@ class NewsletterEmail extends Email {
 
         parent::__construct($this->newsletter->SendFrom, $recipientEmail);
 
-        $this->populateTemplate(new ArrayData(array(
+        $this->setData(new ArrayData(array(
             'UnsubscribeLink' => $this->UnsubscribeLink(),
             'SiteConfig' => DataObject::get_one(SiteConfig::class),
-            'AbsoluteBaseURL' => Director::absoluteBaseURLWithAuth()
+            'AbsoluteBaseURL' => Director::absoluteBaseURL()
         )));
 
         $this->body = $newsletter->getContentBody();
