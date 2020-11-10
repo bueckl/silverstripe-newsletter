@@ -27,8 +27,9 @@ class MailingListAdmin extends ModelAdmin {
         $form = parent::getEditForm($id, $fields);
 
         $gridFieldName = $this->sanitiseClassName($this->modelClass);
-        $gridField = $form->Fields()->fieldByName($gridFieldName);
 
+        $gridField = $form->Fields()->fieldByName($gridFieldName);
+        
         $config = $gridField->getConfig();
         $config->removeComponentsByType(GridFieldDetailForm::class)->addComponents(new MailingListGridFieldDetailForm());
         $config->addComponent(new GridFieldCopyButton(), GridFieldEditButton::class);

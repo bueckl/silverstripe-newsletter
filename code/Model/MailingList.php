@@ -1,4 +1,5 @@
 <?php
+
 namespace Newsletter\Model;
 
 use GridFieldAjaxRefresh\GridFieldAjaxRefresh;
@@ -124,12 +125,12 @@ class MailingList extends DataObject {
 
 
         $fields->addFieldsToTab('Root.Main', [
-            HeaderField::create('FiltersHeader', 'Kriterien / Filter'),
+            HeaderField::create('FiltersHeader', 'Criteria / Filter'),
             LiteralField::create(
                 'FiltersDesc',
                 '
                 <div class="message notice">
-                    Die Mailing-Liste erstellt eine Empfängerliste nach den hier gewählten Kriterien.<br>
+                    We create a Mailing/Recipient List based on the following choices.<br>
                 </div>
                 <br>
                 <br>
@@ -138,11 +139,16 @@ class MailingList extends DataObject {
         ]);
 
         $fields->addFieldsToTab('Root.Main', $FilterableFields);
+        
         $FiltersApplied = unserialize($this->FiltersApplied);
+        
         if ($FiltersApplied) foreach ( $FiltersApplied as $key => $filter ) {
+        
             $field = $FilterableFields->dataFieldByName($key);
             if ($field) $field->setValue($filter);
         }
+
+        
 
         // Filtered recipients
         $filteredRecipients = $this->FilteredRecipients();
@@ -161,7 +167,7 @@ class MailingList extends DataObject {
         // This is potentially dangerous. Reinvestigate …
 
         $fields->addFieldsToTab(
-            'Root.Empfänger mit diesen Kriterien (' . $filteredRecipients->count() . ')', [
+            'Root.Recipients matching the seletected criteria (' . $filteredRecipients->count() . ')', [
             // LiteralField::create('FilteredRecipientsDesc','
 //                 <em>
 //                     These recipients are filtered based on the filtering options. <br>
@@ -176,7 +182,7 @@ class MailingList extends DataObject {
         // we should create a filter … Like e.g a texfield "FreeMailingListFilter". We could than put a "secret" word into
         // that field and add a "FreeMailingListFilter" to MailingList
 
-        $fields->dataFieldByName('Title')->setTitle('Name der Mailing-Liste');
+        $fields->dataFieldByName('Title')->setTitle('Mailing list name');
         $this->extend("updateCMSFields", $fields);
 
         if(!$this->ID)
@@ -241,6 +247,7 @@ class MailingList extends DataObject {
 
         $filterClasses = Config::inst()->get(MailingList::class, 'filter_classes');
 
+
         asort($filterClasses);
 
         foreach ($filterClasses as $fc) {
@@ -248,7 +255,7 @@ class MailingList extends DataObject {
             $filters = singleton($fc)->mailinglistFilters();
 
 
-            if ( $filters && count($filters > 0) ) {
+            if ( $filters && count($filters)  > 0 ) {
 
                 $FilterableFields->add(HeaderField::create('Filters' . $fc .'Header', $fc, 3));
 
@@ -290,12 +297,16 @@ class MailingList extends DataObject {
 
         $members = $members->exclude('Blacklisted', 1);
 
+
+
         foreach (self::get_filterable_fields_or_callbacks(true) as $fieldName => $callBack) {
             $restraint = isset($filtersApplied[$fieldName]) ? $filtersApplied[$fieldName] : false;
             if ($restraint) {
                 $members = $callBack($members, $restraint);
             }
         }
+
+
         return $members;
     }
 
