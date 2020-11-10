@@ -2,6 +2,7 @@
 namespace Newsletter\Admin;
 
 use Newsletter\Form\Gridfield\NewsletterGridFieldDetailForm;
+use Newsletter\Form\Gridfield\NewsletterGridFieldDetailForm_ItemRequest;
 use Newsletter\Model\Newsletter;
 use Newsletter\Model\Newsletter_Sent;
 use SilverStripe\Admin\ModelAdmin;
@@ -70,6 +71,12 @@ class NewsletterAdmin extends ModelAdmin {
                 ->setFieldCasting(array(
                     "Content" => "HTMLText->LimitSentences",
             ));
+
+            $gridFieldName = $this->sanitiseClassName($this->modelClass);
+            $gridField = $form->Fields()->fieldByName($gridFieldName);
+            $gridFieldForm = $gridField->getConfig()->getComponentByType(GridFieldDetailForm::class);
+            $gridFieldForm->setItemRequestClass(NewsletterGridFieldDetailForm_ItemRequest::class);
+
         }
         if ($this->modelClass == Member::class) {
             $config = $form->Fields()->first()->getConfig();

@@ -52,8 +52,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
     {
         if (empty($this->record->Status) || $this->record->Status == "Draft") {
             // save draft button
-            $actions->fieldByName("action_doSave")
-                ->setTitle(_t('Newsletter.SAVE', "Save"))
+//            $actions->fieldByName("action_doSave")->setTitle(_t('Newsletter.SAVE', "Save"))
                 ;
                 //->removeExtraClass('ss-ui-action-constructive')
                 //->setAttribute('data-icon', 'addpage');
@@ -159,9 +158,9 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $navigator->customise(
                 new ArrayData(array('EmailPreviewLink' => $newsletter->Link('sendtestmail'.$emailLink)))
             );
-            Requirements::javascript(NEWSLETTER_DIR . '/javascript/NewsletterAdminEmailPreview.js');
+            Requirements::javascript( 'silverstripe/newsletter:javascript/NewsletterAdminEmailPreview.js');
 
-            return $navigator->renderWith('NewsletterAdmin_SilverStripeNavigator');
+//            return $navigator->renderWith('NewsletterAdmin_SilverStripeNavigator');
         } else {
             return false;
         }
