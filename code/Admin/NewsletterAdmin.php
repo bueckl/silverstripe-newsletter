@@ -5,7 +5,9 @@ use Newsletter\Form\Gridfield\NewsletterGridFieldDetailForm;
 use Newsletter\Form\Gridfield\NewsletterGridFieldDetailForm_ItemRequest;
 use Newsletter\Model\Newsletter;
 use Newsletter\Model\Newsletter_Sent;
+use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
@@ -100,43 +102,51 @@ class NewsletterAdmin extends ModelAdmin {
     public static function template_paths() {
 
         if(!isset(self::$template_paths)) {
-            if(class_exists(SiteConfig::class) &&
-                ($config = SiteConfig::current_site_config()) && $config->Theme) {
-                $theme = $config->Theme;
+
+            $leftAndMainConfig = Config::inst()->get(LeftAndMain::class);
+            $activeThemes = $leftAndMainConfig['admin_themes'];
+            $activeTheme = '';
+
+            foreach ($activeThemes as $theme) {
+                if($theme == 'custom-admin') {
+                    $activeTheme = $theme;
+                }
             }
-//            elseif(SSViewer::current_custom_theme()) {
-//                $theme = SSViewer::current_custom_theme();
-//            } else if(SSViewer::current_theme()){
-//                $theme = SSViewer::current_theme();
-//            }
-            else {
+
+            if($activeTheme) {
+                $theme = $activeTheme;
+            } else {
                 $theme = false;
             }
 
             if($theme) {
-                if(file_exists("../".THEMES_DIR."/".$theme."/templates/email")){
-                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/email";
+                if(file_exists("../".THEMES_DIR."/".$theme."/templates")){
+                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates";
                 }
                 if(file_exists("../".THEMES_DIR."/".$theme."/templates/Email")){
                     self::$template_paths[] = THEMES_DIR."/".$theme."/templates/Email";
                 }
             }
 
-            $project = project();
+//            $project = project();
+//
+//            if(file_exists("../". $project . '/templates/email')){
+//            	self::$template_paths[] = $project . '/templates/email';
+//            }
+//
+//            if(file_exists("../". $project . '/templates/Email')){
+//                self::$template_paths[] = $project . '/templates/Email';
+//            }
 
-            if(file_exists("../". $project . '/templates/email')){
-            	self::$template_paths[] = $project . '/templates/email';
-            }
-
-            if(file_exists("../". $project . '/templates/Email')){
-                self::$template_paths[] = $project . '/templates/Email';
-            }
-        }
-        else {
+        } else {
             if(is_string(self::$template_paths)) {
-            self::$template_paths = array(self::$template_paths);
+                self::$template_paths = array(self::$template_paths);
             }
         }
+
+
+
+
         return self::$template_paths;
     }
 
