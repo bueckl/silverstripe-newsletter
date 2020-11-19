@@ -363,8 +363,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
                 SendRecipientQueue::get()->filterAny(array(
                     'NewsletterID' => $this->ID,
                     'ParentID' => $this->ID
-                )),
-                $gridFieldConfig
+                ))
             );
 
             // $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );

@@ -11,3 +11,7 @@ SilverStripe\Control\Director:
   rules:
     'newsletterlinks/$Hash': 'Newsletter\Controller\TrackLinkController'
     'unsubscribe//$Action/$ValidateHash/$IDs': 'Newsletter\Controller\UnsubscribeController'
+
+SilverStripe\Admin\LeftandMain:
+  admin_themes:
+    - 'newsletter-admin'

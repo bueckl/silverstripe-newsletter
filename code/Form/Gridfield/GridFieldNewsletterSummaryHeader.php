@@ -1,6 +1,7 @@
 <?php
 namespace Newsletter\Form\Gridfield;
 
+use Newsletter\Model\SendRecipientQueue;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 
 /**
@@ -13,7 +14,7 @@ use SilverStripe\Forms\GridField\GridField_HTMLProvider;
  */
 class GridFieldNewsletterSummaryHeader implements GridField_HTMLProvider {
     public function getHTMLFragments( $gridField) {
-        if ($gridField && $gridField->getModelClass() && $gridField->getModelClass() == "SendRecipientQueue") {
+        if ($gridField && $gridField->getModelClass() && $gridField->getModelClass() == SendRecipientQueue::class) {
             $list = $gridField->getList();
 
             $scheduled = $list->filter(array('Status'=>'Scheduled'))->count();
