@@ -218,7 +218,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             $templateName = 'SimpleNewsletterTemplate';
         }
 
-        $newsletterEmail = new NewsletterEmail($newsletter, $recipient, false);
+        $newsletterEmail = new NewsletterEmail($newsletter, $recipient, false, true);
         // Block stylesheets and JS that are not required (email templates should have inline CSS/JS)
         Requirements::clear();
         return HTTP::absoluteURLs($newsletterEmail->getData()->renderWith($templateName));
@@ -240,7 +240,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         } else {
             $recipient->Email = Security::getCurrentUser()->Email;
         }
-        $email = new NewsletterEmail($newsletter, $recipient, true);
+        $email = new NewsletterEmail($newsletter, $recipient, true, true);
         $email->send();
         return Controller::curr()->redirectBack();
     }

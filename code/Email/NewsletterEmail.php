@@ -24,6 +24,7 @@ class NewsletterEmail extends Email {
     protected $newsletter;
     protected $recipient;
     protected $fakeRecipient;
+    protected $template_data;
     // protected $company;
 
     /**
@@ -62,11 +63,12 @@ class NewsletterEmail extends Email {
      * @param Mailinglists $recipient
      * @param Boolean $fakeRecipient
      */
-    function __construct($newsletter, $recipient, $fakeRecipient=false) {
+    function __construct($newsletter, $recipient, $fakeRecipient=false, $templateData = false) {
         $this->newsletter = $newsletter;
         $this->mailinglists = $newsletter->MailingLists();
         $this->recipient = $recipient;
         $this->fakeRecipient = $fakeRecipient;
+        $this->template_data = $templateData;
 
         if($this->recipient instanceof DataObject) {
             $recipientEmail = $this->recipient->Email;
@@ -210,7 +212,7 @@ class NewsletterEmail extends Email {
         );
 
         if($this->template_data) {
-            return $this->template_data->customise($default);
+            return $this->customise($default);
         } else {
             return $this;
         }

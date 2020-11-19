@@ -86,7 +86,9 @@ class SendRecipientQueue extends DataObject {
 
             $email = new NewsletterEmail(
                 $newsletter,
-                $recipient
+                $recipient,
+                false,
+                true
             );
 
             if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
