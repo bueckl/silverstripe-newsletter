@@ -45,7 +45,8 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         'sendtestmail',
         'processqueue',
         'doPreviewRecipientsForAjax',
-        'doDeleteQueue'
+        'doDeleteQueue',
+        'doSend'
     );
 
     public function updateCMSActions($actions)

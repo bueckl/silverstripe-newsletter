@@ -321,7 +321,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
                 new GridFieldNewsletterSummaryHeader(),    //only works on SendRecipientQueue items, not TrackedLinks
                 new GridFieldSortableHeader(),
                 new GridFieldDataColumns(),
-                new GridFieldFilterHeader(),
+//                new GridFieldFilterHeader(),
                 new GridFieldPageCount(),
                 new GridFieldPaginator(30)
             );
