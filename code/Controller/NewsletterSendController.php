@@ -54,6 +54,8 @@ class NewsletterSendController extends BuildTask
 
     protected static $inst = null;
 
+    protected $duplicateID;
+
     protected $title = 'Newsletter Send Controller';
 
     protected $description = 'Triggers processing of the send queue the specific newsletter ID.

@@ -29,7 +29,7 @@
             closed = true;
         } );
 
-        var popup_button_selector = '#action_doProcessQueue';
+        var popup_button_selector = '#Form_ItemEditForm_action_doProcessQueue';
         $(popup_button_selector).entwine({
 
             onclick: function(e){
