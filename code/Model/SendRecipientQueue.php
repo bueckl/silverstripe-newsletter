@@ -2,6 +2,7 @@
 namespace Newsletter\Model;
 
 use Newsletter\Email\NewsletterEmail;
+use SilverStripe\Assets\File;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 
@@ -77,170 +78,114 @@ class SendRecipientQueue extends DataObject {
 
     /** Send the email out to the Recipient */
     public function send($newsletter = null, $recipient = null) {
-
-        if (empty($newsletter)) $newsletter = $this->Newsletter();
-        if (empty($recipient)) $recipient = $this->Member();
+        if (empty($newsletter)) {
+            $newsletter = $this->Newsletter();
+        }
+        if (empty($recipient)) {
+            $recipient = $this->Member();
+        }
 
         //check recipient not blacklisted and verified
         // if ($recipient && empty($recipient->Blacklisted) && !empty($recipient->Verified)) {
 
-            $email = new NewsletterEmail(
-                $newsletter,
-                $recipient,
-                false,
-                true
-            );
-
-            if (!empty($newsletter->ReplyTo)) $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
+        $email = new NewsletterEmail(
+            $newsletter,
+            $recipient,
+            false,
+            true
+        );
 
 
-            $attachment = $newsletter->Attachment1();
+//            if (!empty($newsletter->ReplyTo)) {
+//                $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
+//            }
 
-            if ( $attachment ) {
-
-                  $file =  $attachment->getFullPath();
-                  // We check the filesize in bytes in order to see if the file realy exists
-                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                      $email->attachFile( $file, $file );
-                  }
-
+        $attachment = $newsletter->Attachment1();
+        if ( $attachment->exists() ) {
+            $file =  $attachment->File->AbsoluteLink();
+            // We check the filesize in bytes in order to see if the file realy exists
+            if ($attachment->getAbsoluteSize() > 5000) {
+                $email->addAttachment( $file, $file );
             }
 
+        }
 
-            $attachment = $newsletter->Attachment2();
-
-            if ( $attachment ) {
-
-                  $file =  $attachment->getFullPath();
-                  // We check the filesize in bytes in order to see if the file realy exists
-                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                      $email->attachFile( $file, $file );
-                  }
-
+        $attachment = $newsletter->Attachment2();
+        if ( $attachment->exists() ) {
+            $file =  $attachment->File->AbsoluteLink();
+            // We check the filesize in bytes in order to see if the file realy exists
+            if ($attachment->getAbsoluteSize() > 5000) {
+                $email->addAttachment( $file, $file );
             }
 
+        }
 
-            $attachment = $newsletter->Attachment3();
 
-            if ( $attachment ) {
-
-                  $file =  $attachment->getFullPath();
-                  // We check the filesize in bytes in order to see if the file realy exists
-                  if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                      $email->attachFile( $file, $file );
-                  }
-
+        $attachment = $newsletter->Attachment3();
+        if ( $attachment->exists() ) {
+            $file =  $attachment->File->AbsoluteLink();
+            // We check the filesize in bytes in order to see if the file realy exists
+            if ($attachment->getAbsoluteSize() > 5000) {
+                $email->addAttachment( $file, $file );
             }
 
-
-             // This is normaly the PDF with the EAN Code
-            // if ( $recipient->owner->BookingConfirmationPDF() && $newsletter->BookingConfirmation == true ) {
-
-            //     $attachment = $recipient->owner->BookingConfirmationPDF();
-
-            //     if ( $attachment ) {
-            //         $file =  $attachment->getFullPath();
-            //         // We check the filesize in bytes in order to see if the file realy exists
-            //         if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-            //             $email->attachFile( $file, $file );
-            //         }
-            //     }
-
-            //     // Attach Ticket in this Case: FIA Ticket
-            //     // This is a special case for the AUDIFORMEL E EVENT
-
-            //     // $Tickets = $recipient->owner->TicketPDFs();
-            //     //
-            //     // foreach ( $Tickets as $Ticket) {
-            //     //     $file =  $Ticket->getFullPath();
-            //     //
-            //     //     if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
-            //     //         $email->attachFile( $file, $file );
-            //     //     }
-            //     // }
-
-            // }
+        }
 
 
-            if ( $recipient->owner->NdaPDF() && $newsletter->NdaPDF == true ) {
+        if ( $recipient->owner->NdaPDF() && $newsletter->NdaPDF == true ) {
+            $attachment = $recipient->owner->NdaPDF();
+            if ( $attachment->exists() ) {
+                $file =  $attachment->File->AbsoluteLink();
+                // We check the filesize in bytes in order to see if the file realy exists
+                if ($attachment->getAbsoluteSize() > 5000) {
+                    $email->addAttachment( $file, $file );
+                }
+            }
 
-                $attachment = $recipient->owner->NdaPDF();
-
-                if ( $attachment ) {
-                    $file =  $attachment->getFullPath();
+            if ( $recipient->HotelID > 0 ) {
+                $attachment = $recipient->owner->LuggageTagPDF();
+                if ( $attachment->exists() ) {
+                    $file =  $attachment->File->AbsoluteLink();
                     // We check the filesize in bytes in order to see if the file realy exists
-                    if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                        $email->attachFile( $file, $file );
+                    if ($attachment->getAbsoluteSize() > 5000) {
+                        $email->addAttachment( $file, $file );
                     }
                 }
-
-                if ( $recipient->HotelID > 0 ) {
-
-                    $attachment = $recipient->owner->LuggageTagPDF();
-
-                    if ( $attachment ) {
-                        $file = $attachment->getFullPath();
-                        // We check the filesize in bytes in order to see if the file realy exists
-                        if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                            $email->attachFile( $file, $file );
-                        }
-                    }
-
-                }
-
-
-                if ( $recipient->TravelData()->Pendlerparkplatz == "YES" ) {
-
-                    // $attachment = File::get()->filter('ID', 155866)->first();
-                    $attachment = File::get()->byID(155866);
-
-                    if ( $attachment ) {
-                        $file = $attachment->getFullPath();
-                        // We check the filesize in bytes in order to see if the file realy exists
-                        if (file_exists($file) && ($attachment->getAbsoluteSize() > 5000)) {
-                            $email->attachFile( $file, $file );
-                        }
-                    }
-
-                }
-
-
-
-                // Attach Ticket in this Case: FIA Ticket
-                // This is a special case for the AUDIFORMEL E EVENT
-
-                // $Tickets = $recipient->owner->TicketPDFs();
-                //
-                // foreach ( $Tickets as $Ticket) {
-                //     $file =  $Ticket->getFullPath();
-                //
-                //     if (file_exists($file) && ($Ticket->getAbsoluteSize() > 5000)) {
-                //         $email->attachFile( $file, $file );
-                //     }
-                // }
 
             }
 
 
-            //END ATTACHMENTS
+            if ( $recipient->TravelData()->Pendlerparkplatz == "YES" ) {
+                // $attachment = File::get()->filter('ID', 155866)->first();
+                $attachment = File::get()->byID(155866);
+                if ( $attachment->exists() ) {
+                    $file =  $attachment->File->AbsoluteLink();
+                    // We check the filesize in bytes in order to see if the file realy exists
+                    if ($attachment->getAbsoluteSize() > 5000) {
+                        $email->addAttachment( $file, $file );
+                    }
+                }
 
-            $success = $email->send();
-
-            if ($success) {
-                $this->Status = 'Sent';
-                $recipient->ReceivedCount = $recipient->ReceivedCount + 1;
-            } else {
-                $this->Status = 'Failed';
-                $recipient->BouncedCount = $recipient->BouncedCount + 1;
             }
 
-            $recipient->write();
 
-        // } else {
-        //
-        //     $this->Status = 'BlackListed';
-        //
-        // }
+        }
+
+
+        //END ATTACHMENTS
+
+
+        $success = $email->send();
+
+        if ($success) {
+            $this->Status = 'Sent';
+            $recipient->ReceivedCount = $recipient->ReceivedCount + 1;
+        } else {
+            $this->Status = 'Failed';
+            $recipient->BouncedCount = $recipient->BouncedCount + 1;
+        }
+
+        $recipient->write();
 
         $this->write();
     }
