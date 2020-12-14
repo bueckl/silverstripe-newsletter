@@ -100,52 +100,19 @@ class NewsletterAdmin extends ModelAdmin {
     * @return array
     */
     public static function template_paths() {
-
         if(!isset(self::$template_paths)) {
+            $newsletterAdminConfigs = Config::inst()->get(NewsletterAdmin::class);
+            $templatePaths = $newsletterAdminConfigs['template_paths'];
 
-            $leftAndMainConfig = Config::inst()->get(LeftAndMain::class);
-            $activeThemes = $leftAndMainConfig['admin_themes'];
-            $activeTheme = '';
-
-            foreach ($activeThemes as $theme) {
-                if($theme == 'custom-admin') {
-                    $activeTheme = $theme;
-                }
+            if($templatePaths && !empty($templatePaths)) {
+                self::$template_paths = $templatePaths;
             }
-
-            if($activeTheme) {
-                $theme = $activeTheme;
-            } else {
-                $theme = false;
-            }
-
-            if($theme) {
-                if(file_exists("../".THEMES_DIR."/".$theme."/templates")){
-                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates";
-                }
-                if(file_exists("../".THEMES_DIR."/".$theme."/templates/Email")){
-                    self::$template_paths[] = THEMES_DIR."/".$theme."/templates/Email";
-                }
-            }
-
-//            $project = project();
-//
-//            if(file_exists("../". $project . '/templates/email')){
-//            	self::$template_paths[] = $project . '/templates/email';
-//            }
-//
-//            if(file_exists("../". $project . '/templates/Email')){
-//                self::$template_paths[] = $project . '/templates/Email';
-//            }
 
         } else {
             if(is_string(self::$template_paths)) {
                 self::$template_paths = array(self::$template_paths);
             }
         }
-
-
-
 
         return self::$template_paths;
     }
