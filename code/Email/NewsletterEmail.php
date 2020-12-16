@@ -179,7 +179,7 @@ class NewsletterEmail extends Email {
 
             if($static_base_url = self::get_static_base_url()) {
                 $base_url_changed = true;
-                $base_url = Config::inst()->get('Director', 'alternate_base_url');
+                $base_url = Config::inst()->get(Director::class, 'alternate_base_url');
                 Config::modify()->set(Director::class, 'alternate_base_url', $static_base_url);
             } else {
                 $base_url_changed = false;
