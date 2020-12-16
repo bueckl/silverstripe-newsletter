@@ -118,7 +118,10 @@ class NewsletterAdmin extends ModelAdmin {
     }
 
     public function getList() {
-        $list = parent::getList();
+        
+        // $list = parent::getList();
+        $list = Newsletter::get();
+        
         if ($this->modelClass == Newsletter::class || $this->modelClass == Newsletter_Sent::class ){
             if ($this->modelClass == Newsletter::class) {
                 $statusFilter = array("Draft", "Sending");
