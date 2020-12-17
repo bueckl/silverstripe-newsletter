@@ -67,9 +67,14 @@ class NewsletterAdmin extends ModelAdmin {
             $config = $form->Fields()->first()->getConfig();
             $config->removeComponentsByType(GridFieldDetailForm::class)
                 ->addComponents(new NewsletterGridFieldDetailForm());
-            if ($this->modelClass == Newsletter_Sent::class) {
+
+            $request = $this->getRequest();
+            if (!empty($request->getVar('mail'))) {
+                //add new button and header filter removed
                 $config->removeComponentsByType(GridFieldAddNewButton::class);
+                $config->removeComponentsByType(GridFieldFilterHeader::class);
             }
+
             $config->getComponentByType(GridFieldDataColumns::class)
                 ->setFieldCasting(array(
                     "Content" => "HTMLText->LimitSentences",
