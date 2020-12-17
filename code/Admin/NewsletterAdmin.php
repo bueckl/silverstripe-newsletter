@@ -19,6 +19,8 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\SSViewer;
+use SilverStripe\Forms\GridField\GridFieldFilterHeader;
+
 
 /**
  * @package  newsletter
