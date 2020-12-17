@@ -127,20 +127,29 @@ class NewsletterAdmin extends ModelAdmin {
 
     public function getList() {
         $list = parent::getList();
-        if ($this->modelClass == Newsletter::class){
-            if ($this->modelClass == Newsletter::class) {
-                $statusFilter = array("Draft", "Sending");
-                //using a editform detail request, that should allow Newsletter_Sent objects and regular Newsletters
-                $request = $this->getRequest();
-                if ($var = $request->getVar('mail')) {
-                    $statusFilter = "Sent";
-                }
-            } else {
-                $statusFilter = array("Sent");
-            }
-            $list = $list->addFilter(array("Status" => $statusFilter));
-        }
 
+        $request = $this->getRequest();
+        $paramsSet = $request->postVar('filter');
+        $params = $paramsSet[$this->sanitiseClassName($this->modelClass)];
+        $fields = Config::inst()->get(Newsletter::class, 'searchable_fields');
+
+        if ($this->modelClass == Newsletter::class){
+
+            if ($request->getVar('mail') || $request->postVar('mail')) {
+                $statusFilter = "Sent";
+            } else {
+                $statusFilter = array("Draft", "Sending");
+            }
+            $list = $list->filter(array("Status" => $statusFilter));
+
+            if(is_array($params) && count($params)) {
+                foreach($fields as $field) {
+                    if(isset($params[$field])) {
+                        $list = $list->filter($field.':PartialMatch', $params[$field]);
+                    }
+                }
+            }
+        }
         return $list;
     }
 
