@@ -12,9 +12,11 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\Search\SearchContext;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\View\ArrayData;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\SSViewer;
 
@@ -33,8 +35,7 @@ class NewsletterAdmin extends ModelAdmin {
     public $showImportForm       = false;
 
     private static $managed_models = [
-        Newsletter::class => array('title' => 'Mailing'),
-        Newsletter_Sent::class => array('title' => 'Verschickte Mailings'),
+        Newsletter::class => array('title' => 'Mailing')
         // "MailingList"
         // "Member"
     ];
@@ -72,7 +73,7 @@ class NewsletterAdmin extends ModelAdmin {
             $config->getComponentByType(GridFieldDataColumns::class)
                 ->setFieldCasting(array(
                     "Content" => "HTMLText->LimitSentences",
-            ));
+                ));
 
             $gridFieldName = $this->sanitiseClassName($this->modelClass);
             $gridField = $form->Fields()->fieldByName($gridFieldName);
@@ -86,19 +87,19 @@ class NewsletterAdmin extends ModelAdmin {
                 ->setFieldCasting(array(
                     "Blacklisted" => "Boolean->Nice",
                     "Verified" => "Boolean->Nice",
-            ));
+                ));
         }
         return $form;
     }
 
     /**
-    * looked-up the email template_paths.
-    * if not set, will look up both theme folder and project folder
-    * in both cases, email folder exsits or Email folder exists
-    * return an array containing all folders pointing to the bunch of email templates
-    *
-    * @return array
-    */
+     * looked-up the email template_paths.
+     * if not set, will look up both theme folder and project folder
+     * in both cases, email folder exsits or Email folder exists
+     * return an array containing all folders pointing to the bunch of email templates
+     *
+     * @return array
+     */
     public static function template_paths() {
         if(!isset(self::$template_paths)) {
             $newsletterAdminConfigs = Config::inst()->get(NewsletterAdmin::class);
@@ -119,20 +120,17 @@ class NewsletterAdmin extends ModelAdmin {
 
     public function getList() {
         $list = parent::getList();
-        if ($this->modelClass == Newsletter::class || $this->modelClass == Newsletter_Sent::class ){
+        if ($this->modelClass == Newsletter::class){
             if ($this->modelClass == Newsletter::class) {
                 $statusFilter = array("Draft", "Sending");
-
                 //using a editform detail request, that should allow Newsletter_Sent objects and regular Newsletters
-                if (!empty($_REQUEST['url'])) {
-                    if (strpos($_REQUEST['url'],'/EditForm/field/Newsletter/item/') !== false) {
-                        $statusFilter[] = "Sent";
-                    }
+                $request = $this->getRequest();
+                if ($var = $request->getVar('mail')) {
+                    $statusFilter = "Sent";
                 }
             } else {
                 $statusFilter = array("Sent");
             }
-
             $list = $list->addFilter(array("Status" => $statusFilter));
         }
 
@@ -140,17 +138,50 @@ class NewsletterAdmin extends ModelAdmin {
     }
 
     /**
-    * @return SearchContext
-    */
+     * @return SearchContext
+     */
     public function getSearchContext() {
         $context = Injectable::singleton($this->modelClass)->getDefaultSearchContext();
 
         if($this->modelClass === Newsletter_Sent::class) {
             $context = singleton(Newsletter::class)->getDefaultSearchContext();
-            foreach($context->getFields() as $field) $field->setName(sprintf('q[%s]', $field->getName()));
-            foreach($context->getFilters() as $filter) $filter->setFullName(sprintf('q[%s]', $filter->getFullName()));
+            foreach($context->getFields() as $field) {
+                $field->setName(sprintf('q[%s]', $field->getName()));
+            }
+            foreach($context->getFilters() as $filter) {
+                $filter->setFullName(sprintf('q[%s]', $filter->getFullName()));
+            }
         }
 
         return $context;
     }
+
+    protected function getManagedModelTabs()
+    {
+        $models = $this->getManagedModels();
+        $forms = new ArrayList();
+        $request = $this->getRequest();
+        $var = $request->getVar('mail');
+
+        foreach ($models as $tab => $options) {
+            $forms->push(new ArrayData(array(
+                'Title' => $options['title'],
+                'Tab' => $tab,
+                'ClassName' => $options['dataClass'],
+                'Link' => $this->Link($this->sanitiseClassName($tab)),
+                'LinkOrCurrent' => (empty($var) && $tab == $this->modelTab) ? 'current' : 'link'
+            )));
+        }
+
+        $forms->push(new ArrayData(array(
+            'Title' => "Verschickte Mailings",
+            'Tab' => "Newsletter\Model\Newsletter",
+            'ClassName' => "Newsletter\Model\Newsletter",
+            'Link' => $this->Link($this->sanitiseClassName("Newsletter\Model\Newsletter")).'?mail=sent',
+            'LinkOrCurrent' => ($var == 'sent') ? 'current' : 'link'
+        )));
+
+        return $forms;
+    }
+
 }
