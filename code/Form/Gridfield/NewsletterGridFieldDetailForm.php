@@ -161,7 +161,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             );
             Requirements::javascript( 'silverstripe/newsletter:javascript/NewsletterAdminEmailPreview.js');
 
-//            return $navigator->renderWith('NewsletterAdmin_SilverStripeNavigator');
+            return $navigator->renderWith('NewsletterAdmin_SilverStripeNavigator');
         } else {
             return false;
         }
