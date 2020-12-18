@@ -130,8 +130,8 @@ class Newsletter extends DataObject implements CMSPreviewable {
         foreach(self::$required_fields as $field) {
             if (empty($this->$field)) {
                 $result->addError(_t('Newsletter.FieldRequired',
-                '"{field}" field is required',
-                array('field' => isset(self::$field_labels[$field])?self::$field_labels[$field]:$field)
+                    '"{field}" field is required',
+                    array('field' => isset(self::$field_labels[$field])?self::$field_labels[$field]:$field)
                 ));
             }
         }
@@ -141,7 +141,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
                 if ($this->$relation()->Count() == 0) {
                     $result->addError(_t('Newsletter.RelationRequired',
                         'Select at least one "{relation}"',
-                            array('relation' => $relation)
+                        array('relation' => $relation)
                     ));
                 }
             }
@@ -172,21 +172,21 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
         $fields->addFieldsToTab(
 
-               'Root.Attachments', array(
-               $uploadField1 = new UploadField(
-                   $name = 'Attachment1',
-                   $title = 'Dateianhang 1'
-               ),
-               $uploadField2 = new UploadField(
-                   $name = 'Attachment2',
-                   $title = 'Dateianhang 2'
-               ),
-               $uploadField3 = new UploadField(
-                   $name = 'Attachment3',
-                   $title = 'Dateianhang 3'
-               ))
+            'Root.Attachments', array(
+                $uploadField1 = new UploadField(
+                    $name = 'Attachment1',
+                    $title = 'Dateianhang 1'
+                ),
+                $uploadField2 = new UploadField(
+                    $name = 'Attachment2',
+                    $title = 'Dateianhang 2'
+                ),
+                $uploadField3 = new UploadField(
+                    $name = 'Attachment3',
+                    $title = 'Dateianhang 3'
+                ))
 
-           );
+        );
         $uploadField1->setAllowedMaxFileNumber(1);
         $uploadField2->setAllowedMaxFileNumber(1);
         $uploadField2->setAllowedMaxFileNumber(1);
@@ -245,7 +245,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
             ->setDescription(_t(
                 'Newsletter.ReplyToDesc',
                 'Any undeliverable emails will be collected in this mailbox'
-        ));
+            ));
 
 
         if($this->Status != 'Sent') {
@@ -268,7 +268,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
                 "RenderTemplate",
                 $Drop =new DropdownField("RenderTemplate", _t('NewsletterAdmin.RENDERTEMPLATE',
                     'Template the newsletter render to'),
-                $templateSource)
+                    $templateSource)
             );
 
             $Drop->setDisabledItems(array('VW_Simple_Template'));
@@ -341,75 +341,75 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
 
 
-        if ( $this->ParentID > 0 ) {
+            if ( $this->ParentID > 0 ) {
 
-            // We show the SendRecipientQueue based on the Parent ID
-            $sendRecipientGrid = GridField::create(
-                'SendRecipientQueue',
-                // _t('NewsletterAdmin.SentTo', 'Sent to'),
-                'Empfänger',
-                $this->SendRecipientQueue(),
-                $gridFieldConfig
-            );
+                // We show the SendRecipientQueue based on the Parent ID
+                $sendRecipientGrid = GridField::create(
+                    'SendRecipientQueue',
+                    // _t('NewsletterAdmin.SentTo', 'Sent to'),
+                    'Empfänger',
+                    $this->SendRecipientQueue(),
+                    $gridFieldConfig
+                );
 
-        } else {
+            } else {
 
-            // On the Parent Record we show all recipients of the original AND Duplicated Newsletters …
+                // On the Parent Record we show all recipients of the original AND Duplicated Newsletters …
 
-            $sendRecipientGrid = GridField::create(
-                'SendRecipientQueue',
-                // _t('NewsletterAdmin.SentTo', 'Sent to'),
-                'Empfänger',
-                SendRecipientQueue::get()->filterAny(array(
-                    'NewsletterID' => $this->ID,
-                    'ParentID' => $this->ID
-                ))
-            );
+                $sendRecipientGrid = GridField::create(
+                    'SendRecipientQueue',
+                    // _t('NewsletterAdmin.SentTo', 'Sent to'),
+                    'Empfänger',
+                    SendRecipientQueue::get()->filterAny(array(
+                        'NewsletterID' => $this->ID,
+                        'ParentID' => $this->ID
+                    ))
+                );
 
-            // $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
-        }
+                // $fields->addFieldToTab( 'Root.'._t('NewsletterAdmin.SentTo', 'Sent to'), $sendRecipientGrid );
+            }
 
-        $fields->addFieldToTab( 'Root.Empfänger', $sendRecipientGrid );
+            $fields->addFieldToTab( 'Root.Empfänger', $sendRecipientGrid );
 
-        //only show restart queue button if the newsletter is stuck in "sending"
-        //only show the restart queue button if the user can run the build task (i.e. has full admin permissions)
-        if ($this->Status == "Sending" && Permission::check('ADMIN')) {
+            //only show restart queue button if the newsletter is stuck in "sending"
+            //only show the restart queue button if the user can run the build task (i.e. has full admin permissions)
+            if ($this->Status == "Sending" && Permission::check('ADMIN')) {
 
-            $restartLink = Controller::join_links(
-                Director::absoluteBaseURL(),
-                'dev/tasks/'.$this->sanitiseClassName(NewsletterSendController::class).'?newsletter='.$this->ID
-            );
+                $restartLink = Controller::join_links(
+                    Director::absoluteBaseURL(),
+                    'dev/tasks/'.$this->sanitiseClassName(NewsletterSendController::class).'?newsletter='.$this->ID
+                );
 
-            $fields->addFieldToTab('Root.Restart if stucked …',
-                new LiteralField(
-                    'RestartQueue',
-                    sprintf(
-                    '<a href="%s" class="ss-ui-button" data-icon="arrow-circle-double">%s</a>',
-                    $restartLink,
-                    _t('Newsletter.RestartQueue', 'Restart queue processing')
+                $fields->addFieldToTab('Root.Restart if stucked …',
+                    new LiteralField(
+                        'RestartQueue',
+                        sprintf(
+                            '<a href="%s" class="ss-ui-button" data-icon="arrow-circle-double">%s</a>',
+                            $restartLink,
+                            _t('Newsletter.RestartQueue', 'Restart queue processing')
+                        )
                     )
+                );
+            }
+
+            //only show the TrackedLinks tab, if there are tracked links in the newsletter and the status is "Sent"
+            if($this->TrackedLinks()->count() > 0) {
+                $fields->addFieldToTab('Root.TrackedLinks',GridField::create(
+                    'TrackedLinks',
+                    _t('NewsletterAdmin.TrackedLinks', 'Tracked Links'),
+                    $this->TrackedLinks(),
+                    $gridFieldConfig
                 )
-            );
+                );
+            }
+
+
+
         }
 
-        //only show the TrackedLinks tab, if there are tracked links in the newsletter and the status is "Sent"
-        if($this->TrackedLinks()->count() > 0) {
-            $fields->addFieldToTab('Root.TrackedLinks',GridField::create(
-                'TrackedLinks',
-                _t('NewsletterAdmin.TrackedLinks', 'Tracked Links'),
-                $this->TrackedLinks(),
-                $gridFieldConfig
-                )
-            );
-        }
+        $this->extend('updateCMSFields', $fields);
 
-
-
-    }
-
-    $this->extend('updateCMSFields', $fields);
-
-    return $fields;
+        return $fields;
 
     }
 
@@ -536,17 +536,24 @@ class Newsletter extends DataObject implements CMSPreviewable {
         return $content;
     }
 
+    public function sanitiseClassName($class)
+    {
+        return str_replace('\\', '-', $class);
+    }
+
     public function Link($action = null) {
-        return Controller::join_links(singleton(NewsletterAdmin::class)->Link('Newsletter'),
-            '/EditForm/field/Newsletter/item/', $this->ID, $action);
+        return Controller::join_links(
+            singleton(NewsletterAdmin::class)->Link($this->sanitiseClassName(Newsletter::class)),
+            '/EditForm/field/'.$this->sanitiseClassName(Newsletter::class).'/item/', $this->ID, $action);
     }
 
     /**
      * @return String
      */
     public function CMSEditLink() {
-        return Controller::join_links(singleton(NewsletterAdmin::class)->Link('Newsletter'),
-        '/EditForm/field/Newsletter/item/', $this->ID, 'edit');
+        return Controller::join_links(
+            singleton(NewsletterAdmin::class)->Link($this->sanitiseClassName(Newsletter::class)),
+            '/EditForm/field/'.$this->sanitiseClassName(Newsletter::class).'/item/', $this->ID, 'edit');
     }
 
     public function onBeforeDelete(){
