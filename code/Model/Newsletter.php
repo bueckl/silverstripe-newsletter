@@ -536,11 +536,6 @@ class Newsletter extends DataObject implements CMSPreviewable {
         return $content;
     }
 
-    public function sanitiseClassName($class)
-    {
-        return str_replace('\\', '-', $class);
-    }
-
     public function Link($action = null) {
         return Controller::join_links(
             singleton(NewsletterAdmin::class)->Link($this->sanitiseClassName(Newsletter::class)),
