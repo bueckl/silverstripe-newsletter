@@ -63,7 +63,7 @@ class NewsletterEmail extends Email {
      * @param Mailinglists $recipient
      * @param Boolean $fakeRecipient
      */
-    function __construct($newsletter, $recipient, $fakeRecipient=false, $templateData = false) {
+    public function __construct($newsletter, $recipient, $fakeRecipient=false, $templateData = false) {
         $this->newsletter = $newsletter;
         $this->mailinglists = $newsletter->MailingLists();
         $this->recipient = $recipient;
@@ -78,73 +78,78 @@ class NewsletterEmail extends Email {
 
         parent::__construct($this->newsletter->SendFrom, $recipientEmail);
 
-        $this->setData(new ArrayData(array(
-            'UnsubscribeLink' => $this->UnsubscribeLink(),
-            'SiteConfig' => DataObject::get_one(SiteConfig::class),
-            'AbsoluteBaseURL' => Director::absoluteBaseURL()
-        )));
-
         $this->body = $newsletter->getContentBody();
         $this->subject = $newsletter->Subject;
         $this->ss_template = $newsletter->RenderTemplate;
 
-        if($this->body && $this->newsletter) {
+        if($newsletter->RenderTemplate) {
+            $this->setBody(null);
+            $this->setHTMLTemplate($newsletter->RenderTemplate);
+            $this->setData($this->templateData());
+        } else {
+            $this->setData(new ArrayData(array(
+                'UnsubscribeLink' => $this->UnsubscribeLink(),
+                'SiteConfig' => DataObject::get_one(SiteConfig::class),
+                'AbsoluteBaseURL' => Director::absoluteBaseURL()
+            )));
+            if($this->body && $this->newsletter) {
 
-            $text = $this->body; // ->forTemplate();
+                $text = $this->body; // ->forTemplate();
 
-            //Recipient Fields ShortCode parsing
-            $bodyViewer = new SSViewer_FromString($text);
-            $text = $bodyViewer->process($this->templateData());
+                //Recipient Fields ShortCode parsing
+                $bodyViewer = new SSViewer_FromString($text);
+                $text = $bodyViewer->process($this->templateData());
 
-            // Install link tracking by replacing existing links with "newsletterlink" and hash-based reference.
-            if($this->config()->link_tracking_enabled &&
-                !$this->fakeRecipient &&
-            preg_match_all("/<a\s[^>]*href=\"([^\"]*)\"[^>]*>(.*)<\/a>/siU", $text, $matches)) {
+                // Install link tracking by replacing existing links with "newsletterlink" and hash-based reference.
+                if($this->config()->link_tracking_enabled &&
+                    !$this->fakeRecipient &&
+                    preg_match_all("/<a\s[^>]*href=\"([^\"]*)\"[^>]*>(.*)<\/a>/siU", $text, $matches)) {
 
-                if(isset($matches[1]) && ($links = $matches[1])) {
+                    if(isset($matches[1]) && ($links = $matches[1])) {
 
-                    $titles = (isset($matches[2])) ? $matches[2] : array();
-                    $id = (int) $this->newsletter->ID;
+                        $titles = (isset($matches[2])) ? $matches[2] : array();
+                        $id = (int) $this->newsletter->ID;
 
-                    $replacements = array();
-                    $current = array();
+                        $replacements = array();
+                        $current = array();
 
-                    // workaround as we want to match the longest urls (/foo/bar/baz) before /foo/
-                    array_unique($links);
+                        // workaround as we want to match the longest urls (/foo/bar/baz) before /foo/
+                        array_unique($links);
 
-                    $sorted = array_combine($links, array_map('strlen', $links));
-                    arsort($sorted);
+                        $sorted = array_combine($links, array_map('strlen', $links));
+                        arsort($sorted);
 
-                    foreach($sorted as $link => $length) {
-                        $SQL_link = Convert::raw2sql($link);
+                        foreach($sorted as $link => $length) {
+                            $SQL_link = Convert::raw2sql($link);
 
-                        $tracked = DataObject::get_one('Newsletter_TrackedLink',
-                            "\"NewsletterID\" = '". $id . "' AND \"Original\" = '". $SQL_link ."'");
+                            $tracked = DataObject::get_one('Newsletter_TrackedLink',
+                                "\"NewsletterID\" = '". $id . "' AND \"Original\" = '". $SQL_link ."'");
 
-                        if(!$tracked) {
-                            // make one.
+                            if(!$tracked) {
+                                // make one.
 
-                            $tracked = new Newsletter_TrackedLink();
-                            $tracked->Original = $link;
-                            $tracked->NewsletterID = $id;
-                            $tracked->write();
+                                $tracked = new Newsletter_TrackedLink();
+                                $tracked->Original = $link;
+                                $tracked->NewsletterID = $id;
+                                $tracked->write();
+                            }
+
+                            // replace the link
+                            $replacements[$link] = $tracked->Link();
+
+                            // track that this link is still active
+                            $current[] = $tracked->ID;
                         }
 
-                        // replace the link
-                        $replacements[$link] = $tracked->Link();
-
-                        // track that this link is still active
-                        $current[] = $tracked->ID;
-                   }
-
-                    // replace the strings
-                    $text = str_ireplace(array_keys($replacements), array_values($replacements), $text);
+                        // replace the strings
+                        $text = str_ireplace(array_keys($replacements), array_values($replacements), $text);
+                    }
                 }
+                // replace the body
+                $output = new DBHTMLText();
+                $output->setValue($text);
+                $this->body = $output;
             }
-            // replace the body
-            $output = new DBHTMLText();
-            $output->setValue($text);
-            $this->body = $output;
         }
     }
 

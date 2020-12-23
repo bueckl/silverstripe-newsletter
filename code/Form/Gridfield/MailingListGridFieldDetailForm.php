@@ -4,6 +4,7 @@ namespace Newsletter\Form\Gridfield;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use Newsletter\Model\MailingList;
+use SilverStripe\Forms\FieldList;
 
 /**
  * @package  newsletter
