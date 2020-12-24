@@ -57,7 +57,7 @@
                                     poll();
                                 }, 500);
                             } else if (data.Status == 'Sent') {
-                                location.reload();
+                                window.location.href = 'admin/newsletter';
                             }
                         }
                     }, 'json')

@@ -408,7 +408,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
         $recordID = $this->record->ID;
 
         return json_encode([
-            'Status' => $this->record->Status,
+            'Status' => Newsletter::get_by_id($recordID)->Status,
             'Remaining' => SendRecipientQueue::get()->filter([
                 'NewsletterID' => $recordID,
                 'Status' => 'Scheduled'

@@ -318,7 +318,8 @@ class NewsletterSendController extends BuildTask
 
         if (!empty($newsletterID)) {
             $newsletter = Newsletter::get()->byID($newsletterID);
-            if (!empty($newsletter)) {
+
+            if (!empty($newsletter) && $newsletter->exists()) {
                 //try to clean up any stuck items
                 $this->cleanUpStalledQueue($newsletterID);
 
@@ -332,14 +333,16 @@ class NewsletterSendController extends BuildTask
                 try {
                     //get the first X items to process
                     $queueItems = SendRecipientQueue::get()
-                            ->filter(array('NewsletterID' => $newsletterID, 'Status' => 'Scheduled'))
-                            ->sort('Created ASC')
-                            ->limit(self::$items_to_batch_process);
+                        ->filter(array('NewsletterID' => $newsletterID, 'Status' => 'Scheduled'))
+                        ->sort('Created ASC')
+                        ->limit(self::$items_to_batch_process);
 
                     //set them all to "in process" at once
-                    foreach ($queueItems as $item) {
-                        $item->Status = 'InProgress';
-                        $queueItemsList[] = $item->write();
+                    if($queueItems->count() > 0) {
+                        foreach ($queueItems as $item) {
+                            $item->Status = 'InProgress';
+                            $queueItemsList[] = $item->write();
+                        }
                     }
 
                     // Commit transaction
