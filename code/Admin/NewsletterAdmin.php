@@ -134,13 +134,14 @@ class NewsletterAdmin extends ModelAdmin {
         $fields = Config::inst()->get(Newsletter::class, 'searchable_fields');
 
         if ($this->modelClass == Newsletter::class){
-
-            if ($request->getVar('mail') || $request->postVar('mail')) {
-                $statusFilter = "Sent";
-            } else {
-                $statusFilter = array("Draft", "Sending");
+            if(!$request->postVar('action_doSaveAsNew')) {
+                if ($request->getVar('mail') || $request->postVar('mail')) {
+                    $statusFilter = "Sent";
+                } else {
+                    $statusFilter = array("Draft", "Sending");
+                }
+                $list = $list->filter(array("Status" => $statusFilter));
             }
-            $list = $list->filter(array("Status" => $statusFilter));
 
             if(is_array($params) && count($params)) {
                 foreach($fields as $field) {
@@ -150,6 +151,7 @@ class NewsletterAdmin extends ModelAdmin {
                 }
             }
         }
+
         return $list;
     }
 
