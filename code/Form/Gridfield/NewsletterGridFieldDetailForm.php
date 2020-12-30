@@ -112,7 +112,8 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                         ->setAttribute('data-icon', 'accept')
                         ->setAttribute(
                             'data-url',
-                            Controller::join_links($this->gridField->Link('item'), $this->record->ID, 'emailpreview')
+                            Controller::join_links($this->gridField->Link('item'), $this->record->ID,
+                                'emailpreview?preview=true')
                         )
                         ->setUseButtonTag(true);
 

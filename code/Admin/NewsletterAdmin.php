@@ -134,7 +134,8 @@ class NewsletterAdmin extends ModelAdmin {
         $fields = Config::inst()->get(Newsletter::class, 'searchable_fields');
 
         if ($this->modelClass == Newsletter::class){
-            if(!$request->postVar('action_doSaveAsNew')) {
+            //this custom condition is for sent newsletter saveasnew and emailpreview fixes
+            if(!$request->postVar('action_doSaveAsNew') && ($request->getVar('preview') != true)) {
                 if ($request->getVar('mail') || $request->postVar('mail')) {
                     $statusFilter = "Sent";
                 } else {
