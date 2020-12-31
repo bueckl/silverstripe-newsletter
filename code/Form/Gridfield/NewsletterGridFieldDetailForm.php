@@ -133,15 +133,19 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
     public function ItemEditForm()
     {
         $form = parent::ItemEditForm();
+
         // Do these action update only when the current record is_a newsletter
         if ($this->record && $this->record instanceof Newsletter) {
             $form->setActions($this->updateCMSActions($form->Actions()));
 
             $form->Fields()->push(new HiddenField("PreviewURL", "PreviewURL", $this->LinkPreview()));
+
             // Added in-line to the form, but plucked into different view by LeftAndMain.Preview.js upon load
-            $navField = new LiteralField('SilverStripeNavigator', $this->getSilverStripeNavigator());
-            $navField->setAllowHTML(true);
-            $form->Fields()->push($navField);
+            if($this->record->Status != 'Sent') {
+                $navField = new LiteralField('SilverStripeNavigator', $this->getSilverStripeNavigator());
+                $navField->setAllowHTML(true);
+                $form->Fields()->push($navField);
+            }
         }
         return $form;
     }
