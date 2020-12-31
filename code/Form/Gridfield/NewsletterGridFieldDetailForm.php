@@ -64,6 +64,13 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
                 ->addExtraClass('ss-ui-action-constructive')
                 ->setAttribute('data-icon', 'addpage')
                 ->setUseButtonTag(true), 'action_doSaveAsNew');
+
+            $deleteButton = FormAction::create('doDelete', _t('Newsletter.Delete', "Delete"));
+            $actions->replaceField("action_doDelete",
+                $deleteButton
+                    ->addExtraClass('ss-ui-action-constructive')
+                    ->setAttribute('data-icon', 'addpage')
+                    ->setUseButtonTag(true), 'action_doDelete');
         }
 
         // send button

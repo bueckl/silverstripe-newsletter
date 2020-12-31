@@ -135,7 +135,8 @@ class NewsletterAdmin extends ModelAdmin {
 
         if ($this->modelClass == Newsletter::class){
             //this custom condition is for sent newsletter saveasnew and emailpreview fixes
-            if(!$request->postVar('action_doSaveAsNew') && ($request->getVar('preview') != true)) {
+            if(!$request->postVar('action_doSaveAsNew') && ($request->getVar('preview') != 'true') &&
+                !$request->postVar('action_doDelete')) {
                 if ($request->getVar('mail') || $request->postVar('mail')) {
                     $statusFilter = "Sent";
                 } else {
