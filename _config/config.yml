@@ -9,6 +9,7 @@ SilverStripe\CMS\Controllers\ContentController:
     - Newsletter\Extensions\NewsletterContentControllerExtension
 SilverStripe\Control\Director:
   rules:
+    'newsletter//$Action/$ID': 'Newsletter\Controller\NewsletterFeedbackController'
     'newsletterlinks/$Hash': 'Newsletter\Controller\TrackLinkController'
     'unsubscribe//$Action/$ValidateHash/$IDs': 'Newsletter\Controller\UnsubscribeController'
 

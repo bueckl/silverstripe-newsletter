@@ -61,7 +61,8 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
     private static $has_many = [
         "SendRecipientQueue" => SendRecipientQueue::class,
-        "TrackedLinks" => Newsletter_TrackedLink::class
+        "TrackedLinks" => Newsletter_TrackedLink::class,
+        "NewsletterFeedbacks" => NewsletterFeedback::class
     ];
 
     private static $has_one = [
