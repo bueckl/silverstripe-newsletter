@@ -24,7 +24,7 @@ class NewsletterFeedbackController extends \PageController
     {
         Requirements::javascript( 'silverstripe/newsletter:javascript/NewsletterFeedback.js');
         $fields = new FieldList(
-            HiddenField::create('Newsletter', false, $this->getRequest()->param('ID')),
+            HiddenField::create('Newsletter', false, $this->getRequest()->param('OtherID')),
             TextField::create('Email', 'Your Email'),
             TextField::create('Message', 'Your Message'),
             LiteralField::create('Submit', '<button class="action_doFeedback">Submit</button>')
@@ -33,7 +33,7 @@ class NewsletterFeedbackController extends \PageController
         $form = new Form($this, 'FeedbackForm', $fields);
 
         return $this->customise(array(
-            'Title' => 'sssssssss',
+            'Title' => 'Feedback Form',
             'Form' => $form
         ))->renderWith('FeedbackPage');
     }

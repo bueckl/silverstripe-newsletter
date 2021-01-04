@@ -16,7 +16,7 @@
                 message : message
             },
             success: function (results) {
-                console.log(results)
+                window.location.href = '/';
             },
             error: function (jqXHR, exception) {
                 var msg = '';

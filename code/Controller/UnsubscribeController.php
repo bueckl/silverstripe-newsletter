@@ -4,6 +4,7 @@ namespace Newsletter\Controller;
 use Newsletter\Extensions\NewsletterContentControllerExtension;
 use Newsletter\Model\MailingList;
 use Newsletter\Model\UnsubscribeRecord;
+use Newsletter\Traits\Helper;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
@@ -29,6 +30,8 @@ use SilverStripe\View\Requirements;
  * Create a form that a user can use to unsubscribe from a mailing list
  */
 class UnsubscribeController extends \PageController {
+
+    use Helper;
 
     static public $days_unsubscribe_link_alive = 30;
 
@@ -65,15 +68,6 @@ class UnsubscribeController extends \PageController {
         return "unsubscribe/$action";
     }
 
-    private function getRecipient(){
-        $validateHash = Convert::raw2sql($this->urlParams['ValidateHash']);
-        if($validateHash) {
-            $recipient = Member::get()->filter("ValidateHash", $validateHash)->first();
-            $now = date('Y-m-d H:i:s');
-            if($now <= $recipient->ValidateHashExpired) return $recipient;
-        }
-    }
-
     private function getMailingLists($recipient = null){
         $siteConfig = DataObject::get_one(SiteConfig::class);
         if($siteConfig->GlobalUnsubscribe){
@@ -105,7 +99,7 @@ class UnsubscribeController extends \PageController {
     }
 
     function index() {
-        $recipient = $this->getRecipient();
+        $recipient = $this->getRecipient($this->urlParams);
         $mailinglists = $this->getMailingLists($recipient);
         if($recipient && $recipient->exists() && $mailinglists && $mailinglists->count()) {
             $unsubscribeRecordIDs = array();
@@ -131,7 +125,7 @@ class UnsubscribeController extends \PageController {
                 new HiddenField("Hash", "", $hash),
                 new LiteralField("ResubscribeText",
                     "Click the \"Resubscribe\" if you unsubscribed by accident and want to re-subscribe")
-                );
+            );
             $actions = new FieldList(
                 new FormAction("resubscribe", "Resubscribe")
             );
@@ -145,7 +139,7 @@ class UnsubscribeController extends \PageController {
                 foreach($mailinglists as $list) {
                     $listTitles .= "<li>".$list->Title."</li>";
                 }
-                $recipient = $this->getRecipient();
+                $recipient = $this->getRecipient($this->urlParams);
                 $title = $recipient->FirstName?$recipient->FirstName:$recipient->Email;
                 $content = sprintf(
                     _t('Newsletter.UNSUBSCRIBEFROMLISTSSUCCESS',
@@ -164,11 +158,11 @@ class UnsubscribeController extends \PageController {
             'Content' => $content,
             'Form' => $form
         ))->renderWith('Page');
-        }
+    }
 
-   /**
-    * Unsubscribe the user from the given lists.
-    */
+    /**
+     * Unsubscribe the user from the given lists.
+     */
     function resubscribe() {
         if(isset($_POST['Hash']) && isset($_POST['UnsubscribeRecordIDs'])){
             $recipient = DataObject::get_one(
@@ -192,13 +186,13 @@ class UnsubscribeController extends \PageController {
     }
 
     function undone(){
-        $recipient = $this->getRecipient();
+        $recipient = $this->getRecipient($this->urlParams);
         $mailinglists = $this->getMailingLists($recipient);
 
         if($mailinglists && $mailinglists->count()){
             $listTitles = "";
             foreach($mailinglists as $list) {
-            	$listTitles .= "<li>".$list->Title."</li>";
+                $listTitles .= "<li>".$list->Title."</li>";
             }
 
             $title = $recipient->FirstName?$recipient->FirstName:$recipient->Email;
@@ -271,7 +265,7 @@ class UnsubscribeController extends \PageController {
             $email->send();
 
             $form->sessionMessage(_t('Newsletter.GoodEmailMessage',
-            'You have been sent an email containing an unsubscribe link'), "good");
+                'You have been sent an email containing an unsubscribe link'), "good");
         } else {
             //not found Recipient, just reload the form
             $form->sessionMessage(_t('Newsletter.BadEmailMessage','Email address not found'), "bad");

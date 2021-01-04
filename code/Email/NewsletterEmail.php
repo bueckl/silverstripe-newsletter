@@ -89,6 +89,7 @@ class NewsletterEmail extends Email {
         } else {
             $this->setData(new ArrayData(array(
                 'UnsubscribeLink' => $this->UnsubscribeLink(),
+                'FeedbackLink' => $this->FeedbackLink(),
                 'SiteConfig' => DataObject::get_one(SiteConfig::class),
                 'AbsoluteBaseURL' => Director::absoluteBaseURL()
             )));
@@ -164,6 +165,12 @@ class NewsletterEmail extends Email {
     function Newsletter() {
     	return $this->newsletter;
     }
+
+    public function FeedbackLink() {
+        //feedback link only available for with UnsubscribeLink ValidateHash
+        return Director::absoluteBaseURL() . "newsletter/feedback/".$this->recipient->ValidateHash.'/'.$this->Newsletter()->ID;
+    }
+
 
     function UnsubscribeLink(){
         if($this->recipient && !$this->fakeRecipient){
