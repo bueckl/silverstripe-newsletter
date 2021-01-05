@@ -3,7 +3,10 @@ namespace Newsletter\Form;
 
 use SilverStripe\Core\Convert;
 use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\FormField;
+use SilverStripe\GraphQL\PersistedQuery\PersistedQueryMappingProvider;
 use SilverStripe\ORM\ArrayLib;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\FieldType\DBField;
@@ -33,7 +36,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
      * @param form The parent form
      */
     function __construct($name, $title = "", $source = array(), $extra=array(), $value = "", $extraValue=array(),
-    $form = null) {
+                         $form = null) {
         if(!empty($extra)) $this->extra = $extra;
         if(!empty($extraValue)) $this->extraValue = $extraValue;
         parent::__construct($name, $title, $source, $value, $form);
@@ -47,10 +50,10 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
      * Sets the template to be rendered with
      */
     function FieldHolder($properties = array()) {
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-        Requirements::javascript(NEWSLETTER_DIR . '/thirdparty/jquery-tablednd/jquery.tablednd.0.7.min.js');
-        Requirements::javascript(NEWSLETTER_DIR . '/javascript/CheckboxSetWithExtraField.js');
-        Requirements::css(NEWSLETTER_DIR . '/css/CheckboxSetWithExtraField.css');
+//        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
+//        Requirements::javascript(NEWSLETTER_DIR . '/thirdparty/jquery-tablednd/jquery.tablednd.0.7.min.js');
+        Requirements::javascript('silverstripe/newsletter:javascript/CheckboxSetWithExtraField.js');
+        Requirements::css( 'silverstripe/newsletter:css/CheckboxSetWithExtraField.css');
 
         return parent::FieldHolder($properties);
     }
@@ -79,14 +82,14 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
         }
 
         // Source is not an array
-        if(!is_array($source) && !is_a($source, 'SQLMap')) {
+        if(!is_array($source)) {
             if(is_array($values)) {
                 $items = $values;
             } else {
                 // Source and values are DataObject sets.
-                if($values && is_a($values, 'DataList')) {
+                if($values && is_a($values, DataList::class)) {
                     foreach($values as $object) {
-                        if(is_a($object, 'DataObject')) {
+                        if(is_a($object, DataObject::class)) {
                             $items[] = $object->ID;
                         }
                     }
@@ -97,7 +100,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
             }
         } else {
             // Sometimes we pass a singluar default value thats ! an array && !DataObjectSet
-            if(is_a($values, 'DataList') || is_array($values)) {
+            if(is_a($values, DataList::class) || is_array($values)) {
                 $items = $values;
             } else {
                 $items = explode(',', $values);
@@ -140,7 +143,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
             $footer .= "</tr></tfoot>";
 
             foreach($source as $index => $item) {
-                if(is_a($item, 'DataObject')) {
+                if(is_a($item, DataObject::class)) {
                     $key = $item->ID;
                     $value = $item->Title;
                 } else {
@@ -158,7 +161,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                 }
 
                 $disabled = isset($this->cellDisabled[$key]) &&
-                    in_array('Value', $this->cellDisabled[$key]) ? ' disabled="disabled"' : '';
+                in_array('Value', $this->cellDisabled[$key]) ? ' disabled="disabled"' : '';
                 $options .= "<tr id=\"tr_$itemID\" class=\"$extraClass\">
                 <td>
                 <input id=\"$itemID\" name=\"$this->name[$key][Value]\"
@@ -168,13 +171,17 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                 if(!empty($this->extraValue)){
                     foreach($this->extraValue as $label => $val){
                         if($val)
-                        $extraValue[$label] = json_decode($val);
+                            $extraValue[$label] = json_decode($val);
                     }
                 }
 
                 if(!empty($this->extra)){
                     foreach($this->extra as $label => $fieldType){
                         $value = "";
+
+                        $extraValue = json_decode(json_encode($extraValue), true);
+//                        echo '<pre>'.print_r($array,1);die();
+
                         if(isset($extraValue[$label][$key])){
                             $value = $extraValue[$label][$key];
                         }
@@ -208,7 +215,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
             foreach($value as $key=>$items) {
                 foreach($items as $k=>$v){
                     if($v)
-                    $filtered[$key][$k] = str_replace(", ", "{comma}", $v);
+                        $filtered[$key][$k] = str_replace(", ", "{comma}", $v);
                 }
             }
 
@@ -224,7 +231,8 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
         $this->value['Email']['Value'] = 'Email';
         $this->value['Email']['Required'] = 1;
         $value = ArrayLib::invert($this->value);
-        if($fieldname && $record && ($record->has_many($fieldname) || $record->many_many($fieldname))) {
+//        var_dump($fieldname);die();
+        if($fieldname && $record && ($record->hasMany() || $record->manyMany())) {
             $idList = array();
             if($value) foreach($value['Value'] as $id => $bool) {
                 if($bool) $idList[] = $id;
@@ -247,7 +255,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                     if($k == 'Value'){
                         $record->$fieldname = implode(",", $v);
                     }else{
-                        $record->$k = Convert::array2json($v);
+                        $record->$k = json_encode($v);
                     }
                 }
             } else {

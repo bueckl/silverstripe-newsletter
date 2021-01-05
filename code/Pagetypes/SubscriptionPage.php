@@ -1,6 +1,7 @@
 <?php
 namespace Newsletter\Pagetypes;
 
+use Newsletter\Form\CheckboxSetWithExtraField;
 use Newsletter\Model\MailingList;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -22,6 +23,7 @@ use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
 use SilverStripe\View\Requirements;
 
 /**
@@ -89,8 +91,8 @@ class SubscriptionPage extends \Page {
                 _t('Newsletter.SUBSCRIPTIONFORM', 'SubscriptionForm')
             )
         );
-        Requirements::javascript('newsletter/javascript/SubscriptionPage.js');
-        Requirements::css('newsletter/css/SubscriptionPage.css');
+        Requirements::javascript( 'silverstripe/newsletter:javascript/SubscriptionPage.js');
+        Requirements::css( 'silverstripe/newsletter:css/SubscriptionPage.css');
 
         $subscriptionTab->push(
             new HeaderField(
@@ -104,12 +106,12 @@ class SubscriptionPage extends \Page {
         );
 
         //Fields selction
-        $frontFields = singleton(Recipient::class)->getFrontEndFields()->dataFields();
+        $frontFields = singleton(Member::class)->getFrontEndFields()->dataFields();
 
         $fieldCandidates = array();
         if(count($frontFields)){
             foreach($frontFields as $fieldName => $dataField){
-                $fieldCandidates[$fieldName]= $dataField->Title()?$dataField->Title():$dataField->Name();
+                $fieldCandidates[$fieldName]= $dataField->Title() ? $dataField->Title() : $dataField->Name();
             }
         }
 
@@ -142,29 +144,29 @@ class SubscriptionPage extends \Page {
         //Mailing Lists selection
         $mailinglists = MailingList::get();
         $newsletterSelection = $mailinglists && $mailinglists->count()?
-        new CheckboxSetField("MailingLists",
-            _t("Newsletter.SubscribeTo", "Newsletters to subscribe to"),
-            $mailinglists->map('ID', 'FullTitle'),
-            $mailinglists
-        ):
-        new LiteralField(
-            "NoMailingList",
-            sprintf(
-                '<p>%s</p>',
+            new CheckboxSetField("MailingLists",
+                _t("Newsletter.SubscribeTo", "Newsletters to subscribe to"),
+                $mailinglists->map('ID', 'FullTitle'),
+                $mailinglists
+            ):
+            new LiteralField(
+                "NoMailingList",
                 sprintf(
-                    'You haven\'t defined any mailing list yet, please go to '
-                    . '<a href=\"%s\">the newsletter administration area</a> '
-                    . 'to define a mailing list.',
-                    singleton('NewsletterAdmin')->Link()
+                    '<p>%s</p>',
+                    sprintf(
+                        'You haven\'t defined any mailing list yet, please go to '
+                        . '<a href=\"%s\">the newsletter administration area</a> '
+                        . 'to define a mailing list.',
+                        singleton('NewsletterAdmin')->Link()
+                    )
                 )
-            )
-        );
+            );
         $subscriptionTab->push(
-        	$newsletterSelection
+            $newsletterSelection
         );
 
         $subscriptionTab->push(
-        	new TextField("SubmissionButtonText", "Submit Button Text")
+            new TextField("SubmissionButtonText", "Submit Button Text")
         );
 
         $subscriptionTab->push(
@@ -214,7 +216,7 @@ class SubscriptionPage extends \Page {
      * by the user, we should force that email to be checked and required.
      */
     function getRequired(){
-    	return (!$this->getField('Required')) ? '{"Email":"1"}' : $this->getField('Required');
+        return (!$this->getField('Required')) ? '{"Email":"1"}' : $this->getField('Required');
     }
 }
 
@@ -240,10 +242,10 @@ class SubscriptionPage_Controller extends \PageController {
 
         // block prototype validation
         //Validator::set_javascript_validation_handler('none');
-        Requirements::css('newsletter/css/SubscriptionPage.css');
+        Requirements::css('silverstripe/newsletter:css/SubscriptionPage.css');
         // load the jquery
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
+//        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
+//        Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
     }
 
     function Form(){
@@ -333,7 +335,7 @@ class SubscriptionPage_Controller extends \PageController {
                     }else{
                         $label=isset($customLabel[$field])?$customLabel[$field]:$dataFields[$field]->Title();
                         $error = sprintf(
-                        _t('Newsletter.PleaseEnter', "Please enter your %s field"),
+                            _t('Newsletter.PleaseEnter', "Please enter your %s field"),
                             $label
                         );
                     }
@@ -348,13 +350,13 @@ email: "<span class='exclamation'></span><span class='validation-bubble'>
 Please enter a valid email address<span></span></span>"
 }
 JSON;
-                    $jsonMessageArray[] = $field.":$message";
+                        $jsonMessageArray[] = $field.":$message";
                     } else {
                         $jsonRuleArray[] = $field.":{required: true}";
                         $message = <<<HTML
 <span class='exclamation'></span><span class='validation-bubble'>$error<span></span></span>
 HTML;
-                    $jsonMessageArray[] = $field.":\"$message\"";
+                        $jsonMessageArray[] = $field.":\"$message\"";
                     }
                 }
             }
@@ -371,10 +373,10 @@ email: "<span class='exclamation'></span><span class='validation-bubble'>
 $emailAddrMsg<span></span></span>"
 }}
 JS;
-    }
+        }
 
-    // set the custom script for this form
-    Requirements::customScript(<<<JS
+        // set the custom script for this form
+        Requirements::customScript(<<<JS
 (function($) {
     jQuery(document).ready(function() {
         $("#$FormName").validate({
@@ -388,9 +390,9 @@ JS;
     });
 })(jQuery);
 JS
-    );
+        );
 
-    return $form;
+        return $form;
     }
 
     /**
@@ -401,7 +403,7 @@ JS
         //TODO NewsletterType deprecated
         //TODO UnsubscribeRecord deprecated
         $result = DataObject::get_one("UnsubscribeRecord", "NewsletterTypeID = ".
-                Convert::raw2sql($newletterType->ID)." AND MemberID = ".Convert::raw2sql($member->ID)."");
+            Convert::raw2sql($newletterType->ID)." AND MemberID = ".Convert::raw2sql($member->ID)."");
         if($result && $result->exists()) {
             $result->delete();
         }
@@ -417,7 +419,7 @@ JS
      *
      * @return Redirection
      */
-	function doSubscribe($data, $form, $request){
+    function doSubscribe($data, $form, $request){
 
         //filter weird characters
         $data['Email'] = preg_replace("/[^a-zA-Z0-9\._\-@]/","",$data['Email']);
@@ -529,9 +531,9 @@ JS
             $recipientData = DataObject::get_by_id(Recipient::class, $id)->toMap();
         }
 
-       $daysExpired = SubscriptionPage::get_days_verification_link_alive();
-       $recipientData['SubscritionSubmittedContent2'] =
-           sprintf(
+        $daysExpired = SubscriptionPage::get_days_verification_link_alive();
+        $recipientData['SubscritionSubmittedContent2'] =
+            sprintf(
                 _t(
                     'Newsletter.SubscritionSubmittedContent2',
                     'The verification link will be valid for %s days. If you did not mean to subscribe, '
@@ -577,7 +579,7 @@ JS
                         $email->setFrom($from);
                         $email->setTemplate('SubscriptionConfirmationEmail');
                         $email->setSubject(_t(
-                        'Newsletter.ConfirmSubject',
+                            'Newsletter.ConfirmSubject',
                             "Confirmation of your subscription to our mailing lists"
                         ));
 
@@ -602,7 +604,7 @@ JS
 
             return $this->customise(array(
                 'Title' => _t('Newsletter.VerificationExpired',
-                'The verification link has been expired'),
+                    'The verification link has been expired'),
                 'Content' => $this->customise($recipientData)->renderWith('VerificationExpired'),
             ))->renderWith('Page');
         }
