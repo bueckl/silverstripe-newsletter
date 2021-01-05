@@ -37,8 +37,12 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
      */
     function __construct($name, $title = "", $source = array(), $extra=array(), $value = "", $extraValue=array(),
                          $form = null) {
-        if(!empty($extra)) $this->extra = $extra;
-        if(!empty($extraValue)) $this->extraValue = $extraValue;
+        if(!empty($extra)) {
+            $this->extra = $extra;
+        }
+        if(!empty($extraValue)) {
+            $this->extraValue = $extraValue;
+        }
         parent::__construct($name, $title, $source, $value, $form);
     }
 
@@ -75,7 +79,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                 $join = $record->$funcName();
                 if($join) {
                     foreach($join as $joinItem) {
-                        $values[] = $joinItem->ID;
+                        $values[] = $joinItem;
                     }
                 }
             }
@@ -180,7 +184,6 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                         $value = "";
 
                         $extraValue = json_decode(json_encode($extraValue), true);
-//                        echo '<pre>'.print_r($array,1);die();
 
                         if(isset($extraValue[$label][$key])){
                             $value = $extraValue[$label][$key];
@@ -231,13 +234,20 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
         $this->value['Email']['Value'] = 'Email';
         $this->value['Email']['Required'] = 1;
         $value = ArrayLib::invert($this->value);
-//        var_dump($fieldname);die();
+
         if($fieldname && $record && ($record->hasMany() || $record->manyMany())) {
             $idList = array();
-            if($value) foreach($value['Value'] as $id => $bool) {
-                if($bool) $idList[] = $id;
+            if($value) {
+                foreach($value['Value'] as $id => $bool) {
+                    if($bool) {
+                        $idList[] = $id;
+                    }
+                }
             }
-            $record->$fieldname()->setByIDList($idList);
+
+            $fields = $record->$fieldname();
+            array_push($fields, $idList);
+
         } elseif($fieldname && $record) {
             if($value) {
                 if(is_array($value)) foreach($value as $k => $items){
@@ -269,7 +279,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
         // second arg
         if(!$value && $obj && $obj instanceof DataObject && $obj->hasMethod($this->name)) {
             $funcName = $this->name;
-            $value = $obj->$funcName()->getIDList();
+            $value = $obj->$funcName();
         }else if(is_string($value)) {
             $value = explode(",", $value);
         }

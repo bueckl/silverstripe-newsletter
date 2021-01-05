@@ -1,8 +1,11 @@
 <?php
 namespace Newsletter\Pagetypes;
 
+use Newsletter\Admin\NewsletterAdmin;
+use Newsletter\Controller\UnsubscribeController;
 use Newsletter\Form\CheckboxSetWithExtraField;
 use Newsletter\Model\MailingList;
+use Newsletter\Model\UnsubscribeRecord;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
@@ -62,12 +65,18 @@ class SubscriptionPage extends \Page {
 
     static public $days_verification_link_alive = 2;
 
+    protected $pageFields = [];
+
     static public function set_days_verification_link_alive($days){
         self::$days_verification_link_alive = $days;
     }
 
     static public function get_days_verification_link_alive(){
         return self::$days_verification_link_alive;
+    }
+
+    public function Fields() {
+        return $this->pageFields;
     }
 
     public function requireDefaultRecords() {
@@ -114,14 +123,22 @@ class SubscriptionPage extends \Page {
                 $fieldCandidates[$fieldName]= $dataField->Title() ? $dataField->Title() : $dataField->Name();
             }
         }
+        $this->pageFields = $fieldCandidates;
 
         //Since Email field is the Recipient's identifier,
         //and newsletters subscription is non-sence if no email is given by the user,
         //we should force that email to be checked and required.
         //FisrtName should be checked as default, though it might not be required
-        $defaults = array("Email", "FirstName");
+        $defaults = array(
+            "Email",
+            "FirstName"
+        );
 
-        $extra = array('CustomLabel'=>"Varchar","ValidationMessage"=>"Varchar","Required" =>"Boolean");
+        $extra = array(
+            'CustomLabel'=>"Varchar",
+            "ValidationMessage"=>"Varchar",
+            "Required" =>"Boolean"
+        );
         $extraValue = array(
             'CustomLabel'=>$this->CustomLabel,
             "ValidationMessage"=>$this->ValidationMessage,
@@ -157,7 +174,7 @@ class SubscriptionPage extends \Page {
                         'You haven\'t defined any mailing list yet, please go to '
                         . '<a href=\"%s\">the newsletter administration area</a> '
                         . 'to define a mailing list.',
-                        singleton('NewsletterAdmin')->Link()
+                        singleton(NewsletterAdmin::class)->Link()
                     )
                 )
             );
@@ -248,11 +265,15 @@ class SubscriptionPage_Controller extends \PageController {
 //        Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
     }
 
-    function Form(){
-        if($this->URLParams['Action'] === 'completed' || $this->URLParams['Action'] == 'submitted') return;
-        $dataFields = singleton('Recipient')->getFrontEndFields()->dataFields();
+    public function Form() {
+        if($this->URLParams['Action'] === 'completed' || $this->URLParams['Action'] == 'submitted') {
+            return;
+        }
+        $dataFields = singleton(Member::class)->getFrontEndFields()->dataFields();
 
-        if($this->CustomLabel) $customLabel = json_decode($this->CustomLabel);
+        if($this->CustomLabel) {
+            $customLabel = json_decode($this->CustomLabel);
+        }
 
         $fields = array();
         if($this->Fields){
@@ -298,7 +319,7 @@ class SubscriptionPage_Controller extends \PageController {
             new HeaderField("CustomisedHeading", $this->owner->CustomisedHeading),
             $recipientInfoSection
         );
-        $recipientInfoSection->setID("MemberInfoSection");
+//        $recipientInfoSection->setID("MemberInfoSection");
 
         if($this->MailingLists){
             $mailinglists = DataObject::get(MailingList::class, "ID IN (".$this->MailingLists.")");
@@ -317,8 +338,11 @@ class SubscriptionPage_Controller extends \PageController {
             new FormAction('doSubscribe', $buttonTitle)
         );
 
-        if(!empty($requiredFields)) $required = new RequiredFields($requiredFields);
-        else $required = null;
+        if(!empty($requiredFields)) {
+            $required = new RequiredFields(json_decode(json_encode($requiredFields), true));
+        } else {
+            $required = null;
+        }
         $form = new Form($this, "Form", $formFields, $actions, $required);
 
         // using jQuery to customise the validation of the form
@@ -402,7 +426,7 @@ JS
     protected function removeUnsubscribe($newletterType,$member) {
         //TODO NewsletterType deprecated
         //TODO UnsubscribeRecord deprecated
-        $result = DataObject::get_one("UnsubscribeRecord", "NewsletterTypeID = ".
+        $result = DataObject::get_one(UnsubscribeRecord::class, "NewsletterTypeID = ".
             Convert::raw2sql($newletterType->ID)." AND MemberID = ".Convert::raw2sql($member->ID)."");
         if($result && $result->exists()) {
             $result->delete();
@@ -428,11 +452,11 @@ JS
         $recipient = false;
 
         if(isset($data['Email'])) {
-            $recipient = DataObject::get_one(Recipient::class, "\"Email\" = '". Convert::raw2sql($data['Email']) . "'");
+            $recipient = DataObject::get_one(Member::class, "\"Email\" = '". Convert::raw2sql($data['Email']) . "'");
         }
 
         if(!$recipient) {
-            $recipient = new Recipient();
+            $recipient = new Member();
             $recipient->Verified = false;   //set new recipient as un-verified, if they subscribe through the website
         }
 
@@ -468,7 +492,7 @@ JS
 
             if($this->MailingLists && ($listIDs = explode(",",$this->MailingLists))) {
                 foreach($listIDs as $listID){
-                    $mailinglist = DataObject::get_by_id("MailingList", $listID);
+                    $mailinglist = DataObject::get_by_id(MailingList::class, $listID);
                     if($mailinglist && $mailinglist->exists()){
                         //remove recipient from unsubscribe records if the recipient
                         // unsubscribed from mailing list before
@@ -528,7 +552,7 @@ JS
 
     function submitted(){
         if($id = $this->urlParams['ID']){
-            $recipientData = DataObject::get_by_id(Recipient::class, $id)->toMap();
+            $recipientData = DataObject::get_by_id(Member::class, $id)->toMap();
         }
 
         $daysExpired = SubscriptionPage::get_days_verification_link_alive();
@@ -550,7 +574,9 @@ JS
 
     function subscribeverify() {
         if($hash = $this->urlParams['ID']) {
-            $recipient = DataObject::get_one(Recipient::class, "\"ValidateHash\" = '".Convert::raw2sql($hash)."'");
+            $recipient = DataObject::get_one(
+                Member::class, "\"ValidateHash\" = '".Convert::raw2sql($hash)."'"
+            );
             if($recipient && $recipient->exists()){
                 $now = date('Y-m-d H:i:s');
                 if($now <= $recipient->ValidateHashExpired) {
@@ -603,8 +629,7 @@ JS
                     'The verification link is only validate for %s days.'), $daysExpired);
 
             return $this->customise(array(
-                'Title' => _t('Newsletter.VerificationExpired',
-                    'The verification link has been expired'),
+                'Title' => _t('Newsletter.VerificationExpired', 'The verification link has been expired'),
                 'Content' => $this->customise($recipientData)->renderWith('VerificationExpired'),
             ))->renderWith('Page');
         }
@@ -612,7 +637,7 @@ JS
 
     function completed() {
         if($id = $this->urlParams['ID']){
-            $recipientData = DataObject::get_by_id(Recipient::class, $id)->toMap();
+            $recipientData = DataObject::get_by_id(Member::class, $id)->toMap();
         }
         return $this->customise(array(
             'Title' => _t('Newsletter.SubscriptionCompleted', 'Subscription Completed!'),
