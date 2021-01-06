@@ -35,15 +35,14 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
      * @param extraValue The current extraValues
      * @param form The parent form
      */
-    function __construct($name, $title = "", $source = array(), $extra=array(), $value = "", $extraValue=array(),
-                         $form = null) {
+    function __construct($name, $title = "", $source = array(), $extra=array(), $value = "", $extraValue=array()) {
         if(!empty($extra)) {
             $this->extra = $extra;
         }
         if(!empty($extraValue)) {
             $this->extraValue = $extraValue;
         }
-        parent::__construct($name, $title, $source, $value, $form);
+        parent::__construct($name, $title, $source, $value);
     }
 
     function setCellDisabled($cellDisabled){
@@ -71,12 +70,15 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
     public function Field($properties = array()) {
         $source = $this->source;
         $values = $this->value;
+
+
         // Get values from the join, if available
         if(is_object($this->form)) {
             $record = $this->form->getRecord();
             if(!$values && $record && $record->hasMethod($this->name)) {
                 $funcName = $this->name;
                 $join = $record->$funcName();
+                $join = explode(',', $join);
                 if($join) {
                     foreach($join as $joinItem) {
                         $values[] = $joinItem;
@@ -84,6 +86,8 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                 }
             }
         }
+
+
 
         // Source is not an array
         if(!is_array($source)) {
@@ -118,6 +122,8 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 
         $odd = 0;
         $options = '';
+
+
 
         if ($source == null) {
             $source = array();
@@ -160,8 +166,11 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                 $extraClass .= ' val' . str_replace(' ', '', $key);
                 $itemID = $this->id() . '_' . preg_replace('/[^a-zA-Z0-9]+/', '', $key);
                 $checked = '';
+
+
+
                 if(isset($items)) {
-                    $checked = (in_array($key, $items)) ? ' checked="checked"' : '';
+                    $checked = in_array($key, $items) ? ' checked="checked"' : '';
                 }
 
                 $disabled = isset($this->cellDisabled[$key]) &&
@@ -188,6 +197,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                         if(isset($extraValue[$label][$key])){
                             $value = $extraValue[$label][$key];
                         }
+
                         $dbField = DBField::create_field($fieldType, $value, $this->name."[".$key."][".$label."]");
                         $extraField = $dbField->scaffoldFormField($this->name."[".$key."][".$label."]");
                         $extraField -> setValue($value);
@@ -237,26 +247,49 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 
         if($fieldname && $record && ($record->hasMany() || $record->manyMany())) {
             $idList = array();
+            $labelIdList = array();
+            $valMessageIdList = array();
+
             if($value) {
                 foreach($value['Value'] as $id => $bool) {
                     if($bool) {
                         $idList[] = $id;
                     }
                 }
+                foreach($value['CustomLabel'] as $id => $bool) {
+                    if($bool) {
+                        $labelIdList[$id] = $bool;
+                    }
+                }
+                foreach($value['ValidationMessage'] as $id => $bool) {
+                    if($bool) {
+                        $valMessageIdList[$id] = $bool;
+                    }
+                }
             }
 
-            $fields = $record->$fieldname();
-            array_push($fields, $idList);
+            $ids = implode(",",$idList);
+            $record->setField($fieldname, $ids);
+
+            $labels = json_encode($labelIdList);
+            $record->setField('CustomLabel', $labels);
+
+            $validatioMessages = json_encode($valMessageIdList);
+            $record->setField('ValidationMessage', $validatioMessages);
 
         } elseif($fieldname && $record) {
             if($value) {
-                if(is_array($value)) foreach($value as $k => $items){
-                    if(is_array($items)) foreach($items as $key => $val){
-                        if(!$val){
-                            unset($value[$k][$key]);
-                        }else{
-                            if($k == 'Value'){
-                                $value[$k][$key] = str_replace(", ", "{comma}", $val);
+                if(is_array($value)) {
+                    foreach($value as $k => $items){
+                        if(is_array($items)) {
+                            foreach($items as $key => $val){
+                                if(!$val) {
+                                    unset($value[$k][$key]);
+                                } else {
+                                    if($k == 'Value') {
+                                        $value[$k][$key] = str_replace(", ", "{comma}", $val);
+                                    }
+                                }
                             }
                         }
                     }
@@ -264,7 +297,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                 foreach($value as $k => $v){
                     if($k == 'Value'){
                         $record->$fieldname = implode(",", $v);
-                    }else{
+                    } else {
                         $record->$k = json_encode($v);
                     }
                 }
@@ -274,28 +307,29 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
         }
     }
 
-    function setValue($value, $obj = null){
+    public function setValue($value, $obj = null) {
         // If we're not passed a value directly, we can look for it in a relation method on the object passed as a
         // second arg
         if(!$value && $obj && $obj instanceof DataObject && $obj->hasMethod($this->name)) {
             $funcName = $this->name;
             $value = $obj->$funcName();
-        }else if(is_string($value)) {
+        } else if(is_string($value)) {
             $value = explode(",", $value);
         }
-
         parent::setValue($value, $obj);
-
         // We need to sort the fields according to the $value, so that the list of
         // fields apparing in the right order.
         $sortedSource = array();
         $sourceKeys = array_keys($this->source);
-        foreach($this->value as $item){
-            if(in_array($item, $sourceKeys)){
-                $sortedSource[$item] = $this->source[$item];
-            }
-        }
+
+//        foreach($this->value as $item){
+//            if(in_array($item, $sourceKeys)){
+//                $sortedSource[$item] = $this->source[$item];
+//            }
+//        }
+
         $this->source = array_merge($sortedSource, $this->source);
+
         if(count($this->extra)){
             foreach($this->extra as $field => $type){
                 if($obj && isset($obj->$field)){

@@ -76,7 +76,7 @@ class SubscriptionPage extends \Page {
     }
 
     public function Fields() {
-        return $this->pageFields;
+        return $this->Fields;
     }
 
     public function requireDefaultRecords() {
@@ -120,7 +120,7 @@ class SubscriptionPage extends \Page {
         $fieldCandidates = array();
         if(count($frontFields)){
             foreach($frontFields as $fieldName => $dataField){
-                $fieldCandidates[$fieldName]= $dataField->Title() ? $dataField->Title() : $dataField->Name();
+                $fieldCandidates[$fieldName] = $dataField->Title() ? $dataField->Title() : $dataField->Name();
             }
         }
         $this->pageFields = $fieldCandidates;
@@ -272,7 +272,7 @@ class SubscriptionPage_Controller extends \PageController {
         $dataFields = singleton(Member::class)->getFrontEndFields()->dataFields();
 
         if($this->CustomLabel) {
-            $customLabel = json_decode($this->CustomLabel);
+            $customLabel = json_decode($this->CustomLabel, true);
         }
 
         $fields = array();
@@ -281,8 +281,8 @@ class SubscriptionPage_Controller extends \PageController {
         }
 
         $recipientInfoSection = new CompositeField();
+        $requiredFields = json_decode($this->Required, true);
 
-        $requiredFields = json_decode($this->Required);
         if(!empty($fields)){
             foreach($fields as $field){
                 if(isset($dataFields[$field]) && $dataFields[$field]){
@@ -347,7 +347,7 @@ class SubscriptionPage_Controller extends \PageController {
 
         // using jQuery to customise the validation of the form
         $FormName = $form->FormName();
-        $validationMessage = json_decode($this->ValidationMessage);
+        $validationMessage = json_decode($this->ValidationMessage, true);
 
         if(!empty($requiredFields)){
             $jsonRuleArray = array();
