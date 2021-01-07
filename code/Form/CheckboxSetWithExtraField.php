@@ -1,10 +1,8 @@
 <?php
 namespace Newsletter\Form;
 
-use SilverStripe\Core\Convert;
 use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\FormField;
-use SilverStripe\GraphQL\PersistedQuery\PersistedQueryMappingProvider;
 use SilverStripe\ORM\ArrayLib;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -249,6 +247,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
             $idList = array();
             $labelIdList = array();
             $valMessageIdList = array();
+            $requiredIdList = array();
 
             if($value) {
                 foreach($value['Value'] as $id => $bool) {
@@ -266,6 +265,11 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                         $valMessageIdList[$id] = $bool;
                     }
                 }
+                foreach($value['Required'] as $id => $bool) {
+                    if($bool) {
+                        $requiredIdList[$id] = $bool;
+                    }
+                }
             }
 
             $ids = implode(",",$idList);
@@ -274,8 +278,11 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
             $labels = json_encode($labelIdList);
             $record->setField('CustomLabel', $labels);
 
-            $validatioMessages = json_encode($valMessageIdList);
-            $record->setField('ValidationMessage', $validatioMessages);
+            $validationMessages = json_encode($valMessageIdList);
+            $record->setField('ValidationMessage', $validationMessages);
+
+            $required = json_encode($requiredIdList);
+            $record->setField('Required', $required);
 
         } elseif($fieldname && $record) {
             if($value) {

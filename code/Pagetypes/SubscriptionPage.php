@@ -89,7 +89,7 @@ class SubscriptionPage extends \Page {
             $page->SendNotification = 1;
             $page->ShowInMenus = false;
             $page->write();
-            $page->publish('Stage', 'Live');
+            $page->copyVersionToStage('Stage', 'Live', true);
         }
     }
 
@@ -160,7 +160,7 @@ class SubscriptionPage extends \Page {
 
         //Mailing Lists selection
         $mailinglists = MailingList::get();
-        $newsletterSelection = $mailinglists && $mailinglists->count()?
+        $newsletterSelection = $mailinglists && $mailinglists->count() ?
             new CheckboxSetField("MailingLists",
                 _t("Newsletter.SubscribeTo", "Newsletters to subscribe to"),
                 $mailinglists->map('ID', 'FullTitle'),
@@ -319,13 +319,13 @@ class SubscriptionPage_Controller extends \PageController {
             new HeaderField("CustomisedHeading", $this->owner->CustomisedHeading),
             $recipientInfoSection
         );
-//        $recipientInfoSection->setID("MemberInfoSection");
+        $recipientInfoSection->id = 'MemberInfoSection';
 
         if($this->MailingLists){
-            $mailinglists = DataObject::get(MailingList::class, "ID IN (".$this->MailingLists.")");
+            $mailinglists = DataObject::get(MailingList::class, "ID IN (".implode(',', json_decode($this->MailingLists)).")");
         }
 
-        if(isset($mailinglists) && $mailinglists && $mailinglists->count()>1){
+        if(isset($mailinglists) && $mailinglists->count() > 1){
             $newsletterSection = new CompositeField(
                 new LabelField("Newsletters", _t("SubscriptionPage.To", "Subscribe to:"), 4),
                 new CheckboxSetField("NewsletterSelection","", $mailinglists, $mailinglists->getIDList())
@@ -501,8 +501,7 @@ JS
                         $recipient->MailingLists()->add($mailinglist);
                     }
                 }
-            }
-            else {
+            } else {
                 user_error('No Newsletter type selected to subscribe to', E_USER_WARNING);
             }
         }
@@ -536,14 +535,15 @@ JS
         //Send Verification Email
         $email = new Email();
         $email->setTo($recipient->Email);
-        $from = $this->NotificationEmailFrom?$this->NotificationEmailFrom:Email::getAdminEmail();
+        $from = $this->NotificationEmailFrom ? $this->NotificationEmailFrom : $email->config()->get('admin_email');
         $email->setFrom($from);
-        $email->setTemplate('SubscriptionVerificationEmail');
+        $email->setHTMLTemplate('SubscriptionVerificationEmail');
         $email->setSubject(_t(
             'Newsletter.VerifySubject',
             "Thanks for subscribing to our mailing lists, please verify your email"
         ));
-        $email->populateTemplate( $templateData );
+//        $email->populateTemplate( $templateData );
+        $email->renderWith('SubscriptionVerificationEmail', $templateData);
         $email->send();
 
         $url = $this->Link('submitted')."/".$recipient->ID;

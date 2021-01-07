@@ -16,3 +16,7 @@ SilverStripe\Control\Director:
 SilverStripe\Admin\LeftandMain:
   admin_themes:
     - 'newsletter-admin'
+
+SilverStripe\View\SSViewer:
+  themes:
+    - 'newsletter-front'
