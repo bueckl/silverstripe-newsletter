@@ -52,7 +52,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
      */
     function FieldHolder($properties = array()) {
 //        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-//        Requirements::javascript(NEWSLETTER_DIR . '/thirdparty/jquery-tablednd/jquery.tablednd.0.7.min.js');
+        Requirements::javascript('silverstripe/newsletter:thirdparty/jquery-tablednd/jquery.tablednd.0.7.min.js');
         Requirements::javascript('silverstripe/newsletter:javascript/CheckboxSetWithExtraField.js');
         Requirements::css( 'silverstripe/newsletter:css/CheckboxSetWithExtraField.css');
 

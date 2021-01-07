@@ -25,7 +25,8 @@
             "images",
             "javascript",
             "css",
-            "scss"
+            "scss",
+            "thirdparty"
         ]
     },
 	"minimum-stability": "dev"
