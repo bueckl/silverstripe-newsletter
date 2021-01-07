@@ -542,8 +542,7 @@ JS
             'Newsletter.VerifySubject',
             "Thanks for subscribing to our mailing lists, please verify your email"
         ));
-//        $email->populateTemplate( $templateData );
-        $email->renderWith('SubscriptionVerificationEmail', $templateData);
+        $email->setData($templateData);
         $email->send();
 
         $url = $this->Link('submitted')."/".$recipient->ID;
