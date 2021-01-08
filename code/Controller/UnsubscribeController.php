@@ -261,7 +261,7 @@ class UnsubscribeController extends \PageController {
                 'Newsletter.ConfirmUnsubscribeSubject',
                 "Confirmation of your unsubscribe request"
             ));
-            $email->populateTemplate( $templateData );
+            $email->setData( $templateData );
             $email->send();
 
             $form->sessionMessage(_t('Newsletter.GoodEmailMessage',
