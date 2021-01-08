@@ -5,6 +5,7 @@ use Newsletter\Extensions\NewsletterContentControllerExtension;
 use Newsletter\Model\MailingList;
 use Newsletter\Model\UnsubscribeRecord;
 use Newsletter\Traits\Helper;
+use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
@@ -51,9 +52,9 @@ class UnsubscribeController extends \PageController {
 
     function init() {
         parent::init();
-        Requirements::css('newsletter/css/SubscriptionPage.css');
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
+        Requirements::css('silverstripe/newsletter:css/SubscriptionPage.css');
+//        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
+//        Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
     }
 
     static public function set_days_unsubscribe_link_alive($days){
@@ -131,7 +132,7 @@ class UnsubscribeController extends \PageController {
             );
 
             $form = new Form($this, "ResubscribeForm", $fields, $actions);
-            $form->setFormAction($this->Link('resubscribe'));
+            $form->setFormAction(Controller::join_links(Director::absoluteBaseURL(), $this->relativeLink('resubscribe')));
             $mailinglists = $this->getMailingListsByUnsubscribeRecords($unsubscribeRecordIDs);
 
             if($mailinglists && $mailinglists->count()){
@@ -164,20 +165,22 @@ class UnsubscribeController extends \PageController {
      * Unsubscribe the user from the given lists.
      */
     function resubscribe() {
-        if(isset($_POST['Hash']) && isset($_POST['UnsubscribeRecordIDs'])){
+        if(isset($_POST['Hash']) && isset($_POST['UnsubscribeRecordIDs'])) {
             $recipient = DataObject::get_one(
-                'Recipient',
+                Member::class,
                 "\"ValidateHash\" = '" . Convert::raw2sql($_POST['Hash']) . "'"
             );
             $mailinglists = $this->getMailingListsByUnsubscribeRecords($_POST['UnsubscribeRecordIDs']);
+
             if($recipient && $recipient->exists() && $mailinglists && $mailinglists->count()){
-                $recipient->MailingLIsts()->addMany($mailinglists);
+                $recipient->MailingLists()->addMany($mailinglists);
             }
+
             $url = Director::absoluteBaseURL() . $this->RelativeLink('undone') . "/" . $_POST['Hash']. "/" .
                 $_POST['UnsubscribeRecordIDs'];
             Controller::curr()->redirect($url, 302);
             return $url;
-        }else{
+        } else {
             return $this->customise(array(
                 'Title' => _t('Newsletter.INVALIDRESUBSCRIBE', 'Invalid resubscrible'),
                 'Content' => _t('Newsletter.INVALIDRESUBSCRIBECONTENT', 'This resubscribe link is invalid')
@@ -195,14 +198,14 @@ class UnsubscribeController extends \PageController {
                 $listTitles .= "<li>".$list->Title."</li>";
             }
 
-            $title = $recipient->FirstName?$recipient->FirstName:$recipient->Email;
+            $title = $recipient->FirstName ? $recipient->FirstName : $recipient->Email;
             $content = sprintf(
                 _t('Newsletter.RESUBSCRIBEFROMLISTSSUCCESS',
                     '<h3>Thank you. %s!</h3><br />You have been resubscribed to: %s.'),
                 $title,
                 "<ul>".$listTitles."</ul>"
             );
-        }else{
+        } else {
             $content =
                 _t('Newsletter.RESUBSCRIBESUCCESS', 'Thank you.<br />You have been resubscribed successfully');
         }
