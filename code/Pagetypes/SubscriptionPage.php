@@ -93,7 +93,7 @@ class SubscriptionPage extends \Page {
         }
     }
 
-    function getCMSFields() {
+    public function getCMSFields() {
         $fields = parent::getCMSFields();
         $fields ->addFieldToTab("Root",
             $subscriptionTab = new Tab(
@@ -232,7 +232,7 @@ class SubscriptionPage extends \Page {
      * Email field is the member's identifier, and newsletters subscription is non-sense if no email is given
      * by the user, we should force that email to be checked and required.
      */
-    function getRequired(){
+    public function getRequired(){
         return (!$this->getField('Required')) ? '{"Email":"1"}' : $this->getField('Required');
     }
 }
@@ -262,7 +262,7 @@ class SubscriptionPage_Controller extends \PageController {
         Requirements::css('silverstripe/newsletter:css/SubscriptionPage.css');
         // load the jquery
 //        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-//        Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
+        Requirements::javascript( 'silverstripe/newsletter:thirdparty/jquery-validate/jquery.validate.min.js');
     }
 
     public function Form() {
@@ -364,46 +364,34 @@ class SubscriptionPage_Controller extends \PageController {
                         );
                     }
 
-                    if($field === 'Email') {
-                        $jsonRuleArray[] = $field.":{required: true, email: true}";
-                        $message = <<<JSON
-{
-required: "<span class='exclamation'></span><span class='validation-bubble'>
-$error<span></span></span>",
-email: "<span class='exclamation'></span><span class='validation-bubble'>
-Please enter a valid email address<span></span></span>"
-}
-JSON;
-                        $jsonMessageArray[] = $field.":$message";
-                    } else {
-                        $jsonRuleArray[] = $field.":{required: true}";
-                        $message = <<<HTML
-<span class='exclamation'></span><span class='validation-bubble'>$error<span></span></span>
-HTML;
-                        $jsonMessageArray[] = $field.":\"$message\"";
-                    }
+//                    if($field === 'Email') {
+//                        $jsonRuleArray[] = $field.":{required: true, email: true}";
+//                        $message =
+//                            "<span class='exclamation'></span><span class='validation-bubble'>$error<span></span></span>,
+//email: <span class='exclamation'></span><span class='validation-bubble'>Please enter a valid email address<span></span></span>";
+//                        $jsonMessageArray[] = $field.":$message";
+//                    } else {
+                    $jsonRuleArray[] = $field.":{required: true}";
+                    $message = "<span class='exclamation'></span><span class='validation-bubble'>$error<span></span></span>";
+                    $jsonMessageArray[] = $field.":\"$message\"";
+//                    }
                 }
             }
             $rules = "{".implode(", ", $jsonRuleArray)."}";
             $messages = "{".implode(",", $jsonMessageArray)."}";
-        }else{
+        } else {
             $rules = "{Email:{required: true, email: true}}";
             $emailAddrMsg = _t('Newsletter.ValidEmail', 'Please enter your email address');
-            $messages = <<<JS
-{Email: {
-required: "<span class='exclamation'></span><span class='validation-bubble'>
-$emailAddrMsg<span></span></span>",
-email: "<span class='exclamation'></span><span class='validation-bubble'>
-$emailAddrMsg<span></span></span>"
-}}
-JS;
+            $messages = " {Email: {
+            required: <span class='exclamation'></span><span class='validation-bubble'>$emailAddrMsg <span></span></span>;
+            email: <span class='exclamation'></span><span class='validation-bubble'>$emailAddrMsg<span></span></span>}}";
         }
 
         // set the custom script for this form
-        Requirements::customScript(<<<JS
+        Requirements::customScript("
 (function($) {
     jQuery(document).ready(function() {
-        $("#$FormName").validate({
+        $(\"#$FormName\").validate({
             errorPlacement: function(error, element){
             	error.insertAfter(element);
             },
@@ -412,8 +400,7 @@ JS;
             rules: $rules
         });
     });
-})(jQuery);
-JS
+})(jQuery)", 'form-error-message'
         );
 
         return $form;
@@ -443,7 +430,7 @@ JS
      *
      * @return Redirection
      */
-    function doSubscribe($data, $form, $request){
+    public function doSubscribe($data, $form, $request){
 
         //filter weird characters
         $data['Email'] = preg_replace("/[^a-zA-Z0-9\._\-@]/","",$data['Email']);
@@ -549,7 +536,7 @@ JS
         $this->redirect($url);
     }
 
-    function submitted(){
+    public function submitted(){
         if($id = $this->urlParams['ID']){
             $recipientData = DataObject::get_by_id(Member::class, $id)->toMap();
         }
@@ -571,7 +558,7 @@ JS
         ))->renderWith('Page');
     }
 
-    function subscribeverify() {
+    public function subscribeverify() {
         if($hash = $this->urlParams['ID']) {
             $recipient = DataObject::get_one(
                 Member::class, "\"ValidateHash\" = '".Convert::raw2sql($hash)."'"
@@ -634,7 +621,7 @@ JS
         }
     }
 
-    function completed() {
+    public function completed() {
         if($id = $this->urlParams['ID']){
             $recipientData = DataObject::get_by_id(Member::class, $id)->toMap();
         }
