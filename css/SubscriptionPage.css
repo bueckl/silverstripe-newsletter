@@ -9,3 +9,7 @@
 .SendNotificationControlledPanel { display: none; }
 
 #Form_ResubscribeForm .Actions:after { display: none; }
+
+.message.bad {
+    color: #FF0000;
+}

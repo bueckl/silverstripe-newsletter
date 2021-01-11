@@ -48,13 +48,8 @@ class UnsubscribeController extends \PageController {
 
     function __construct($data = null) {
         parent::__construct($data);
-    }
-
-    function init() {
-        parent::init();
         Requirements::css('silverstripe/newsletter:css/SubscriptionPage.css');
-//        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-//        Requirements::javascript(THIRDPARTY_DIR . '/jquery-validate/jquery.validate.min.js');
+        Requirements::javascript( 'silverstripe/newsletter:thirdparty/jquery-validate/jquery.validate.min.js');
     }
 
     static public function set_days_unsubscribe_link_alive($days){
