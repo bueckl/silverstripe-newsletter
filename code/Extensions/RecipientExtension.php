@@ -146,13 +146,21 @@ class RecipientExtension extends DataExtension
      * email address, so that users with the same name can be distinguished. */
     public function getTitle() {
         $f = '';
-        if (!empty($this->owner->FirstName)) $f = "$this->FirstName ";
+        if (!empty($this->owner->FirstName)) {
+            $f = "$this->owner->FirstName ";
+        }
         $m = '';
-        if (!empty($this->owner->MiddleName)) $m = "$this->MiddleName ";
+        if (!empty($this->owner->MiddleName)) {
+            $m = "$this->owner->MiddleName ";
+        }
         $s = '';
-        if (!empty($this->owner->Surname)) $s = "$this->owner->Surname ";
+        if (!empty($this->owner->Surname)) {
+            $s = "$this->owner->Surname ";
+        }
         $e = '';
-        if (!empty($this->owner->Email)) $e = "($this->owner->Email)";
+        if (!empty($this->owner->Email)) {
+            $e = "($this->owner->Email)";
+        }
         return $f.$m.$s.$e;
     }
 
@@ -174,8 +182,9 @@ class RecipientExtension extends DataExtension
         return false;
     }
 
-    public function getHashText(){
-        return substr($this->ValidateHash, 0, 10)."******".substr($this->ValidateHash, -10);
+    public function getHashText() {
+        return substr($this->owner->ValidateHash, 0, 10)."******".
+            substr($this->owner->ValidateHash, -10);
     }
 
     /**

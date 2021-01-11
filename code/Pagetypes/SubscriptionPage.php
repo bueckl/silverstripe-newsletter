@@ -589,13 +589,13 @@ class SubscriptionPage_Controller extends \PageController {
                         $email->setTo($recipient->Email);
                         $from = $this->NotificationEmailFrom?$this->NotificationEmailFrom:Email::getAdminEmail();
                         $email->setFrom($from);
-                        $email->setTemplate('SubscriptionConfirmationEmail');
+                        $email->setHTMLTemplate('SubscriptionConfirmationEmail');
                         $email->setSubject(_t(
                             'Newsletter.ConfirmSubject',
                             "Confirmation of your subscription to our mailing lists"
                         ));
 
-                        $email->populateTemplate( $templateData );
+                        $email->setData( $templateData );
                         $email->send();
                     }
 
