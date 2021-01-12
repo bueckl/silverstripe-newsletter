@@ -19,6 +19,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\Requirements;
@@ -46,7 +47,7 @@ class UnsubscribeController extends \PageController {
         'sendUnsubscribeLink'
     );
 
-    function __construct($data = null) {
+    public function __construct($data = null) {
         parent::__construct($data);
         Requirements::css('silverstripe/newsletter:css/SubscriptionPage.css');
         Requirements::javascript( 'silverstripe/newsletter:thirdparty/jquery-validate/jquery.validate.min.js');
@@ -60,7 +61,7 @@ class UnsubscribeController extends \PageController {
         return self::$days_unsubscribe_link_alive;
     }
 
-    function RelativeLink($action = null) {
+    public function RelativeLink($action = null) {
         return "unsubscribe/$action";
     }
 
@@ -94,7 +95,7 @@ class UnsubscribeController extends \PageController {
         return $mailinglists;
     }
 
-    function index() {
+    public function index() {
         $recipient = $this->getRecipient($this->urlParams);
         $mailinglists = $this->getMailingLists($recipient);
         if($recipient && $recipient->exists() && $mailinglists && $mailinglists->count()) {
@@ -112,10 +113,10 @@ class UnsubscribeController extends \PageController {
         }
     }
 
-    function done() {
+    public function done() {
         $unsubscribeRecordIDs = $this->urlParams['IDs'];
         $hash = $this->urlParams['ID'];
-        if($unsubscribeRecordIDs){
+        if($unsubscribeRecordIDs) {
             $fields = new FieldList(
                 new HiddenField("UnsubscribeRecordIDs", "", $unsubscribeRecordIDs),
                 new HiddenField("Hash", "", $hash),
@@ -130,7 +131,7 @@ class UnsubscribeController extends \PageController {
             $form->setFormAction(Controller::join_links(Director::absoluteBaseURL(), $this->relativeLink('resubscribe')));
             $mailinglists = $this->getMailingListsByUnsubscribeRecords($unsubscribeRecordIDs);
 
-            if($mailinglists && $mailinglists->count()){
+            if($mailinglists && $mailinglists->count()) {
                 $listTitles = "";
                 foreach($mailinglists as $list) {
                     $listTitles .= "<li>".$list->Title."</li>";
@@ -143,7 +144,7 @@ class UnsubscribeController extends \PageController {
                     $title,
                     "<ul>".$listTitles."</ul>"
                 );
-            }else{
+            } else {
                 $content =
                     _t('Newsletter.UNSUBSCRIBESUCCESS', 'Thank you.<br />You have been unsubscribed successfully');
             }
@@ -151,7 +152,7 @@ class UnsubscribeController extends \PageController {
 
         return $this->customise(array(
             'Title' => _t('UNSUBSCRIBEDTITLE', 'Unsubscribed'),
-            'Content' => $content,
+            'Content' => DBField::create_field('HTMLText', $content),
             'Form' => $form
         ))->renderWith('Page');
     }
@@ -159,7 +160,7 @@ class UnsubscribeController extends \PageController {
     /**
      * Unsubscribe the user from the given lists.
      */
-    function resubscribe() {
+    public function resubscribe() {
         if(isset($_POST['Hash']) && isset($_POST['UnsubscribeRecordIDs'])) {
             $recipient = DataObject::get_one(
                 Member::class,
@@ -183,11 +184,11 @@ class UnsubscribeController extends \PageController {
         }
     }
 
-    function undone(){
+    public function undone() {
         $recipient = $this->getRecipient($this->urlParams);
         $mailinglists = $this->getMailingLists($recipient);
 
-        if($mailinglists && $mailinglists->count()){
+        if($mailinglists && $mailinglists->count()) {
             $listTitles = "";
             foreach($mailinglists as $list) {
                 $listTitles .= "<li>".$list->Title."</li>";
@@ -207,7 +208,7 @@ class UnsubscribeController extends \PageController {
 
         return $this->customise(array(
             'Title' => _t('Newsletter.RESUBSCRIBED', 'Resubscribed'),
-            'Content' => $content,
+            'Content' => DBField::create_field('HTMLText', $content),
         ))->renderWith('Page');
     }
 
@@ -239,7 +240,7 @@ class UnsubscribeController extends \PageController {
             if($recipient->ValidateHash){
                 $recipient->ValidateHashExpired = date('Y-m-d H:i:s', time() + (86400 * $days));
                 $recipient->write();
-            }else{
+            } else {
                 $recipient->generateValidateHashAndStore($days);
             }
 

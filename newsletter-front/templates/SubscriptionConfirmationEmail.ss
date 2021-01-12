@@ -93,7 +93,18 @@
 				<tr>
 					<td align="center" valign="top" sytle="border-collapse:collapse;">
 						<table border="0" cellpadding="0" cellspacing="0" width="751" id="templateContainer" sytle="border: 1px solid #B29E80;background-color:#161616;">
-							<% include NewsletterHeader %>
+							<tr>
+                            	<td align="center" valign="top" sytle="border-collapse:collapse;">
+                            		<table border="0" cellpadding="0" cellspacing="0" width="751" id="templateHeader" style="border-bottom:1px solid #FFFFFF;">
+                            			<tr>
+                            				<td class="headerContent" sytle="border-collapse:collapse;line-height:2%;padding:0;">
+                            					<h2><a title="$SiteConfig.Title" href="$AbsoluteBaseURL">$SiteConfig.Title</a></h2>
+                            				</td>
+                            			</tr>
+                            		</table>
+                            	</td>
+                            </tr>
+
 							<tr>
 								<td align="center" valign="top" sytle="border-collapse:collapse;">
 									<table border="0" cellpadding="20" cellspacing="0" width="751" id="templateBody" style="background-color:#FFFFFF;">
@@ -101,7 +112,7 @@
 											<td valign="top" class="bodyContent" sytle="border-collapse:collapse;">
 												<div sytle="color:#000000;font-family:'Lucida Sans Unicode',sans-serif,Verdana,Arial;font-size:13pt;line-height:140%;text-align:left;">
 													<p>Dear $FirstName,</p>
-													
+
 													<% if MailingLists %>
 														<h5>We confirm that you have subscribed to:
 														</h5>
@@ -117,13 +128,30 @@
 									</table>
 								</td>
 							</tr>
-							<% include NewsletterFooter %>
+							<tr>
+                            	<td align="center" valign="top" sytle="border-collapse:collapse;">
+                            		<table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateFooterTag">
+                            			<tr>
+                            				<td class="footerTagLine" sytle="border-collapse:collapse;">
+                            					<% if SiteConfig.Tagline %>
+                            						<p>$SiteConfig.Tagline</p>
+                            					<% end_if %>
+                            				</td>
+                            			</tr>
+                            		</table>
+                            	</td>
+                            </tr>
 						</table>
 						<br />
 					</td>
 				</tr>
 			</table>
-			<% include UnsubscribeFooter %>
+			<br />
+            <div style="font-family:'Lucida Sans Unicode',sans-serif,Verdana,Arial;font-size:70%;color:#CC3300;">
+            	<p>To unsubscribe, click <a href="$UnsubscribeLink">here</a>
+            </div>
+            <br />
+            <br />
 		</center>
 	</body>
 </html>
