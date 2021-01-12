@@ -139,16 +139,16 @@ class MailingList extends DataObject {
         ]);
 
         $fields->addFieldsToTab('Root.Main', $FilterableFields);
-        
+
         $FiltersApplied = unserialize($this->FiltersApplied);
-        
+
         if ($FiltersApplied) foreach ( $FiltersApplied as $key => $filter ) {
-        
+
             $field = $FilterableFields->dataFieldByName($key);
             if ($field) $field->setValue($filter);
         }
 
-        
+
 
         // Filtered recipients
         $filteredRecipients = $this->FilteredRecipients();
@@ -174,7 +174,8 @@ class MailingList extends DataObject {
 //                     Make sure to save for these to refresh.
 //                 </em>
 //             '),
-            new CompositeField($grid)
+//            new CompositeField($grid)
+            $grid
         ]);
 
 
