@@ -587,7 +587,8 @@ class SubscriptionPage_Controller extends \PageController {
                     if($this->SendNotification){
                         $email = new Email();
                         $email->setTo($recipient->Email);
-                        $from = $this->NotificationEmailFrom?$this->NotificationEmailFrom:Email::getAdminEmail();
+                        $from = $this->NotificationEmailFrom ?
+                            $this->NotificationEmailFrom : $email->config()->get('admin_email');
                         $email->setFrom($from);
                         $email->setHTMLTemplate('SubscriptionConfirmationEmail');
                         $email->setSubject(_t(
