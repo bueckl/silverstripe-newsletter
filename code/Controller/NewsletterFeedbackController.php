@@ -10,6 +10,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\View\Requirements;
 
@@ -26,7 +27,7 @@ class NewsletterFeedbackController extends \PageController
         $fields = new FieldList(
             HiddenField::create('Newsletter', false, $this->getRequest()->param('OtherID')),
             TextField::create('Email', 'Your Email'),
-            TextField::create('Message', 'Your Message'),
+            TextareaField::create('Message', 'Your Message'),
             LiteralField::create('Submit', '<button class="action_doFeedback">Submit</button>')
         );
 
@@ -35,7 +36,7 @@ class NewsletterFeedbackController extends \PageController
         return $this->customise(array(
             'Title' => 'Feedback Form',
             'Form' => $form
-        ))->renderWith('FeedbackPage');
+        ))->renderWith('Page');
     }
 
     public function processFeedback(HTTPRequest $request = null)
