@@ -22,6 +22,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
     // can be two-D array eg. array("Email"=>arrray("Value","Reqired"));
     public $cellDisabled = array();
     public $tragable = true;
+    public $sortedArray = array();
 
     /**
      * Creates a new optionset field.
@@ -33,13 +34,15 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
      * @param extraValue The current extraValues
      * @param form The parent form
      */
-    function __construct($name, $title = "", $source = array(), $extra=array(), $value = "", $extraValue=array()) {
+    function __construct($name, $title = "", $source = array(), $extra=array(), $value = "", $extraValue=array(), $sortedArray=array()) {
         if(!empty($extra)) {
             $this->extra = $extra;
         }
         if(!empty($extraValue)) {
             $this->extraValue = $extraValue;
         }
+        $this->sortedArray = $sortedArray;
+
         parent::__construct($name, $title, $source, $value);
     }
 
@@ -130,8 +133,9 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
                 _t('Newsletter.NoOptions', 'No options available')
             );
         }else{
+            $reqItem = explode('/',$_SERVER['REQUEST_URI']);
 
-            $header = "<thead><tr><th></th>";
+            $header = "<thead data-page=\"$reqItem[5]\" ><tr><th></th>";
             $footer = "<tfoot><tr><td></td>";
             if(!empty($this->extra)){
                 foreach($this->extra as $label=>$type){
@@ -149,8 +153,9 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 
             $header .= "</tr></thead>";
             $footer .= "</tr></tfoot>";
+            $properOrderedArray = array_merge(array_flip($this->sortedArray), $source);
 
-            foreach($source as $index => $item) {
+            foreach($properOrderedArray as $index => $item) {
                 if(is_a($item, DataObject::class)) {
                     $key = $item->ID;
                     $value = $item->Title;
@@ -173,7 +178,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 
                 $disabled = isset($this->cellDisabled[$key]) &&
                 in_array('Value', $this->cellDisabled[$key]) ? ' disabled="disabled"' : '';
-                $options .= "<tr id=\"tr_$itemID\" class=\"$extraClass\">
+                $options .= "<tr id=\"tr_$itemID\" class=\"$extraClass\" data-item=\"$key\">
                 <td>
                 <input id=\"$itemID\" name=\"$this->name[$key][Value]\"
                 type=\"checkbox\" value=\"$key\"$checked $disabled class=\"checkbox\" /> $value

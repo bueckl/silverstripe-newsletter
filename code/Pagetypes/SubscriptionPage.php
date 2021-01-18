@@ -6,6 +6,7 @@ use Newsletter\Controller\UnsubscribeController;
 use Newsletter\Form\CheckboxSetWithExtraField;
 use Newsletter\Model\MailingList;
 use Newsletter\Model\UnsubscribeRecord;
+use PHPUnit\Util\Json;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
@@ -52,6 +53,7 @@ class SubscriptionPage extends \Page {
         'NotificationEmailSubject' => 'Varchar',
         'NotificationEmailFrom' => 'Varchar',
         "OnCompleteMessage" => "HTMLText",
+        "CheckboxSetWithExtraFieldSort" => 'Varchar(255)'
     ];
 
     private static $defaults = [
@@ -77,6 +79,10 @@ class SubscriptionPage extends \Page {
 
     public function Fields() {
         return $this->Fields;
+    }
+
+    public function checkboxSetWithExtraFieldSortedList() {
+        return explode(',', $this->CheckboxSetWithExtraFieldSort);
     }
 
     public function requireDefaultRecords() {
@@ -152,7 +158,8 @@ class SubscriptionPage extends \Page {
                 $fieldCandidates,
                 $extra,
                 $defaults,
-                $extraValue
+                $extraValue,
+                $this->checkboxSetWithExtraFieldSortedList()
             )
         );
 
@@ -247,7 +254,8 @@ class SubscriptionPage_Controller extends \PageController {
         'subscribeverify',
         'submitted',
         'completed',
-        'Form'
+        'Form',
+        'checkboxsetsort'
     );
 
     /**
@@ -587,8 +595,7 @@ class SubscriptionPage_Controller extends \PageController {
                     if($this->SendNotification){
                         $email = new Email();
                         $email->setTo($recipient->Email);
-                        $from = $this->NotificationEmailFrom ?
-                            $this->NotificationEmailFrom : $email->config()->get('admin_email');
+                        $from = $this->NotificationEmailFrom?$this->NotificationEmailFrom:Email::getAdminEmail();
                         $email->setFrom($from);
                         $email->setHTMLTemplate('SubscriptionConfirmationEmail');
                         $email->setSubject(_t(
@@ -630,5 +637,18 @@ class SubscriptionPage_Controller extends \PageController {
             'Title' => _t('Newsletter.SubscriptionCompleted', 'Subscription Completed!'),
             'Content' => $this->customise($recipientData)->renderWith('SubscriptionCompleted'),
         ))->renderWith('Page');
+    }
+
+    public function checkboxsetsort() {
+        $request = $this->getRequest();
+        $pageID = $request->postVar('page');
+        $items = $request->postVar('items');
+        $page = SubscriptionPage::get_by_id($pageID);
+        $page->CheckboxSetWithExtraFieldSort = implode(',',$items);
+        $page->write();
+//        if($page->isPublished()) {
+//            $this->owner->publishRecursive();
+//        }
+//        return 'done';
     }
 }
