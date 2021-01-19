@@ -53,7 +53,7 @@ class SubscriptionPage extends \Page {
         'NotificationEmailSubject' => 'Varchar',
         'NotificationEmailFrom' => 'Varchar',
         "OnCompleteMessage" => "HTMLText",
-        "CheckboxSetWithExtraFieldSort" => 'Varchar(255)'
+        "CheckboxSetWithExtraFieldSort" => 'Text'
     ];
 
     private static $defaults = [
@@ -288,11 +288,21 @@ class SubscriptionPage_Controller extends \PageController {
             $fields = explode(",",$this->Fields);
         }
 
+
+
         $recipientInfoSection = new CompositeField();
         $requiredFields = json_decode($this->Required, true);
 
         if(!empty($fields)){
-            foreach($fields as $field){
+
+            $fullSortedList = $this->checkboxSetWithExtraFieldSortedList();
+            foreach ($fullSortedList as $key => $item) {
+                if(!in_array($item, $fields)) {
+                    unset($fullSortedList[$key]);
+                }
+            }
+
+            foreach($fullSortedList as $field){
                 if(isset($dataFields[$field]) && $dataFields[$field]){
                     if(is_a($dataFields[$field], "ImageField")){
                         if(isset($requiredFields[$field])) {

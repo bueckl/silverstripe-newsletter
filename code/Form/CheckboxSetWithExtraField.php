@@ -153,6 +153,7 @@ class CheckboxSetWithExtraField extends CheckboxSetField {
 
             $header .= "</tr></thead>";
             $footer .= "</tr></tfoot>";
+
             $properOrderedArray = array_merge(array_flip($this->sortedArray), $source);
 
             foreach($properOrderedArray as $index => $item) {
