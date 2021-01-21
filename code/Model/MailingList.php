@@ -17,7 +17,7 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\UnsavedRelationList;
 use SilverStripe\Security\Member;
-use Brandday\Model\Slot;
+use Brandday\Model\Segment;
 /**
  * MailingList.
  * Represents a specific container of newsletter recipients
@@ -34,7 +34,7 @@ class MailingList extends DataObject {
     /* a mailing list could contains many newsletter recipients */
     private static $many_many = [
         'Members' => Member::class,
-        'Slots' => Slot::class
+        'Segments' => Segment::class
     ];
 
     private static $belongs_many_many = [
