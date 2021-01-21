@@ -17,7 +17,7 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\UnsavedRelationList;
 use SilverStripe\Security\Member;
-
+use Brandday\Model\Slot;
 /**
  * MailingList.
  * Represents a specific container of newsletter recipients
@@ -33,7 +33,8 @@ class MailingList extends DataObject {
 
     /* a mailing list could contains many newsletter recipients */
     private static $many_many = [
-        'Members' => Member::class
+        'Members' => Member::class,
+        'Slots' => Slot::class
     ];
 
     private static $belongs_many_many = [
@@ -253,6 +254,7 @@ class MailingList extends DataObject {
 
         foreach ($filterClasses as $fc) {
 
+            
             $filters = singleton($fc)->mailinglistFilters();
 
 
@@ -280,6 +282,8 @@ class MailingList extends DataObject {
                 }
             }
         }
+    
+
         if ($callBacks) {
             return $callBacksArr;
         } else {
@@ -294,6 +298,7 @@ class MailingList extends DataObject {
     public function FilteredRecipients() {
 
         $filtersApplied = unserialize($this->FiltersApplied);
+
         $members = Member::get();
 
         $members = $members->exclude('Blacklisted', 1);
@@ -341,11 +346,13 @@ class MailingList extends DataObject {
     }
 
     public function onBeforeWrite() {
+        
         parent::onBeforeWrite();
 
         // Saving selected filters
         $data = $this->record;
         $keys = array_keys($data);
+
 
         // Find all Fields having a "Filter_" prefix
         $filterArray = preg_grep('/Filter_/', $keys);
@@ -354,7 +361,7 @@ class MailingList extends DataObject {
         foreach($filterArray as $key => $val) {
             // ignore empty values
             if ( $this->$val && !empty($this->$val) ) {
-                $filterKeyValue[$val] = $this->$val;
+                $filterKeyValue[$val] = $this->$val;                
             }
         }
         $this->FiltersApplied = serialize($filterKeyValue);
