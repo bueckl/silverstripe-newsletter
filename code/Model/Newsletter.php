@@ -203,6 +203,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
         $fields->removeFieldFromTab('Root.SendRecipientQueue',"SendRecipientQueue");
         $fields->removeByName('SendRecipientQueue');
         $fields->removeByName('TrackedLinks');
+        $fields->removeByName('NewsletterFeedbacks');
 
         $Important = new LiteralField('Hint1',
             '<div class="message bad" style="font-size: 17px; margin: 0px 0; background: #cc0000; color:

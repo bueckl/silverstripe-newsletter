@@ -144,7 +144,7 @@ class NewsletterGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Item
             if($this->record->Status != 'Sent') {
                 $navField = new LiteralField('SilverStripeNavigator', $this->getSilverStripeNavigator());
                 $navField->setAllowHTML(true);
-                $form->Fields()->push($navField);
+                $form->Fields()->findTab('Root.Main')->push($navField);
             }
         }
         return $form;
