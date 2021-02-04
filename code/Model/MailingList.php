@@ -33,8 +33,8 @@ class MailingList extends DataObject {
 
     /* a mailing list could contains many newsletter recipients */
     private static $many_many = [
-        'Members' => Member::class,
-        'Segments' => Segment::class
+        'Members' => Member::class
+        // 'Segments' => Segment::class
     ];
 
     private static $belongs_many_many = [
@@ -263,13 +263,17 @@ class MailingList extends DataObject {
                 $FilterableFields->add(HeaderField::create('Filters' . $fc .'Header', $fc, 3));
 
                 foreach ( $filters as $key => $filterable ) {
+
                     $field = null;
                     if (isset($filterable['Field'])) {
                         $field = $filterable['Field'];
                     } else {
                         $field = singleton($fc)->getCMSFields()->dataFieldByName($key);
                     }
+                    
+
                     $fieldName = 'Filter_' . $fc . '_' . $field->getName();
+
 
                     if ($callBacks) {
                         if (isset($filterable['Callback'])) {
@@ -282,7 +286,6 @@ class MailingList extends DataObject {
                 }
             }
         }
-    
 
         if ($callBacks) {
             return $callBacksArr;
@@ -358,6 +361,7 @@ class MailingList extends DataObject {
         $filterArray = preg_grep('/Filter_/', $keys);
 
         $filterKeyValue = array();
+
         foreach($filterArray as $key => $val) {
             // ignore empty values
             if ( $this->$val && !empty($this->$val) ) {
