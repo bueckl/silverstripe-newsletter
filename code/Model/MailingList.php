@@ -1,7 +1,7 @@
 <?php
 
 namespace Newsletter\Model;
-
+use SilverStripe\Dev\Debug;
 use GridFieldAjaxRefresh\GridFieldAjaxRefresh;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CompositeField;
@@ -33,8 +33,8 @@ class MailingList extends DataObject {
 
     /* a mailing list could contains many newsletter recipients */
     private static $many_many = [
-        'Members' => Member::class
-        // 'Segments' => Segment::class
+        'Members' => Member::class,
+        'Segments' => Segment::class
     ];
 
     private static $belongs_many_many = [
@@ -75,6 +75,7 @@ class MailingList extends DataObject {
      * @return FieldList
      */
     function getCMSFields() {
+        
         $fields = new FieldList();
 
         $fields->push(new TabSet("Root", $mainTab = new Tab("Main")));
@@ -288,8 +289,10 @@ class MailingList extends DataObject {
         }
 
         if ($callBacks) {
+
             return $callBacksArr;
         } else {
+
             return $FilterableFields;
         }
     }
@@ -356,13 +359,16 @@ class MailingList extends DataObject {
         $data = $this->record;
         $keys = array_keys($data);
 
-
+        
+        
         // Find all Fields having a "Filter_" prefix
         $filterArray = preg_grep('/Filter_/', $keys);
 
         $filterKeyValue = array();
 
         foreach($filterArray as $key => $val) {
+
+            // echo $val.'<br>';            
             // ignore empty values
             if ( $this->$val && !empty($this->$val) ) {
                 $filterKeyValue[$val] = $this->$val;                
@@ -373,5 +379,7 @@ class MailingList extends DataObject {
         $this->updateRecipientsforMailingList();
 
     }
+
+
 
 }

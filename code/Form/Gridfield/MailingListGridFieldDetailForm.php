@@ -1,11 +1,13 @@
 <?php
 
 namespace Newsletter\Form\Gridfield;
+
+use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use Newsletter\Model\MailingList;
 use SilverStripe\Forms\FieldList;
-
+use SilverStripe\Dev\Debug;
 /**
  * @package  newsletter
  */
@@ -28,10 +30,15 @@ class MailingListGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Ite
     public function updateCMSActions(FieldList $actions)
     {
 
-        $actions->fieldByName("action_doSave")
-            ->setTitle(_t('MailingList.SAVEANDSYNC', "Save & Update Recipients for this Mailing List"))
-            ->removeExtraClass('ss-ui-action-constructive')
-            ->setAttribute('data-icon', 'addpage');
+        $button = FormAction::create('doSave',  _t('MailingList.SAVEANDSYNC', "Save & Update Recipients for this Mailing List"));
+        $actions->replaceField("action_doSave",
+            $button
+            ->addExtraClass('ss-ui-action-constructive')
+            ->setAttribute('data-icon', 'addpage')
+            ->setUseButtonTag(true), 'action_doSave');
+
+
+       
         return $actions;
     }
 
@@ -40,5 +47,12 @@ class MailingListGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Ite
         $form = parent::ItemEditForm();
         $form->setActions($this->updateCMSActions($form->Actions()));
         return $form;
+    }
+
+    public function doSave($data, $form) {
+                
+        parent::doSave($data, $form);        
+        return $this->redirectBack();
+        
     }
 }
