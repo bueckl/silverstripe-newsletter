@@ -17,7 +17,7 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\UnsavedRelationList;
 use SilverStripe\Security\Member;
-use Brandday\Model\Segment;
+use Gueststar\Model\Segment;
 /**
  * MailingList.
  * Represents a specific container of newsletter recipients
