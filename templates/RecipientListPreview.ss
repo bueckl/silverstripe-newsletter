@@ -26,12 +26,12 @@
     <tr>
         <td nowrap>$Pos</td>
         <td nowrap><strong>$Email</strong></td>
-        <td nowrap>$UDID</td>
+        <td nowrap>$Email</td>
         <td nowrap>$FirstName</td>
         <td nowrap>$Surname</td>
         <td nowrap>I/E: $InternalExternal</td>
         <td nowrap>E: $getSubeventName</td>
-        <td nowrap>E: $Hotel.NameMatch</td>
+        <%-- <td nowrap>E: $Hotel.NameMatch</td> --%>
     </tr>
 <% end_loop %>
     </table>
