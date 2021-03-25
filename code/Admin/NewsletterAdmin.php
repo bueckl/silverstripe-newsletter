@@ -38,13 +38,12 @@ class NewsletterAdmin extends ModelAdmin {
 
     private static $managed_models = [
         Newsletter::class => array('title' => 'Mailing')
-        // "MailingList"
-        // "Member"
     ];
 
     /**
      * @var array Array of template paths to check
      */
+
     static $template_paths = null; //could be customised in _config.php
 
     public function init() {
@@ -125,6 +124,7 @@ class NewsletterAdmin extends ModelAdmin {
         return self::$template_paths;
     }
 
+
     public function getList() {
         $list = parent::getList();
 
@@ -134,7 +134,9 @@ class NewsletterAdmin extends ModelAdmin {
         $fields = Config::inst()->get(Newsletter::class, 'searchable_fields');
 
         if ($this->modelClass == Newsletter::class){
+
             //this custom condition is for sent newsletter saveasnew and emailpreview fixes
+            
             if(!$request->postVar('action_doSaveAsNew') && ($request->getVar('preview') != 'true') &&
                 !$request->postVar('action_doDelete')) {
                 if ($request->getVar('mail') || $request->postVar('mail')) {
@@ -156,6 +158,8 @@ class NewsletterAdmin extends ModelAdmin {
 
         return $list;
     }
+
+
 
     /**
      * @return SearchContext

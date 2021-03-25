@@ -1,6 +1,6 @@
 <?php
-namespace Newsletter\Model;
 
+namespace Newsletter\Model;
 
 use Newsletter\Admin\NewsletterAdmin;
 use Newsletter\Controller\NewsletterSendController;
@@ -554,14 +554,17 @@ class Newsletter extends DataObject implements CMSPreviewable {
     }
 
     public function onBeforeDelete(){
+
         parent::onBeforeDelete();
         $queueditems = $this->SendRecipientQueue();
+        
         if($queueditems && $queueditems->exists()){
             foreach($queueditems as $item){
                 $item->delete();
             }
         }
         $trackedLinks = $this->TrackedLinks();
+        
         if($trackedLinks && $trackedLinks->exists()){
             foreach($trackedLinks as $link){
                 $link->delete();

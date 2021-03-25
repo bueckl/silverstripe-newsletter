@@ -90,40 +90,11 @@ class MailingList extends DataObject {
         $FilterableFields = self::get_filterable_fields_or_callbacks();
 
 
-        // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setTitle('Ich bin … / Art des Teilnehmers');
-        // $FilterableFields->dataFieldByName('Filter_Member_GuestType')->setDescription('Keine Auswahl für Alle');
-
-        // $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
-
-
         if($FilterableFields->dataFieldByName('Filter_Member_WillAssist')) {
             $FilterableFields->dataFieldByName('Filter_Member_WillAssist')
                 ->setTitle('Teilnahme bestätigt')
                 ->setDescription('Keine Auswahl für Alle');
         }
-
-
-        // $FilterableFields->dataFieldByName('Filter_Member_NDAAccepted')->setTitle('Geheimhaltungserklärung akzeptiert');
-        // // $FilterableFields->dataFieldByName('Filter_Member_CountryImport')->setTitle('CountryImport');
-        // $FilterableFields->dataFieldByName('Filter_Member_PhotoTermsAccepted')->setTitle('Foto Einverständniserklärung akzeptiert');
-
-        // $FilterableFields->dataFieldByName('Filter_Member_Locale')->setEmptyString('Bitte wählen')->setDescription('Keine Auswahl für Alle');
-
-        // $FilterableFields->dataFieldByName('Filter_Member_AttendeeCheck')->setDescription('Ist Teilnehmer');
-        // $FilterableFields->dataFieldByName('Filter_Member_CrewCheck')->setDescription('Crew Only');
-
-        // $FilterableFields->dataFieldByName('Filter_Member_PhotoCheck')->setDescription('Hat KEIN Profilbild');
-
-        // $FilterableFields->dataFieldByName('Filter_Member_BadgeType')->setTitle('Ausweisart');
-
-
-        // $FilterableFields->dataFieldByName('Filter_Member_isPkwWave1')->setTitle('Anreisen PKW, W1');
-        // $FilterableFields->dataFieldByName('Filter_Member_isPkwWave2und3')->setTitle('Anreisen PKW, W2 + W3');
-
-        //$FilterableFields->dataFieldByName('Filter_Member_isSchoenefeld')->setTitle('Anreisen Schönefeld');
-        //$FilterableFields->dataFieldByName('Filter_Member_isTegel')->setTitle('Anreisen Tegel');
-        //$FilterableFields->dataFieldByName('Filter_Member_isTrain')->setTitle('Anreisen Bahnhof');
-
 
 
         $fields->addFieldsToTab('Root.Main', [
@@ -145,7 +116,6 @@ class MailingList extends DataObject {
         $FiltersApplied = unserialize($this->FiltersApplied);
 
         if ($FiltersApplied) foreach ( $FiltersApplied as $key => $filter ) {
-
             $field = $FilterableFields->dataFieldByName($key);
             if ($field) $field->setValue($filter);
         }
@@ -162,6 +132,7 @@ class MailingList extends DataObject {
         );
 
         // Important to set ModelClass otherwise Grid moans
+
         $grid->setModelClass(Member::class);
         $grid->getConfig()->removeComponentsByType(GridFieldAjaxRefresh::class);
 
@@ -170,20 +141,9 @@ class MailingList extends DataObject {
 
         $fields->addFieldsToTab(
             'Root.Recipients matching the seletected criteria (' . $filteredRecipients->count() . ')', [
-            // LiteralField::create('FilteredRecipientsDesc','
-//                 <em>
-//                     These recipients are filtered based on the filtering options. <br>
-//                     Make sure to save for these to refresh.
-//                 </em>
-//             '),
-//            new CompositeField($grid)
             $grid
         ]);
 
-
-        // Additional manual added recipients -> removed to keep things lean. In order to add "special" users to a list
-        // we should create a filter … Like e.g a texfield "FreeMailingListFilter". We could than put a "secret" word into
-        // that field and add a "FreeMailingListFilter" to MailingList
 
         $fields->dataFieldByName('Title')->setTitle('Mailing list name');
         $this->extend("updateCMSFields", $fields);
@@ -243,11 +203,11 @@ class MailingList extends DataObject {
      * @param bool $callBacks whether to return
      * @return array|FieldList
      */
+
     public static function get_filterable_fields_or_callbacks($callBacks = false) {
 
         $FilterableFields = new FieldList();
         $callBacksArr = [];
-
         $filterClasses = Config::inst()->get(MailingList::class, 'filter_classes');
 
 
@@ -270,8 +230,7 @@ class MailingList extends DataObject {
                         $field = $filterable['Field'];
                     } else {
                         $field = singleton($fc)->getCMSFields()->dataFieldByName($key);
-                    }
-                    
+                    }                    
 
                     $fieldName = 'Filter_' . $fc . '_' . $field->getName();
 
@@ -309,8 +268,6 @@ class MailingList extends DataObject {
 
         $members = $members->exclude('Blacklisted', 1);
 
-
-
         foreach (self::get_filterable_fields_or_callbacks(true) as $fieldName => $callBack) {
             $restraint = isset($filtersApplied[$fieldName]) ? $filtersApplied[$fieldName] : false;
             if ($restraint) {
@@ -323,15 +280,14 @@ class MailingList extends DataObject {
     }
 
     /**
-     * Returns all recipients who aren't blacklisted, and are verified.
+     * Returns all recipients who aren't blacklisted
      */
     public function ActiveRecipients() {
         if($this->Members()  instanceof UnsavedRelationList ) {
             return new ArrayList();
         }
         $Members = $this->Members();
-        $Members = $Members->exclude('Blacklisted', 1);
-        //return $this->Members()->exclude('Blacklisted', 1)->exclude('Verified', 0);
+        $Members = $Members->exclude('Blacklisted', 1);        
         return $Members;
     }
 
@@ -339,7 +295,7 @@ class MailingList extends DataObject {
 
         $Recipients = $this->FilteredRecipients();
 
-        // First delete all Member for this Mailing List
+        // First remove all Member form the current Mailing List
         $this->Members()->removeAll();
 
         // Now add the Members which fit the filter settings
@@ -360,7 +316,6 @@ class MailingList extends DataObject {
         $keys = array_keys($data);
 
         
-        
         // Find all Fields having a "Filter_" prefix
         $filterArray = preg_grep('/Filter_/', $keys);
 
@@ -374,6 +329,7 @@ class MailingList extends DataObject {
                 $filterKeyValue[$val] = $this->$val;                
             }
         }
+
         $this->FiltersApplied = serialize($filterKeyValue);
 
         $this->updateRecipientsforMailingList();

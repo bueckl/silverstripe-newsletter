@@ -49,10 +49,13 @@ class MailingListGridFieldDetailForm_ItemRequest extends GridFieldDetailForm_Ite
         return $form;
     }
 
-    public function doSave($data, $form) {
+    // public function doSave($data, $form) {
                 
-        parent::doSave($data, $form);        
-        return $this->redirectBack();
+    //     parent::doSave($data, $form);        
+    //     // The redirect makes the gridfield behave weired
+    //     // When creating a new mailing list the name field keeps empty althoug it has been correctly created …
+    //     // Not sure why we have this redirect here
+    //     // return $this->redirectBack();
         
-    }
+    // }
 }
