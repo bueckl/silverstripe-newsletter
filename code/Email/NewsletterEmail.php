@@ -73,7 +73,7 @@ class NewsletterEmail extends Email {
         if($this->recipient instanceof DataObject) {
             $recipientEmail = $this->recipient->Email;
         } else {
-            $recipientEmail = $this->recipient['Email'];
+            $recipientEmail = $this->recipient->Email;
         }
 
         parent::__construct($this->newsletter->SendFrom, $recipientEmail);
