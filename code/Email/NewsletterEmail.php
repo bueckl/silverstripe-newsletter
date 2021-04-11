@@ -87,6 +87,7 @@ class NewsletterEmail extends Email {
             $this->setHTMLTemplate($newsletter->RenderTemplate);
             $this->setData($this->templateData());
         } else {
+
             $this->setData(new ArrayData(array(
                 'UnsubscribeLink' => $this->UnsubscribeLink(),
                 'FeedbackLink' => $this->FeedbackLink(),
@@ -146,6 +147,8 @@ class NewsletterEmail extends Email {
                         $text = str_ireplace(array_keys($replacements), array_values($replacements), $text);
                     }
                 }
+
+                $text = singleton('PageController')->getParsedString($text, $this->recipient );
                 // replace the body
                 $output = new DBHTMLText();
                 $output->setValue($text);
@@ -216,7 +219,7 @@ class NewsletterEmail extends Email {
             "Bcc" => $this->bcc,
             "From" => $this->from,
             "Subject" => $this->subject,
-            "Body" => $this->body,
+            "Body" => singleton('PageController')->getParsedString($this->Newsletter()->getContentBody(), $this->recipient ),
             "BaseURL" => $this->BaseURL(),
             "IsEmail" => true,
             "Recipient" => $this->recipient,

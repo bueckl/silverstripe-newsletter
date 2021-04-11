@@ -249,19 +249,21 @@ class Newsletter extends DataObject implements CMSPreviewable {
                 'Any undeliverable emails will be collected in this mailbox'
             ));
 
-
+        /*
         if($this->Status != 'Sent') {
-            $contentHelp = '<strong>'
-                . _t('Newsletter.FormattingHelp', 'Formatting Help')
-                . '</strong><br />';
-            $contentHelp .= '<ul>';
-            foreach($this->getAvailablePlaceholders() as $title => $description) {
-                $contentHelp .= sprintf('<li><em>$%s</em>: %s</li>', $title, $description);
-            }
-            $contentHelp .= '</ul>';
-            $contentField = $fields->dataFieldByName('Content');
-            if($contentField) $contentField->setDescription($contentHelp);
+            // $contentHelp = '<strong>'
+            //     . _t('Newsletter.FormattingHelp', 'Formatting Help')
+            //     . '</strong><br />';
+            // $contentHelp .= '<ul>';
+            // foreach($this->getAvailablePlaceholders() as $title => $description) {
+            //     $contentHelp .= sprintf('<li><em>$%s</em>: %s</li>', $title, $description);
+            // }
+            // $contentHelp .= '</ul>';
+            // $contentField = $fields->dataFieldByName('Content');
+            // if($contentField) $contentField->setDescription($contentHelp);
         }
+        */
+
 
         // Only show template selection if there's more than one template set
         $templateSource = $this->templateSource();
@@ -533,7 +535,6 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
     function getContentBody(){
         $content = $this->obj('Content');
-
         $this->extend("updateContentBody", $content);
         return $content;
     }
