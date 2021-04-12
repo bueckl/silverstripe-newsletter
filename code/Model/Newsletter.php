@@ -272,7 +272,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
                 "RenderTemplate",
                 $Drop =new DropdownField("RenderTemplate", _t('NewsletterAdmin.RENDERTEMPLATE',
                     'Template the newsletter render to'),
-                    $templateSource)
+                    asort($templateSource))
             );
 
             $Drop->setDisabledItems(array('VW_Simple_Template'));
