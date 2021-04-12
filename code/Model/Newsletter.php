@@ -267,12 +267,14 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
         // Only show template selection if there's more than one template set
         $templateSource = $this->templateSource();
+        asort($templateSource);
+
         if(count($templateSource) > 1) {
             $fields->replaceField(
                 "RenderTemplate",
                 $Drop =new DropdownField("RenderTemplate", _t('NewsletterAdmin.RENDERTEMPLATE',
                     'Template the newsletter render to'),
-                    asort($templateSource))
+                    $templateSource)
             );
 
             $Drop->setDisabledItems(array('VW_Simple_Template'));
