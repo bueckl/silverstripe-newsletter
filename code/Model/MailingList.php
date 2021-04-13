@@ -219,6 +219,7 @@ class MailingList extends DataObject {
             $filters = singleton($fc)->mailinglistFilters();
 
 
+
             if ( $filters && count($filters)  > 0 ) {
 
                 $FilterableFields->add(HeaderField::create('Filters' . $fc .'Header', $fc, 3));
@@ -329,6 +330,12 @@ class MailingList extends DataObject {
                 $filterKeyValue[$val] = $this->$val;                
             }
         }
+
+        if ( $_POST['Filter_SilverStripe\Security\Member_Segments']) {
+            $filterKeyValue['Filter_SilverStripe\Security\Member_Segments'] = $_POST['Filter_SilverStripe\Security\Member_Segments'];    
+        }
+
+        
 
         $this->FiltersApplied = serialize($filterKeyValue);
 
