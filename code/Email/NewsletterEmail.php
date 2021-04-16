@@ -79,9 +79,8 @@ class NewsletterEmail extends Email {
         parent::__construct($this->newsletter->SendFrom, $recipientEmail);
 
         $this->body = $newsletter->getContentBody();
-        $this->subject = $newsletter->Subject;
-        
-        $this->subject = singleton('PageController')->getParsedString($text, $this->recipient );
+        // $this->subject = $newsletter->Subject;
+        $this->subject = singleton('PageController')->getParsedString($newsletter->Subject, $this->recipient );
 
         $this->ss_template = $newsletter->RenderTemplate;
 
