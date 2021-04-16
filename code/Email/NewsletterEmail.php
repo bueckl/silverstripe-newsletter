@@ -80,6 +80,9 @@ class NewsletterEmail extends Email {
 
         $this->body = $newsletter->getContentBody();
         $this->subject = $newsletter->Subject;
+        
+        $this->subject = singleton('PageController')->getParsedString($text, $this->recipient );
+
         $this->ss_template = $newsletter->RenderTemplate;
 
         if($newsletter->RenderTemplate) {
@@ -149,6 +152,7 @@ class NewsletterEmail extends Email {
                 }
 
                 $text = singleton('PageController')->getParsedString($text, $this->recipient );
+
                 // replace the body
                 $output = new DBHTMLText();
                 $output->setValue($text);
