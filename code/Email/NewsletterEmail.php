@@ -12,6 +12,8 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer_FromString;
+use TractorCow\Fluent\State\FluentState;
+use Gueststar\Model\Event;
 
 /**
  * Email object for sending newsletters.
@@ -65,13 +67,19 @@ class NewsletterEmail extends Email {
      */
     public function __construct($newsletter, $recipient, $fakeRecipient=false, $templateData = false) {
         $this->newsletter = $newsletter;
+
+
         $this->mailinglists = $newsletter->MailingLists();
         $this->recipient = $recipient;
         $this->fakeRecipient = $fakeRecipient;
         $this->template_data = $templateData;
 
         if($this->recipient instanceof DataObject) {
-            $recipientEmail = $this->recipient->Email;
+            $recipientEmail = $this->recipient->Email;            
+            if($recipient->Locale) {
+                FluentState::singleton()->setLocale($recipient->Locale);    
+            }
+
         } else {
             $recipientEmail = $this->recipient->Email;
         }

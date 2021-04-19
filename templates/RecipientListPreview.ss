@@ -31,7 +31,7 @@
         <td nowrap>$Surname</td>
         <td nowrap>I/E: $InternalExternal</td>
         <td nowrap>E: $getSubeventName</td>
-        <td nowrap>E: $Hotel.NameMatch</td>
+        <td nowrap>L: $Locale</td>
     </tr>
 <% end_loop %>
     </table>
