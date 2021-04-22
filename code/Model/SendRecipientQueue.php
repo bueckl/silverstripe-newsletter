@@ -96,11 +96,9 @@ class SendRecipientQueue extends DataObject {
         );
 
 
-//            if (!empty($newsletter->ReplyTo)) {
-//                $email->addCustomHeader('Reply-To', $newsletter->ReplyTo);
-//            }
 
         $attachment = $newsletter->Attachment1();
+
         if ( $attachment->exists() ) {
             $file = ASSETS_PATH . '/' . $attachment->FileFilename;
             // We check the filesize in bytes in order to see if the file realy exists
@@ -111,6 +109,7 @@ class SendRecipientQueue extends DataObject {
         }
 
         $attachment = $newsletter->Attachment2();
+
         if ( $attachment->exists() ) {
             $file = ASSETS_PATH . '/' . $attachment->FileFilename;
             // We check the filesize in bytes in order to see if the file realy exists
@@ -122,6 +121,7 @@ class SendRecipientQueue extends DataObject {
 
 
         $attachment = $newsletter->Attachment3();
+
         if ( $attachment->exists() ) {
             $file = ASSETS_PATH . '/' . $attachment->FileFilename;
             // We check the filesize in bytes in order to see if the file realy exists
@@ -131,19 +131,30 @@ class SendRecipientQueue extends DataObject {
 
         }
 
+        if ( $newsletter->AgendaPDF == true ) {            
 
-        if ( $recipient->owner->NdaPDF() && $newsletter->NdaPDF == true ) {
-            $attachment = $recipient->owner->NdaPDF();
-            if ( $attachment->exists() ) {
-                $file = ASSETS_PATH . '/' . $attachment->FileFilename;
-                // We check the filesize in bytes in order to see if the file realy exists
-                if ($attachment->getAbsoluteSize() > 5000) {
-                    $email->addAttachment($file);
-                }
+            if ( $recipient->getSubEvent() ) {
+
+                $attachment = $recipient->getSubEvent()->AgendaPDF();
+            
+                if ( $attachment->exists() ) {
+                    $file = ASSETS_PATH . '/' . $attachment->FileFilename;
+                    // We check the filesize in bytes in order to see if the file realy exists
+                    if ($attachment->getAbsoluteSize() > 5000) {
+                        $email->addAttachment($file);
+                    }
+                }    
             }
+            
+        }
 
-            if ( $recipient->HotelID > 0 ) {
-                $attachment = $recipient->owner->LuggageTagPDF();
+
+        if ( $newsletter->AgendaPDF_en == true ) {            
+
+            if ( $recipient->getSubEvent() ) {
+
+                $attachment = $recipient->getSubEvent()->AgendaPDF_en();
+            
                 if ( $attachment->exists() ) {
                     $file = ASSETS_PATH . '/' . $attachment->FileFilename;
                     // We check the filesize in bytes in order to see if the file realy exists
@@ -153,24 +164,12 @@ class SendRecipientQueue extends DataObject {
                 }
 
             }
-
-
-            if ( $recipient->TravelData()->Pendlerparkplatz == "YES" ) {
-                // $attachment = File::get()->filter('ID', 155866)->first();
-                $attachment = File::get()->byID(155866);
-                if ( $attachment->exists() ) {
-                    $file = ASSETS_PATH . '/' . $attachment->FileFilename;
-                    // We check the filesize in bytes in order to see if the file realy exists
-                    if ($attachment->getAbsoluteSize() > 5000) {
-                        $email->addAttachment($file);
-                    }
-                }
-
-            }
-
+            
 
         }
 
+
+        
 
         //END ATTACHMENTS
 

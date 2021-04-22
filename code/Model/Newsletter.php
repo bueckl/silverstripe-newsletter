@@ -56,7 +56,11 @@ class Newsletter extends DataObject implements CMSPreviewable {
         "ReplyTo" => "Varchar(255)",
         "RenderTemplate" => "Varchar",
         "ParentID" => "Int",
-        "NewAddedOnly" => "Boolean"
+        "NewAddedOnly" => "Boolean",
+        "Agenda" => "Boolean",
+        "AgendaPDF" => "Boolean",
+        "AgendaPDF_en" => "Boolean",
+        "NdaPDF" => "Boolean"
     ];
 
     private static $has_many = [
@@ -174,6 +178,11 @@ class Newsletter extends DataObject implements CMSPreviewable {
         $fields->addFieldsToTab(
 
             'Root.Attachments', array(
+
+                CheckboxField::create('AgendaPDF', 'Attach Agenda PDF (Uploaded in Event)'),
+                CheckboxField::create('AgendaPDF_en', 'Attach Agenda PDF (EN) (Uploaded in Event)'),
+        
+
                 $uploadField1 = new UploadField(
                     $name = 'Attachment1',
                     $title = 'Dateianhang 1'
