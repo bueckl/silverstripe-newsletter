@@ -69,6 +69,12 @@ class Newsletter extends DataObject implements CMSPreviewable {
         "NewsletterFeedbacks" => NewsletterFeedback::class
     ];
 
+    private static $owns = [
+        "Attachment1",
+        "Attachment2",
+        "Attachment3"
+    ];
+    
     private static $has_one = [
         "Attachment1" => File::class,
         "Attachment2" => File::class,
