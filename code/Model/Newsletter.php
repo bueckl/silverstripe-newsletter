@@ -51,6 +51,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
         "Status" => "Enum('Draft, Sending, Sent', 'Draft')",
         "Subject" => "Varchar(255)",
         "Content" => "HTMLText",
+        "Description" => "Text",
         "SentDate" => "Datetime",
         "SendFrom" => "Varchar(255)",
         "ReplyTo" => "Varchar(255)",
@@ -102,6 +103,7 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
     private static $summary_fields = [
         "Subject",
+        "Description",
         "SentDate",
         "Status"
     ];
