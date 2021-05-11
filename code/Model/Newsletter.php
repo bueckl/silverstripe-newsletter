@@ -61,7 +61,8 @@ class Newsletter extends DataObject implements CMSPreviewable {
         "Agenda" => "Boolean",
         "AgendaPDF" => "Boolean",
         "AgendaPDF_en" => "Boolean",
-        "NdaPDF" => "Boolean"
+        "NdaPDF" => "Boolean",
+        "TravelDocPDF" => "Boolean"
     ];
 
     private static $has_many = [

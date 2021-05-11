@@ -169,6 +169,21 @@ class SendRecipientQueue extends DataObject {
         }
 
 
+         if ( $newsletter->TravelDocPDF == true ) {            
+
+                $attachment = $recipient->TravelDocPDF();
+            
+                if ( $attachment->exists() ) {
+                    $file = ASSETS_PATH . '/' . $attachment->FileFilename;
+                    // We check the filesize in bytes in order to see if the file realy exists
+                    if ($attachment->getAbsoluteSize() > 5000) {
+                        $email->addAttachment($file);
+                    }
+                }    
+            
+        }
+
+
         
 
         //END ATTACHMENTS
