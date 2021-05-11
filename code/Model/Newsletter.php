@@ -190,6 +190,8 @@ class Newsletter extends DataObject implements CMSPreviewable {
 
                 CheckboxField::create('AgendaPDF', 'Attach Agenda PDF (Uploaded in Event)'),
                 CheckboxField::create('AgendaPDF_en', 'Attach Agenda PDF (EN) (Uploaded in Event)'),
+
+                CheckboxField::create('TravelDocPDF', 'Attach TravelDocPDF'),
         
 
                 $uploadField1 = new UploadField(
