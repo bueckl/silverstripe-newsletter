@@ -331,8 +331,13 @@ class MailingList extends DataObject {
             }
         }
 
+        // Whenever we use CheckboxSetField. Investigate why?
         if ( $_POST['Filter_SilverStripe\Security\Member_Segments']) {
             $filterKeyValue['Filter_SilverStripe\Security\Member_Segments'] = $_POST['Filter_SilverStripe\Security\Member_Segments'];    
+        }
+
+        if ( $_POST['Filter_SilverStripe\Security\Member_TravelData']) {
+            $filterKeyValue['Filter_SilverStripe\Security\Member_TravelData'] = $_POST['Filter_SilverStripe\Security\Member_TravelData'];    
         }
 
         
