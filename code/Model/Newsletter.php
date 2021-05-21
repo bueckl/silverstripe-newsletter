@@ -62,7 +62,8 @@ class Newsletter extends DataObject implements CMSPreviewable {
         "AgendaPDF" => "Boolean",
         "AgendaPDF_en" => "Boolean",
         "NdaPDF" => "Boolean",
-        "TravelDocPDF" => "Boolean"
+        "TravelDocPDF" => "Boolean",
+        "IndividualPDF" => "Boolean"
     ];
 
     private static $has_many = [
@@ -192,6 +193,8 @@ class Newsletter extends DataObject implements CMSPreviewable {
                 CheckboxField::create('AgendaPDF_en', 'Attach Agenda PDF (EN) (Uploaded in Event)'),
 
                 CheckboxField::create('TravelDocPDF', 'Attach TravelDocPDF'),
+
+                CheckboxField::create('IndividualPDF', 'Attach Individual PDF'),
         
 
                 $uploadField1 = new UploadField(
